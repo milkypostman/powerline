@@ -77,8 +77,8 @@ install the memoized function over the original function."
 (defmacro pl/arrow-xpm (dir)
   "Generate an arrow xpm function for DIR."
   (let ((rowfunc (intern (format "pl/arrow-row-%s" (symbol-name dir)))))
-    `(defun ,(intern (format "pl/arrow-xpm-%s" (symbol-name dir))) (height color1 color2 &optional char-width)
-       (unless char-width (setq char-width (frame-char-width)))
+    `(defun ,(intern (format "pl/arrow-xpm-%s" (symbol-name dir))) (height unitwidth color1 color2)
+       (unless unitwidth (setq unitwidth (frame-char-width)))
        (let* ((dots (/ height 2))
               (width (ceiling height 2))
               (total-width (pl/size-up unitwidth width))
@@ -313,7 +313,7 @@ static char * %s[] = {
      ,docstring
      (let* ((color1 (if face1 (face-attribute face1 :background) "None"))
             (color2 (if face2 (face-attribute face2 :background) "None"))
-            (image (,func (frame-char-height) color1 color2 (frame-char-width))))
+            (image (,func (frame-char-height)  (frame-char-width) color1 color2)))
        (propertize (make-string (ceiling (plist-get (cdr image) :width) (frame-char-width)) ? )
                    'display image))))
 
