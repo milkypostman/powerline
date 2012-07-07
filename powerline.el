@@ -4,7 +4,7 @@
 
 ;; Author: Donald Ephraim Curtis <dcurtis@milkbox.net>
 ;; URL: http://github.com/milkypostman/powerline
-;; Version: 2
+;; Version: 2.0
 ;; Keywords: mode-line
 
 ;;; Code:
