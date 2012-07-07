@@ -102,7 +102,7 @@ static char * arrow_%s[] = {
            "\n"
            (mapconcat (lambda (d) (,rowfunc d width left-pad right-pad)) (number-sequence dots 1 -1) "\n")
            "};")
-          'xpm t :ascent 'center :width total-width)))))
+          'xpm t :ascent 'center)))))
 
 (memoize (pl/arrow-xpm left))
 (memoize (pl/arrow-xpm right))
@@ -314,7 +314,7 @@ static char * %s[] = {
      (let* ((color1 (if face1 (face-attribute face1 :background) "None"))
             (color2 (if face2 (face-attribute face2 :background) "None"))
             (image (,func (frame-char-height)  (frame-char-width) color1 color2)))
-       (propertize (make-string (ceiling (plist-get (cdr image) :width) (frame-char-width)) ? )
+       (propertize (make-string (ceiling (car (image-size image))) ? )
                    'display image))))
 
 
