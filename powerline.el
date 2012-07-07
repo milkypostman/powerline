@@ -69,6 +69,11 @@ install the memoized function over the original function."
           (make-string right-pad ? )
           "\","))
 
+
+(defun pl/size-up (unitsize width)
+  "Extend WIDTH to the nearest multiple of the UNITSIZE."
+  (* unitsize (ceiling width unitsize)))
+
 (defmacro pl/arrow-xpm (dir)
   "Generate an arrow xpm function for DIR."
   (let ((rowfunc (intern (format "pl/arrow-row-%s" (symbol-name dir)))))
@@ -76,7 +81,7 @@ install the memoized function over the original function."
        (unless char-width (setq char-width (frame-char-width)))
        (let* ((dots (/ height 2))
               (width (ceiling height 2))
-              (total-width (* char-width (ceiling width char-width)))
+              (total-width (pl/size-up unitwidth width))
               (pad (- total-width width))
               (left-pad (/ pad 2))
               (right-pad (/ pad 2))
