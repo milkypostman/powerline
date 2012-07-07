@@ -60,3 +60,24 @@ In essence, this extensions just provides functions that can be used in the `mod
                        
 The last line of this is what actually puts it all together.  But notice we pre-compile the `rhs` of the statusline and this allows us to more accurately right justify the text.  There are currently no other "separators", just the arrows.  I will be introducing more gradually.  This version should be easier to modify.
 
+
+## Implementing New Separators
+
+**It's possible this API may change a bit in the future.**
+
+The function should return an XPM image created using the `create-image` function.
+
+There is a function called `memoize` that will help make calling the function multiple times with the same parameters be much quicker by caching the return value.
+
+Each divider should have the signature: `(pl/<divider> (height unitwidth color1 color2))`
+
+`height` specifies the height of the XPM
+
+`unitwidth` specifies the unit that the width should scale to.  In most cases this is the width of a character as returned by `(frame-char-width)`.  It is important that the width be in the unit size of a character for the purposes of aligning text right.  While the `display` property of text can specify `space` and use `:align-to` to align to a particular pixel, there is no easy way to calculate the width that must be reserved for the right side.  The original implementation simple let the separators be whatever width they chose, but it meant that sometimes there was extra spacing on the right hand side because the fill width could not be accurately calculated.  The original implmentation also didn't calculate the reserve size.  While the fill width can be specified as a fraction of the character width, there is no simple way to calculate the pixel width of the right side.  That is, one would have to iterate through every item and calculate the total pixel width and so for now it's just easier to make dividers respect the width of characters.
+
+`color1` the left-hand color
+
+`color2` the right-hand color
+
+
+
