@@ -377,9 +377,9 @@ static char * %s[] = {
                                 (powerline-major-mode face1 'l)
                                 (powerline-minor-modes face1 'l)
                                 (powerline-raw mode-line-process face1 'l)
-
                                 (powerline-narrow face1 'l)
 
+                                (powerline-raw " " face1)
                                 (powerline-arrow-right face1 face2)
 
                                 (powerline-vc face2)
