@@ -47,26 +47,18 @@ install the memoized function over the original function."
            (puthash ,args-sym (apply ,func ,args-sym) ,table-sym))))))
 
 
-(defun pl/arrow-row-right (dots width &optional left-pad right-pad)
+(defun pl/arrow-row-right (dots width)
   "Generate a string with DOTS dots and spaces to fill out WIDTH."
-  (unless left-pad (setq left-pad 0))
-  (unless right-pad (setq right-pad 0))
   (concat "\""
-          (make-string left-pad ?.)
           (make-string dots ?.)
           (make-string (- width dots) ? )
-          (make-string right-pad ? )
           "\","))
 
-(defun pl/arrow-row-left (dots width &optional left-pad right-pad)
+(defun pl/arrow-row-left (dots width)
   "Generate a string with DOTS dots and spaces to fill out WIDTH."
-  (unless left-pad (setq left-pad 0))
-  (unless right-pad (setq right-pad 0))
   (concat "\""
-          (make-string left-pad ?.)
           (make-string (- width dots) ?.)
           (make-string dots ? )
-          (make-string right-pad ? )
           "\","))
 
 
@@ -74,20 +66,17 @@ install the memoized function over the original function."
   "Extend WIDTH to the nearest multiple of the UNITSIZE."
   (* unitsize (ceiling width unitsize)))
 
+
 (defmacro pl/arrow-xpm (dir)
   "Generate an arrow xpm function for DIR."
   (let ((rowfunc (intern (format "pl/arrow-row-%s" (symbol-name dir)))))
-    `(defun ,(intern (format "pl/arrow-xpm-%s" (symbol-name dir))) (height unitwidth color1 color2)
-       (unless unitwidth (setq unitwidth (frame-char-width)))
-       (let* ((dots (/ height 2))
+    `(defun ,(intern (format "powerline-arrow-%s" (symbol-name dir))) (face1 face2 &optional height)
+       (unless height (setq height (frame-char-height)))
+       (let* ((color1 (if face1 (face-attribute face1 :background) "None"))
+              (color2 (if face2 (face-attribute face2 :background) "None"))
+              (dots (/ height 2))
               (width (ceiling height 2))
-              (total-width (pl/size-up unitwidth width))
-              (pad (- total-width width))
-              (left-pad (/ pad 2))
-              (right-pad (/ pad 2))
               (odd (not (= dots width))))
-         (if (eq ',dir 'left) (setq left-pad (1+ left-pad))
-           (setq right-pad (1+ right-pad)))
          (create-image
           (concat
            (format "/* XPM */
@@ -95,12 +84,12 @@ static char * arrow_%s[] = {
 \"%s %s 2 1\",
 \". c %s\",
 \"  c %s\",
-" (symbol-name ',dir) total-width height (or color1 "None") (or color2 "None"))
-           (mapconcat (lambda (d) (,rowfunc d width left-pad right-pad)) (number-sequence 1 dots) "\n")
+" (symbol-name ',dir) width height (or color1 "None") (or color2 "None"))
+           (mapconcat (lambda (d) (,rowfunc d width)) (number-sequence 1 dots) "\n")
            (and odd "\n")
-           (and odd (,rowfunc (+ dots 1) width left-pad right-pad))
+           (and odd (,rowfunc (+ dots 1) width))
            "\n"
-           (mapconcat (lambda (d) (,rowfunc d width left-pad right-pad)) (number-sequence dots 1 -1) "\n")
+           (mapconcat (lambda (d) (,rowfunc d width)) (number-sequence dots 1 -1) "\n")
            "};")
           'xpm t :ascent 'center)))))
 
@@ -309,27 +298,6 @@ static char * %s[] = {
 (defpltext powerline-buffer-id
   (format-mode-line mode-line-buffer-identification))
 
-;;;###autoload
-(defmacro defplsep (name docstring &optional func)
-  "Create a function NAME with optional DOCSTRING that takes arguments FACE1, FACE2 and call FUNC with the background colors for those faces or \"None\"."
-  (unless func
-    (setq func docstring)
-    (setq docstring nil))
-  `(defun ,name
-     (&optional face1 face2)
-     ,docstring
-     (let* ((color1 (if face1 (face-attribute face1 :background) "None"))
-            (color2 (if face2 (face-attribute face2 :background) "None"))
-            (image (,func (frame-char-height)  (frame-char-width) color1 color2)))
-       (propertize (make-string (ceiling (car (image-size image))) ? )
-                   'display image))))
-
-
-;;;###autoload
-(defplsep powerline-arrow-left pl/arrow-xpm-left)
-
-;;;###autoload
-(defplsep powerline-arrow-right pl/arrow-xpm-right)
 
 ;;;###autoload
 (setq-default mode-line-format
@@ -338,24 +306,25 @@ static char * %s[] = {
                  (let* ((active (eq (frame-selected-window) (selected-window)))
                         (face1 (if active 'powerline-active1 'powerline-inactive1))
                         (face2 (if active 'powerline-active2 'powerline-inactive2))
-                        (lhs (concat
+                        (lhs (list
                               (powerline-raw "%*" nil 'l)
                               (powerline-buffer-size nil 'l)
                               (powerline-buffer-id nil 'l)
 
+                              (powerline-raw " ")
                               (powerline-arrow-right nil face1)
 
                               (powerline-major-mode face1 'l)
                               (powerline-minor-modes face1 'l)
                               (powerline-raw mode-line-process face1 'l)
-
                               (powerline-narrow face1 'l)
 
+                              (powerline-raw " " face1)
                               (powerline-arrow-right face1 face2)
 
                               (powerline-vc face2)
                               ))
-                        (rhs (concat
+                        (rhs (list
                               (powerline-raw global-mode-string face2 'r)
 
                               (powerline-arrow-left face2 face1)
@@ -370,8 +339,31 @@ static char * %s[] = {
                               (powerline-raw "%6p" nil 'r)
 
                               (powerline-hud face2 face1))))
-                   (concat lhs (powerline-fill face2 (length (format-mode-line rhs))) rhs)))))
+                   (concat
+                    (powerline-render lhs)
+                    (powerline-fill face2 (powerline-width rhs))
+                    (powerline-render rhs))))))
 
+
+(defun pl/render (item)
+  (if (listp item)
+      (propertize " " 'display item)
+    item))
+
+(defun powerline-render (values)
+  (mapconcat 'pl/render values ""))
+
+(defun powerline-width (values)
+  "Get the length of VALUES."
+  (if values
+      (let ((val (car values)))
+        (+ (cond
+            ((stringp val) (length (format-mode-line val)))
+            ((and (listp val) (eq 'image (car val)))
+             (car (image-size val)))
+            (t 0))
+           (powerline-width (cdr values))))
+    0))
 
 (provide 'powerline)
 
