@@ -76,8 +76,8 @@ install the memoized function over the original function."
        (unless height (setq height (frame-char-height)))
        (let* ((color1 (if face1 (face-attribute face1 :background) "None"))
               (color2 (if face2 (face-attribute face2 :background) "None"))
-              (dots (/ height 2))
-              (width (ceiling height 2))
+              (dots (1- (/ height 2)))
+              (width (1- (ceiling height 2)))
               (odd (not (= dots width))))
          (create-image
           (concat
@@ -87,11 +87,11 @@ static char * arrow_%s[] = {
 \". c %s\",
 \"  c %s\",
 " (symbol-name ',dir) width height (or color1 "None") (or color2 "None"))
-           (mapconcat (lambda (d) (,rowfunc d width)) (number-sequence 1 dots) "\n")
+           (mapconcat (lambda (d) (,rowfunc d width)) (number-sequence 0 dots) "\n")
            (and odd "\n")
            (and odd (,rowfunc (+ dots 1) width))
            "\n"
-           (mapconcat (lambda (d) (,rowfunc d width)) (number-sequence dots 1 -1) "\n")
+           (mapconcat (lambda (d) (,rowfunc d width)) (number-sequence dots 0 -1) "\n")
            "};")
           'xpm t :ascent 'center)))))
 
