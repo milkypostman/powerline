@@ -9,6 +9,8 @@
 
 ;;; Code:
 
+(require 'cl)
+
 (defvar powerline-buffer-size-suffix t)
 
 (defface powerline-active1 '((t (:background "grey22" :inherit mode-line))) "Powerline face 1."
