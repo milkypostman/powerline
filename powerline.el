@@ -237,6 +237,13 @@ static char * %s[] = {
     (setq reserve (+ reserve 3)))
   (propertize " " 'display `((space :align-to (- right-fringe ,reserve))) 'face face))
 
+(defun powerline-fill-center (face reserve)
+  (unless reserve
+    (setq reserve 20))
+  (when (eq 'right (get-scroll-bar-mode))
+    (setq reserve (+ reserve 3)))
+  (propertize " " 'display `((space :align-to (- center ,reserve))) 'face face))
+
 
 ;;;###autoload
 (defpltext powerline-major-mode
