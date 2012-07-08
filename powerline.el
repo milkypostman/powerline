@@ -95,9 +95,12 @@ static char * arrow_%s[] = {
            "};")
           'xpm t :ascent 'center)))))
 
-(memoize (pl/arrow-xpm left))
-(memoize (pl/arrow-xpm right))
-
+(defun powerline-reset ()
+  "Reset memoized functions."
+  (interactive)
+  (memoize (pl/arrow-xpm left))
+  (memoize (pl/arrow-xpm right)))
+(powerline-reset)
 
 (defun pl/make-xpm (name color1 color2 data)
   "Return an XPM image with NAME using COLOR1 for enabled and COLOR2 for disabled bits specified in DATA."
