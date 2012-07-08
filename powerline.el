@@ -199,7 +199,7 @@ static char * %s[] = {
    " "))
 
 ;;;###autoload
-(defmacro defpltext (name body)
+(defmacro defpowerline (name body)
   `(defun ,name
      (&optional face pad)
      (let ((str ,body))
@@ -235,7 +235,7 @@ static char * %s[] = {
 
 
 ;;;###autoload
-(defpltext powerline-major-mode
+(defpowerline powerline-major-mode
   (propertize mode-name
               'help-echo "Major mode\n\ mouse-1: Display major mode menu\n\ mouse-2: Show help for major mode\n\ mouse-3: Toggle minor modes"
               'local-map (let ((map (make-sparse-keymap)))
@@ -247,7 +247,7 @@ static char * %s[] = {
                            map)))
 
 ;;;###autoload
-(defpltext powerline-minor-modes
+(defpowerline powerline-minor-modes
   (mapconcat (lambda (mm)
                (propertize mm
                            'help-echo "Minor mode\n mouse-1: Display minor mode menu\n mouse-2: Show help for minor mode\n mouse-3: Toggle minor modes"
@@ -262,7 +262,7 @@ static char * %s[] = {
 
 
 ;;;###autoload
-(defpltext powerline-narrow
+(defpowerline powerline-narrow
   (let (real-point-min real-point-max)
     (save-excursion
       (save-restriction
@@ -276,14 +276,14 @@ static char * %s[] = {
                               'mouse-1 'mode-line-widen)))))
 
 ;;;###autoload
-(defpltext powerline-vc
+(defpowerline powerline-vc
   (when (and (buffer-file-name (current-buffer))
              vc-mode)
     (format-mode-line '(vc-mode vc-mode))))
 
 
 ;;;###autoload
-(defpltext powerline-buffer-size
+(defpowerline powerline-buffer-size
   (propertize
    (if powerline-buffer-size-suffix
        "%I"
@@ -295,7 +295,7 @@ static char * %s[] = {
                           (redraw-modeline)))))
 
 ;;;###autoload
-(defpltext powerline-buffer-id
+(defpowerline powerline-buffer-id
   (format-mode-line mode-line-buffer-identification))
 
 
