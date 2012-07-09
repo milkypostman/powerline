@@ -218,7 +218,7 @@ static char * %s[] = {
 (defun powerline-raw (str &optional face pad)
   (propertize  (concat
                 (when (and str (eq pad 'l)) " ")
-                str
+                (format-mode-line str)
                 (when (and str (eq pad 'r)) " "))
                'face face))
 
