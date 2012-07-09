@@ -326,8 +326,7 @@ static char * %s[] = {
 
                                 (powerline-narrow face1 'l)
 
-                                (powerline-vc face1)
-                                ))
+                                (powerline-vc face1)))
                           (rhs (list
                                 (powerline-raw global-mode-string face2 'r)
 
@@ -382,8 +381,7 @@ static char * %s[] = {
                                 (powerline-raw " " face1)
                                 (powerline-arrow-right face1 face2)
 
-                                (powerline-vc face2)
-                                ))
+                                (powerline-vc face2)))
                           (rhs (list
                                 (powerline-raw global-mode-string face2 'r)
 
