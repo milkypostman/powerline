@@ -304,6 +304,25 @@ static char * %s[] = {
 (defpowerline powerline-buffer-id
   (format-mode-line mode-line-buffer-identification))
 
+(defvar pl/minibuffer-selected-window-list '())
+
+(defun pl/minibuffer-selected-window ()
+  "Return the selected window when entereing the minibuffer."
+  (when pl/minibuffer-selected-window-list
+    (car pl/minibuffer-selected-window-list)))
+
+(defun pl/minibuffer-setup ()
+  "Save the minibuffer-selected-window to `pl/minibuffer-selected-window'."
+  (push (minibuffer-selected-window) pl/minibuffer-selected-window-list))
+
+(add-hook 'minibuffer-setup-hook 'pl/minibuffer-setup)
+
+(defun pl/minibuffer-exit ()
+  "Set `pl/minibuffer-selected-window' to nil."
+  (pop pl/minibuffer-selected-window-list))
+
+(add-hook 'minibuffer-exit-hook 'pl/minibuffer-exit)
+
 
 ;;;###autoload
 (defun powerline-default-center ()
@@ -312,7 +331,9 @@ static char * %s[] = {
   (setq-default mode-line-format
                 '("%e"
                   (:eval
-                   (let* ((active (eq (frame-selected-window) (selected-window)))
+                   (let* ((active (or (eq (frame-selected-window) (selected-window))
+                                      (and (minibuffer-window-active-p (frame-selected-window))
+                                           (eq (pl/minibuffer-selected-window) (selected-window)))))
                           (face1 (if active 'powerline-active1 'powerline-inactive1))
                           (face2 (if active 'powerline-active2 'powerline-inactive2))
                           (lhs (list
@@ -358,7 +379,6 @@ static char * %s[] = {
                       (powerline-fill face1 (powerline-width rhs))
                       (powerline-render rhs)))))))
 
-
 ;;;###autoload
 (defun powerline-default ()
   "Setup a default mode-line."
@@ -366,7 +386,9 @@ static char * %s[] = {
   (setq-default mode-line-format
                 '("%e"
                   (:eval
-                   (let* ((active (eq (frame-selected-window) (selected-window)))
+                   (let* ((active (or (eq (frame-selected-window) (selected-window))
+                                      (and (minibuffer-window-active-p (frame-selected-window))
+                                           (eq (pl/minibuffer-selected-window) (selected-window)))))
                           (face1 (if active 'powerline-active1 'powerline-inactive1))
                           (face2 (if active 'powerline-active2 'powerline-inactive2))
                           (lhs (list
