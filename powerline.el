@@ -341,6 +341,9 @@ static char * %s[] = {
                           (center (list
                                    (powerline-raw " " face1)
                                    (powerline-arrow-right face1 face2)
+                                   (when (boundp 'erc-modified-channels-object)
+                                     (powerline-raw erc-modified-channels-object
+                                                    face1 'l))
                                    (powerline-major-mode face2 'l)
                                    (powerline-raw " :" face2)
                                    (powerline-minor-modes face2 'l)
@@ -372,6 +375,10 @@ static char * %s[] = {
 
                                 (powerline-raw " ")
                                 (powerline-arrow-right nil face1)
+
+                                (when (boundp 'erc-modified-channels-object)
+                                  (powerline-raw erc-modified-channels-object
+                                                 face1 'l))
 
                                 (powerline-major-mode face1 'l)
                                 (powerline-minor-modes face1 'l)
