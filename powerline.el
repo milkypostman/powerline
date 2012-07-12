@@ -216,11 +216,12 @@ static char * %s[] = {
 
 ;;;###autoload
 (defun powerline-raw (str &optional face pad)
-  (propertize  (concat
-                (when (and str (eq pad 'l)) " ")
-                (format-mode-line str)
-                (when (and str (eq pad 'r)) " "))
-               'face face))
+  (let ((rendered-str (format-mode-line str)))
+    (propertize  (concat
+                  (when (and rendered-str (eq pad 'l)) " ")
+                  str
+                  (when (and rendered-str (eq pad 'r)) " "))
+                 'face face)))
 
 
 ;;;###autoload
@@ -411,9 +412,9 @@ static char * %s[] = {
 
 
 (defun pl/render (item)
-  (if (listp item)
-      (propertize " " 'display item)
-    item))
+  (cond
+   ((and (listp item) (eq 'image (car item))) (propertize " " 'display item))
+   (item item)))
 
 (defun powerline-render (values)
   (mapconcat 'pl/render values ""))
