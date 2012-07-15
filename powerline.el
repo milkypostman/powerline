@@ -304,7 +304,9 @@ static char * %s[] = {
 
 ;;;###autoload
 (defpowerline powerline-process
-  (car mode-line-process))
+  (cond
+   ((listp mode-line-process) (car mode-line-process))
+   ((stringp mode-line-process) mode-line-process)))
 
 (defvar pl/minibuffer-selected-window-list '())
 
