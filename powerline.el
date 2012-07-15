@@ -302,6 +302,10 @@ static char * %s[] = {
 (defpowerline powerline-buffer-id
   (format-mode-line mode-line-buffer-identification))
 
+;;;###autoload
+(defpowerline powerline-process
+  (car mode-line-process))
+
 (defvar pl/minibuffer-selected-window-list '())
 
 (defun pl/minibuffer-selected-window ()
@@ -342,8 +346,6 @@ static char * %s[] = {
                                 (powerline-raw " ")
                                 (powerline-arrow-right nil face1)
 
-                                (powerline-raw mode-line-process face1 'l)
-
                                 (powerline-narrow face1 'l)
 
                                 (powerline-vc face1)))
@@ -365,6 +367,7 @@ static char * %s[] = {
                                      (powerline-raw erc-modified-channels-object
                                                     face1 'l))
                                    (powerline-major-mode face2 'l)
+                                   (powerline-process face2)
                                    (powerline-raw " :" face2)
                                    (powerline-minor-modes face2 'l)
                                    (powerline-raw " " face2)
@@ -405,8 +408,8 @@ static char * %s[] = {
                                                  face1 'l))
 
                                 (powerline-major-mode face1 'l)
+                                (powerline-process face1)
                                 (powerline-minor-modes face1 'l)
-                                (powerline-raw mode-line-process face1 'l)
                                 (powerline-narrow face1 'l)
 
                                 (powerline-raw " " face1)
@@ -432,6 +435,7 @@ static char * %s[] = {
                       (powerline-render lhs)
                       (powerline-fill face2 (powerline-width rhs))
                       (powerline-render rhs)))))))
+
 
 ;;;###autoload
 (fset 'powerline-default 'powerline-default-theme)
