@@ -323,7 +323,7 @@ static char * %s[] = {
 
 
 ;;;###autoload
-(defun powerline-default-center ()
+(defun powerline-center-theme ()
   "Setup a default mode-line with major and minor modes centered."
   (interactive)
   (setq-default mode-line-format
@@ -378,7 +378,10 @@ static char * %s[] = {
                       (powerline-render rhs)))))))
 
 ;;;###autoload
-(defun powerline-default ()
+(fset 'powerline-default-center 'powerline-center-theme)
+
+;;;###autoload
+(defun powerline-default-theme ()
   "Setup a default mode-line."
   (interactive)
   (setq-default mode-line-format
@@ -429,6 +432,10 @@ static char * %s[] = {
                       (powerline-render lhs)
                       (powerline-fill face2 (powerline-width rhs))
                       (powerline-render rhs)))))))
+
+;;;###autoload
+(fset 'powerline-default 'powerline-default-theme)
+
 
 
 (defun pl/render (item)
