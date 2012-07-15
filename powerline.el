@@ -437,6 +437,36 @@ static char * %s[] = {
 (fset 'powerline-default 'powerline-default-theme)
 
 
+;;;###autoload
+(defun powerline-nano-theme ()
+  "Setup a nano-like mode-line."
+  (interactive)
+  (setq-default mode-line-format
+                '("%e"
+                  (:eval
+                   (let* ((active (or (eq (frame-selected-window) (selected-window))
+                                      (and (minibuffer-window-active-p (frame-selected-window))
+                                           (eq (pl/minibuffer-selected-window) (selected-window)))))
+                          (lhs (list
+                                (powerline-raw (concat
+                                                "GNU Emacs "
+                                                (number-to-string emacs-major-version)
+                                                "."
+                                                (number-to-string emacs-minor-version))
+                                               nil 'l)))
+                          (rhs (list
+                                (if (buffer-modified-p)
+                                    (powerline-raw "Modified" nil 'r))))
+                          (center (list
+                                   (powerline-raw "%b" nil))))
+
+                     (concat
+                      (powerline-render lhs)
+                      (powerline-fill-center nil (/ (powerline-width center) 2.0))
+                      (powerline-render center)
+                      (powerline-fill nil (powerline-width rhs))
+                      (powerline-render rhs)))))))
+
 
 (defun pl/render (item)
   (cond
