@@ -350,7 +350,7 @@ static char * %s[] = {
 
                                 (powerline-vc face1)))
                           (rhs (list
-                                (powerline-raw global-mode-string face2 'r)
+                                (powerline-raw global-mode-string face1 'r)
 
                                 (powerline-raw "%4l" face1 'r)
                                 (powerline-raw ":" face1)
