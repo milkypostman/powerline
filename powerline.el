@@ -14,16 +14,22 @@
 
 (defvar powerline-buffer-size-suffix t)
 
-(defface powerline-active1 '((t (:background "grey22" :inherit mode-line))) "Powerline face 1."
+(defface powerline-active1 '((t (:background "grey22" :inherit mode-line)))
+  "Powerline face 1."
   :group 'powerline)
 
-(defface powerline-active2 '((t (:background "grey40" :inherit mode-line))) "Powerline face 2."
+(defface powerline-active2 '((t (:background "grey40" :inherit mode-line)))
+  "Powerline face 2."
   :group 'powerline)
 
-(defface powerline-inactive1 '((t (:background "grey11" :inherit mode-line-inactive))) "Powerline face 1."
+(defface powerline-inactive1
+  '((t (:background "grey11" :inherit mode-line-inactive)))
+  "Powerline face 1."
   :group 'powerline)
 
-(defface powerline-inactive2 '((t (:background "grey20" :inherit mode-line-inactive))) "Powerline face 2."
+(defface powerline-inactive2
+  '((t (:background "grey20" :inherit mode-line-inactive)))
+  "Powerline face 2."
   :group 'powerline)
 
 
@@ -73,7 +79,8 @@ install the memoized function over the original function."
 (defmacro pl/arrow-xpm (dir)
   "Generate an arrow xpm function for DIR."
   (let ((rowfunc (intern (format "pl/arrow-row-%s" (symbol-name dir)))))
-    `(defun ,(intern (format "powerline-arrow-%s" (symbol-name dir))) (face1 face2 &optional height)
+    `(defun ,(intern (format "powerline-arrow-%s" (symbol-name dir)))
+       (face1 face2 &optional height)
        (unless height (setq height (frame-char-height)))
        (let* ((color1 (if face1 (face-attribute face1 :background) "None"))
               (color2 (if face2 (face-attribute face2 :background) "None"))
@@ -88,11 +95,13 @@ static char * arrow_%s[] = {
 \". c %s\",
 \"  c %s\",
 " (symbol-name ',dir) width height (or color1 "None") (or color2 "None"))
-           (mapconcat (lambda (d) (,rowfunc d width)) (number-sequence 0 dots) "\n")
+           (mapconcat
+            (lambda (d) (,rowfunc d width)) (number-sequence 0 dots) "\n")
            (and odd "\n")
            (and odd (,rowfunc (+ dots 1) width))
            "\n"
-           (mapconcat (lambda (d) (,rowfunc d width)) (number-sequence dots 0 -1) "\n")
+           (mapconcat
+            (lambda (d) (,rowfunc d width)) (number-sequence dots 0 -1) "\n")
            "};")
           'xpm t :ascent 'center)))))
 
@@ -172,7 +181,8 @@ static char * %s[] = {
       (setq pmin (point-min)))
     (propertize (make-string width ? )
                 'display
-                (pl/percent-xpm (frame-char-height) pmax pmin we ws (* (frame-char-width) width) color1 color2))))
+                (pl/percent-xpm (frame-char-height) pmax pmin we ws
+                                (* (frame-char-width) width) color1 color2))))
 
 
 ;;;###autoload
@@ -231,12 +241,17 @@ static char * %s[] = {
     (setq reserve 20))
   (when (eq 'right (get-scroll-bar-mode))
     (setq reserve (- reserve 3)))
-  (propertize " " 'display `((space :align-to (- right-margin ,reserve))) 'face face))
+  (propertize " "
+              'display `((space :align-to (- right-margin ,reserve)))
+              'face face))
 
 (defun powerline-fill-center (face reserve)
   (unless reserve
     (setq reserve 20))
-  (propertize " " 'display `((space :align-to (- (- center ,reserve) (.5 . left-margin)))) 'face face))
+  (propertize " "
+              'display `((space :align-to (- (- center ,reserve)
+                                             (.5 . left-margin))))
+              'face face))
 
 
 ;;;###autoload
@@ -257,11 +272,18 @@ static char * %s[] = {
                (propertize mm
                            'help-echo "Minor mode\n mouse-1: Display minor mode menu\n mouse-2: Show help for minor mode\n mouse-3: Toggle minor modes"
                            'local-map (let ((map (make-sparse-keymap)))
-                                        (define-key map [mode-line down-mouse-1]   (powerline-mouse 'minor 'menu mm))
-                                        (define-key map [mode-line mouse-2]        (powerline-mouse 'minor 'help mm))
-                                        (define-key map [mode-line down-mouse-3]   (powerline-mouse 'minor 'menu mm))
-                                        (define-key map [header-line down-mouse-3] (powerline-mouse 'minor 'menu mm))
-
+                                        (define-key map
+                                          [mode-line down-mouse-1]
+                                          (powerline-mouse 'minor 'menu mm))
+                                        (define-key map
+                                          [mode-line mouse-2]
+                                          (powerline-mouse 'minor 'help mm))
+                                        (define-key map
+                                          [mode-line down-mouse-3]
+                                          (powerline-mouse 'minor 'menu mm))
+                                        (define-key map
+                                          [header-line down-mouse-3]
+                                          (powerline-mouse 'minor 'menu mm))
                                         map)))
              (split-string (format-mode-line minor-mode-alist)) " "))
 
@@ -336,11 +358,16 @@ static char * %s[] = {
   (setq-default mode-line-format
                 '("%e"
                   (:eval
-                   (let* ((active (or (eq (frame-selected-window) (selected-window))
-                                      (and (minibuffer-window-active-p (frame-selected-window))
-                                           (eq (pl/minibuffer-selected-window) (selected-window)))))
-                          (face1 (if active 'powerline-active1 'powerline-inactive1))
-                          (face2 (if active 'powerline-active2 'powerline-inactive2))
+                   (let* ((active (or (eq (frame-selected-window)
+                                          (selected-window))
+                                      (and (minibuffer-window-active-p
+                                            (frame-selected-window))
+                                           (eq (pl/minibuffer-selected-window)
+                                               (selected-window)))))
+                          (face1 (if active 'powerline-active1
+                                   'powerline-inactive1))
+                          (face2 (if active 'powerline-active2
+                                   'powerline-inactive2))
                           (lhs (list
                                 (powerline-raw "%*" nil 'l)
                                 (powerline-buffer-size nil 'l)
@@ -378,7 +405,8 @@ static char * %s[] = {
 
                      (concat
                       (powerline-render lhs)
-                      (powerline-fill-center face1 (/ (powerline-width center) 2.0))
+                      (powerline-fill-center face1 (/ (powerline-width center)
+                                                      2.0))
                       (powerline-render center)
                       (powerline-fill face1 (powerline-width rhs))
                       (powerline-render rhs)))))))
@@ -393,11 +421,16 @@ static char * %s[] = {
   (setq-default mode-line-format
                 '("%e"
                   (:eval
-                   (let* ((active (or (eq (frame-selected-window) (selected-window))
-                                      (and (minibuffer-window-active-p (frame-selected-window))
-                                           (eq (pl/minibuffer-selected-window) (selected-window)))))
-                          (face1 (if active 'powerline-active1 'powerline-inactive1))
-                          (face2 (if active 'powerline-active2 'powerline-inactive2))
+                   (let* ((active (or (eq (frame-selected-window)
+                                          (selected-window))
+                                      (and (minibuffer-window-active-p
+                                            (frame-selected-window))
+                                           (eq (pl/minibuffer-selected-window)
+                                               (selected-window)))))
+                          (face1 (if active 'powerline-active1
+                                   'powerline-inactive1))
+                          (face2 (if active 'powerline-active2
+                                   'powerline-inactive2))
                           (lhs (list
                                 (powerline-raw "%*" nil 'l)
                                 (powerline-buffer-size nil 'l)
@@ -451,15 +484,20 @@ static char * %s[] = {
   (setq-default mode-line-format
                 '("%e"
                   (:eval
-                   (let* ((active (or (eq (frame-selected-window) (selected-window))
-                                      (and (minibuffer-window-active-p (frame-selected-window))
-                                           (eq (pl/minibuffer-selected-window) (selected-window)))))
+                   (let* ((active (or (eq (frame-selected-window)
+                                          (selected-window))
+                                      (and (minibuffer-window-active-p
+                                            (frame-selected-window))
+                                           (eq (pl/minibuffer-selected-window)
+                                               (selected-window)))))
                           (lhs (list
                                 (powerline-raw (concat
                                                 "GNU Emacs "
-                                                (number-to-string emacs-major-version)
+                                                (number-to-string
+                                                 emacs-major-version)
                                                 "."
-                                                (number-to-string emacs-minor-version))
+                                                (number-to-string
+                                                 emacs-minor-version))
                                                nil 'l)))
                           (rhs (list
                                 (if (buffer-modified-p)
@@ -469,7 +507,8 @@ static char * %s[] = {
 
                      (concat
                       (powerline-render lhs)
-                      (powerline-fill-center nil (/ (powerline-width center) 2.0))
+                      (powerline-fill-center nil (/ (powerline-width center)
+                                                    2.0))
                       (powerline-render center)
                       (powerline-fill nil (powerline-width rhs))
                       (powerline-render rhs)))))))
