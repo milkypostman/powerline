@@ -350,6 +350,14 @@ static char * %s[] = {
 
 (add-hook 'minibuffer-exit-hook 'pl/minibuffer-exit)
 
+(defun powerline-selected-window-active ()
+  "Return whether the current window is active."
+  (or (eq (frame-selected-window)
+          (selected-window))
+      (and (minibuffer-window-active-p
+            (frame-selected-window))
+           (eq (pl/minibuffer-selected-window)
+               (selected-window)))))
 
 ;;;###autoload
 (defun powerline-center-theme ()
@@ -358,12 +366,7 @@ static char * %s[] = {
   (setq-default mode-line-format
                 '("%e"
                   (:eval
-                   (let* ((active (or (eq (frame-selected-window)
-                                          (selected-window))
-                                      (and (minibuffer-window-active-p
-                                            (frame-selected-window))
-                                           (eq (pl/minibuffer-selected-window)
-                                               (selected-window)))))
+                   (let* ((active (powerline-selected-window-active))
                           (face1 (if active 'powerline-active1
                                    'powerline-inactive1))
                           (face2 (if active 'powerline-active2
@@ -414,6 +417,7 @@ static char * %s[] = {
 ;;;###autoload
 (fset 'powerline-default-center 'powerline-center-theme)
 
+
 ;;;###autoload
 (defun powerline-default-theme ()
   "Setup a default mode-line."
@@ -421,12 +425,7 @@ static char * %s[] = {
   (setq-default mode-line-format
                 '("%e"
                   (:eval
-                   (let* ((active (or (eq (frame-selected-window)
-                                          (selected-window))
-                                      (and (minibuffer-window-active-p
-                                            (frame-selected-window))
-                                           (eq (pl/minibuffer-selected-window)
-                                               (selected-window)))))
+                   (let* ((active (powerline-selected-window-active))
                           (face1 (if active 'powerline-active1
                                    'powerline-inactive1))
                           (face2 (if active 'powerline-active2
@@ -484,12 +483,7 @@ static char * %s[] = {
   (setq-default mode-line-format
                 '("%e"
                   (:eval
-                   (let* ((active (or (eq (frame-selected-window)
-                                          (selected-window))
-                                      (and (minibuffer-window-active-p
-                                            (frame-selected-window))
-                                           (eq (pl/minibuffer-selected-window)
-                                               (selected-window)))))
+                   (let* ((active (powerline-selected-window-active))
                           (lhs (list
                                 (powerline-raw (concat
                                                 "GNU Emacs "
