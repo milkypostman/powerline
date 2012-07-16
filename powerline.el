@@ -1,7 +1,7 @@
 ;;; powerline.el --- Rewrite of Powerline
 
 ;; Copyright (c) 2012 Donald Ephraim Curtis
-;; Copyright (c) 2012 Nicholas Rougier
+;; Copyright (c) 2012 Nicolas Rougier
 
 ;; Author: Donald Ephraim Curtis <dcurtis@milkbox.net>
 ;; URL: http://github.com/milkypostman/powerline
