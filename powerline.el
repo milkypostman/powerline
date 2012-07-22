@@ -230,7 +230,7 @@ static char * %s[] = {
   (let ((rendered-str (format-mode-line str)))
     (propertize  (concat
                   (when (and rendered-str (eq pad 'l)) " ")
-                  str
+                  (if (listp str) rendered-str str)
                   (when (and rendered-str (eq pad 'r)) " "))
                  'face face)))
 
