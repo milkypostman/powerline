@@ -242,14 +242,14 @@ static char * %s[] = {
   (when (eq 'right (get-scroll-bar-mode))
     (setq reserve (- reserve 3)))
   (propertize " "
-              'display `((space :align-to (- right-margin ,reserve)))
+              'display `((space :align-to (- (+ right right-fringe right-margin) ,reserve)))
               'face face))
 
 (defun powerline-fill-center (face reserve)
   (unless reserve
     (setq reserve 20))
   (propertize " "
-              'display `((space :align-to (- (- center ,reserve)
+              'display `((space :align-to (- (+ center (.5 . right-margin)) ,reserve
                                              (.5 . left-margin))))
               'face face))
 
