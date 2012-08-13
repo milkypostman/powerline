@@ -81,29 +81,30 @@ install the memoized function over the original function."
   (let ((rowfunc (intern (format "pl/arrow-row-%s" (symbol-name dir)))))
     `(defun ,(intern (format "powerline-arrow-%s" (symbol-name dir)))
        (face1 face2 &optional height)
-       (unless height (setq height (frame-char-height)))
-       (let* ((color1 (if face1 (face-attribute face1 :background) "None"))
-              (color2 (if face2 (face-attribute face2 :background) "None"))
-              (dots (1- (/ height 2)))
-              (width (1- (ceiling height 2)))
-              (odd (not (= dots width))))
-         (create-image
-          (concat
-           (format "/* XPM */
+       (when window-system
+         (unless height (setq height (frame-char-height)))
+         (let* ((color1 (if face1 (face-attribute face1 :background) "None"))
+                (color2 (if face2 (face-attribute face2 :background) "None"))
+                (dots (1- (/ height 2)))
+                (width (1- (ceiling height 2)))
+                (odd (not (= dots width))))
+           (create-image
+            (concat
+             (format "/* XPM */
 static char * arrow_%s[] = {
 \"%s %s 2 1\",
 \". c %s\",
 \"  c %s\",
 " (symbol-name ',dir) width height (or color1 "None") (or color2 "None"))
-           (mapconcat
-            (lambda (d) (,rowfunc d width)) (number-sequence 0 dots) "\n")
-           (and odd "\n")
-           (and odd (,rowfunc (+ dots 1) width))
-           "\n"
-           (mapconcat
-            (lambda (d) (,rowfunc d width)) (number-sequence dots 0 -1) "\n")
-           "};")
-          'xpm t :ascent 'center)))))
+             (mapconcat
+              (lambda (d) (,rowfunc d width)) (number-sequence 0 dots) "\n")
+             (and odd "\n")
+             (and odd (,rowfunc (+ dots 1) width))
+             "\n"
+             (mapconcat
+              (lambda (d) (,rowfunc d width)) (number-sequence dots 0 -1) "\n")
+             "};")
+            'xpm t :ascent 'center))))))
 
 (defun powerline-reset ()
   "Reset memoized functions."
