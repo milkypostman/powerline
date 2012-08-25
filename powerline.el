@@ -115,37 +115,38 @@ static char * arrow_%s[] = {
 
 (defun pl/make-xpm (name color1 color2 data)
   "Return an XPM image with NAME using COLOR1 for enabled and COLOR2 for disabled bits specified in DATA."
-  (create-image
-   (concat
-    (format "/* XPM */
+  (when window-system
+    (create-image
+     (concat
+      (format "/* XPM */
 static char * %s[] = {
 \"%i %i 2 1\",
 \". c %s\",
 \"  c %s\",
 "
-            (downcase (replace-regexp-in-string " " "_" name))
-            (length (car data))
-            (length data)
-            (or color1 "None")
-            (or color2 "None"))
-    (let ((len  (length data))
-          (idx  0))
-      (apply 'concat
-             (mapcar '(lambda (dl)
-                        (setq idx (+ idx 1))
-                        (concat
-                         "\""
-                         (concat
-                          (mapcar '(lambda (d)
-                                     (if (eq d 0)
-                                         (string-to-char " ")
-                                       (string-to-char ".")))
-                                  dl))
-                         (if (eq idx len)
-                             "\"};"
-                           "\",\n")))
-                     data))))
-   'xpm t :ascent 'center))
+              (downcase (replace-regexp-in-string " " "_" name))
+              (length (car data))
+              (length data)
+              (or color1 "None")
+              (or color2 "None"))
+      (let ((len  (length data))
+            (idx  0))
+        (apply 'concat
+               (mapcar '(lambda (dl)
+                          (setq idx (+ idx 1))
+                          (concat
+                           "\""
+                           (concat
+                            (mapcar '(lambda (d)
+                                       (if (eq d 0)
+                                           (string-to-char " ")
+                                         (string-to-char ".")))
+                                    dl))
+                           (if (eq idx len)
+                               "\"};"
+                             "\",\n")))
+                       data))))
+     'xpm t :ascent 'center)))
 
 (defun pl/percent-xpm
   (height pmax pmin winend winstart width color1 color2)
