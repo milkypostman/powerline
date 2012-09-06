@@ -241,7 +241,7 @@ static char * %s[] = {
 (defun powerline-fill (face reserve)
   (unless reserve
     (setq reserve 20))
-  (when (eq 'right (get-scroll-bar-mode))
+  (when (and window-system (eq 'right (get-scroll-bar-mode)))
     (setq reserve (- reserve 3)))
   (propertize " "
               'display `((space :align-to (- (+ right right-fringe right-margin) ,reserve)))
