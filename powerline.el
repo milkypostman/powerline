@@ -33,27 +33,38 @@
   :group 'powerline)
 
 
+(defun create-or-get-powerline-cache ()
+  "Return a frame-local hash table that acts as a memoization
+cache for powerline. Create one if the frame doesn't have one
+yet."
+  (or (frame-parameter nil 'powerline-cache)
+      (let ((table (make-hash-table :test 'equal)))
+        ;; Store it as a frame-local variable
+        (modify-frame-parameters nil `((powerline-cache . ,table)))
+        table)))
+
 ;; from memoize.el @ http://nullprogram.com/blog/2010/07/26/
 (defun memoize (func)
   "Memoize FUNC.
-If argument is a symbol then
-install the memoized function over the original function."
+If argument is a symbol then install the memoized function over
+the original function.  Use frame-local memoization."
   (typecase func
-    (symbol (fset func (memoize-wrap (symbol-function func))) func)
-    (function (memoize-wrap func))))
+    (symbol (fset func (memoize-wrap-frame-local (symbol-function func))) func)
+    (function (memoize-wrap-frame-local func))))
 
-(defun memoize-wrap (func)
-  "Return the memoized version of FUNC."
-  (let ((table-sym (gensym))
+(defun memoize-wrap-frame-local (func)
+  "Return the memoized version of FUNC.  The memoization cache is
+frame-local."
+  (let ((cache-sym (gensym))
         (val-sym (gensym))
         (args-sym (gensym)))
-    (set table-sym (make-hash-table :test 'equal))
     `(lambda (&rest ,args-sym)
        ,(concat (documentation func) "\n(memoized function)")
-       (let ((,val-sym (gethash ,args-sym ,table-sym)))
+       (let* ((,cache-sym (create-or-get-powerline-cache))
+              (,val-sym (gethash ,args-sym ,cache-sym)))
          (if ,val-sym
              ,val-sym
-           (puthash ,args-sym (apply ,func ,args-sym) ,table-sym))))))
+           (puthash ,args-sym (apply ,func ,args-sym) ,cache-sym))))))
 
 
 (defun pl/arrow-row-right (dots width)
