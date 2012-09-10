@@ -269,9 +269,7 @@ static char * %s[] = {
 
 ;;;###autoload
 (defpowerline powerline-major-mode
-  (propertize (typecase mode-name
-                (string mode-name)
-                (cons (if (first mode-name) (second mode-name) (third mode-name))))
+  (propertize (format-mode-line mode-name)
               'help-echo "Major mode\n\ mouse-1: Display major mode menu\n\ mouse-2: Show help for major mode\n\ mouse-3: Toggle minor modes"
               'local-map (let ((map (make-sparse-keymap)))
                            (define-key map [mode-line down-mouse-1]
