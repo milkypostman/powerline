@@ -279,6 +279,38 @@ static char * %s[] = {
                            (define-key map [mode-line down-mouse-3] mode-line-mode-menu)
                            map)))
 
+(defun mode-list-to-string-list (ml)
+  (case (type-of ml)
+    ('string (list ml))
+    ('symbol
+     (if ml
+         (mode-list-to-string-list (symbol-value ml) )
+       nil))
+    (('function 'subr) (mode-list-to-string-list (list (funcall ml))))
+    ('cons
+     (let ((kar (car ml))
+           (kdr (cdr ml)))
+       (case (type-of kar)
+         ('symbol
+          (setq kdr (car kdr))
+          (let ((val (symbol-value kar)))
+            (case val
+              (:eval (mode-list-to-string-list (eval kdr) ))
+              ;; properties now not handlet properly
+              (:propertize (mode-list-to-string-list kdr ))
+              (t (if (eq val t)
+                     (mode-list-to-string-list kdr)
+                   (if (null val)
+                       nil
+                     (mode-list-to-string-list (cons val kdr))))))))
+         ('integer
+          ;; heh, now do nothing, must reduce max width if < 0 or do padding if > 0
+          (mode-list-to-string-list kdr ))        
+         (t (append (mode-list-to-string-list kar ) (mode-list-to-string-list kdr ))))))
+    ;; unknown
+    (t (list (format "%s" ml)))))
+
+
 ;;;###autoload
 (defpowerline powerline-minor-modes
   (mapconcat (lambda (mm)
@@ -298,7 +330,8 @@ static char * %s[] = {
                                           [header-line down-mouse-3]
                                           (powerline-mouse 'minor 'menu mm))
                                         map)))
-             (split-string (format-mode-line minor-mode-alist)) " "))
+             ;;(split-string (format-mode-line minor-mode-alist)) " "))
+             (mode-list-to-string-list minor-mode-alist) ""))
 
 
 ;;;###autoload
