@@ -10,7 +10,7 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
+(require 'cl)
 
 (defvar powerline-buffer-size-suffix t)
 
