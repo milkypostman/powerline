@@ -35,7 +35,6 @@
   :group 'powerline
   :type 'bool)
 
-
 (defun create-or-get-powerline-cache ()
   "Return a frame-local hash table that acts as a memoization
 cache for powerline. Create one if the frame doesn't have one
@@ -90,6 +89,21 @@ frame-local."
   (* unitsize (ceiling width unitsize)))
 
 
+(defun pl/hex-color (color)
+  "Gets the hexadecimal value of a color"
+  (let ((ret color))
+    (cond
+     ((string= "#" (substring color 0 1))
+      (setq ret (upcase ret)))
+     ((color-defined-p color)
+      (setq ret (concat "#"
+                        (mapconcat
+                         (lambda(val)
+                           (format "%02X" (* val 255)))
+                         (color-name-to-rgb color) ""))))
+     (t (setq ret nil)))
+    (symbol-value 'ret)))
+
 (defmacro pl/arrow-xpm (dir)
   "Generate an arrow xpm function for DIR."
   (let ((rowfunc (intern (format "pl/arrow-row-%s" (symbol-name dir)))))
@@ -97,8 +111,8 @@ frame-local."
        (face1 face2 &optional height)
        (when window-system
          (unless height (setq height (frame-char-height)))
-         (let* ((color1 (if face1 (face-attribute face1 :background) "None"))
-                (color2 (if face2 (face-attribute face2 :background) "None"))
+         (let* ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
+                (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
                 (dots (1- (/ height 2)))
                 (width (1- (ceiling height 2)))
                 (odd (not (= dots width))))
