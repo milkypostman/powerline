@@ -32,6 +32,21 @@
   "Powerline face 2."
   :group 'powerline)
 
+(defun powerline-hex-color (color)
+  "Gets the hexadecimal value of a color"
+  (let ((ret color))
+    (cond
+     ((string= "#" (substring color 0 1))
+      (setq ret (upcase ret)))
+     ((color-defined-p color)
+      (setq ret (concat "#"
+                        (mapconcat
+                         (lambda(val)
+                           (format "%02X" (* val 255)))
+                         (color-name-to-rgb color) ""))))
+     (t (setq ret nil)))
+    (symbol-value 'ret)))
+
 
 (defun create-or-get-powerline-cache ()
   "Return a frame-local hash table that acts as a memoization
@@ -94,8 +109,8 @@ frame-local."
        (face1 face2 &optional height)
        (when window-system
          (unless height (setq height (frame-char-height)))
-         (let* ((color1 (if face1 (face-attribute face1 :background) "None"))
-                (color2 (if face2 (face-attribute face2 :background) "None"))
+         (let* ((color1 (if face1 (powerline-hex-color (face-attribute face1 :background)) "None"))
+                (color2 (if face2 (powerline-hex-color (face-attribute face2 :background)) "None"))
                 (dots (1- (/ height 2)))
                 (width (1- (ceiling height 2)))
                 (odd (not (= dots width))))
@@ -393,15 +408,15 @@ static char * %s[] = {
                                 (powerline-arrow-right nil face1)
 
                                 (powerline-narrow face1 'l)
-
+                                
                                 (powerline-vc face1)))
                           (rhs (list
                                 (powerline-raw global-mode-string face1 'r)
-
+                                
                                 (powerline-raw "%4l" face1 'r)
                                 (powerline-raw ":" face1)
                                 (powerline-raw "%3c" face1 'r)
-
+                                
                                 (powerline-arrow-left face1 nil)
                                 (powerline-raw " ")
                                 (powerline-raw "%6p" nil 'r)
