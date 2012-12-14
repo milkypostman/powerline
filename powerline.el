@@ -12,8 +12,6 @@
 
 (require 'cl)
 
-(defvar powerline-buffer-size-suffix t)
-
 (defface powerline-active1 '((t (:background "grey22" :inherit mode-line)))
   "Powerline face 1."
   :group 'powerline)
@@ -31,6 +29,11 @@
   '((t (:background "grey20" :inherit mode-line-inactive)))
   "Powerline face 2."
   :group 'powerline)
+
+(defcustom powerline-buffer-size-suffix t
+  "Display the buffer size suffix."
+  :group 'powerline
+  :type 'bool)
 
 
 (defun create-or-get-powerline-cache ()
