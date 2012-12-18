@@ -279,36 +279,36 @@ static char * %s[] = {
                            (define-key map [mode-line down-mouse-3] mode-line-mode-menu)
                            map)))
 
-(defun mode-list-to-string-list (ml)
-  (case (type-of ml)
-    ('string (list ml))
-    ('symbol
+(defun powerline-mode-list-to-string-list (ml)
+  (typecase ml
+    (string (list ml))
+    (symbol
      (if ml
-         (mode-list-to-string-list (symbol-value ml) )
+         (powerline-mode-list-to-string-list (symbol-value ml) )
        nil))
-    (('function 'subr) (mode-list-to-string-list (list (funcall ml))))
-    ('cons
+    ((or function subr) (powerline-mode-list-to-string-list (list (funcall ml))))
+    (cons
      (let ((kar (car ml))
            (kdr (cdr ml)))
-       (case (type-of kar)
-         ('symbol
-          (setq kdr (car kdr))
-          (let ((val (symbol-value kar)))
+       (typecase kar
+         (symbol
+          (let ((val (symbol-value kar))
+                (kadr (if (listp kdr) (car kdr) nil)))
             (case val
-              (:eval (mode-list-to-string-list (eval kdr) ))
-              ;; properties now not handlet properly
-              (:propertize (mode-list-to-string-list kdr ))
-              (t (if (eq val t)
-                     (mode-list-to-string-list kdr)
-                   (if (null val)
-                       nil
-                     (mode-list-to-string-list (cons val kdr))))))))
-         ('integer
-          ;; heh, now do nothing, must reduce max width if < 0 or do padding if > 0
-          (mode-list-to-string-list kdr ))        
-         (t (append (mode-list-to-string-list kar ) (mode-list-to-string-list kdr ))))))
+              (:eval (powerline-mode-list-to-string-list (eval kadr) ))
+              ;; propertize?
+              (:propertize (powerline-mode-list-to-string-list kdr ))
+              (t
+               (if val
+                   (powerline-mode-list-to-string-list kadr)
+                 (powerline-mode-list-to-string-list (cdr kdr)))))))
+         (integer
+          ;; now do nothing, must clamp to width if < 0 or do padding if > 0
+          (powerline-mode-list-to-string-list kdr ))
+         (t (append (powerline-mode-list-to-string-list kar ) (powerline-mode-list-to-string-list kdr ))))))
     ;; unknown
-    (t (list (format "%s" ml)))))
+    (t ;;(message "mode-list-to-string-error Unknown: type: %s;\nval: %s" ml (type-of ml))
+     (list (format "%s" ml)))))
 
 
 ;;;###autoload
