@@ -428,7 +428,7 @@ static char * %s[] = {
                                    (powerline-arrow-right face1 face2)
                                    (when (boundp 'erc-modified-channels-object)
                                      (powerline-raw erc-modified-channels-object
-                                                    face1 'l))
+                                                    face2 'l))
                                    (powerline-major-mode face2 'l)
                                    (powerline-process face2)
                                    (powerline-raw " :" face2)
