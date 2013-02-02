@@ -69,25 +69,12 @@ frame-local."
            (puthash ,args-sym (apply ,func ,args-sym) ,cache-sym))))))
 
 
-(defun pl/arrow-row-right (dots width)
-  "Generate a string with DOTS dots and spaces to fill out WIDTH."
-  (concat "\""
-          (make-string dots ?.)
-          (make-string (- width dots) ? )
+(defun pl/xpm-row-string (width total left right)
+  "Generate a string of two types of characters filled on the
+left by WIDTH out of TOTAL. "
+  (concat "\"" (make-string width left)
+          (make-string (- total width) right)
           "\","))
-
-(defun pl/arrow-row-left (dots width)
-  "Generate a string with DOTS dots and spaces to fill out WIDTH."
-  (concat "\""
-          (make-string (- width dots) ?.)
-          (make-string dots ? )
-          "\","))
-
-
-(defun pl/size-up (unitsize width)
-  "Extend WIDTH to the nearest multiple of the UNITSIZE."
-  (* unitsize (ceiling width unitsize)))
-
 
 (defun pl/hex-color (color)
   "Gets the hexadecimal value of a color"
@@ -104,18 +91,21 @@ frame-local."
      (t (setq ret nil)))
     (symbol-value 'ret)))
 
-(defmacro pl/arrow-xpm (dir)
+(defmacro pl/arrow (dir)
   "Generate an arrow xpm function for DIR."
-  (let ((rowfunc (intern (format "pl/arrow-row-%s" (symbol-name dir)))))
+  (let ((start (if (eq dir 'left) 'width 0))
+        (end (if (eq dir 'left) '(- width midwidth) 'midwidth))
+        (incr (if (eq dir 'left) -1 1)))
     `(defun ,(intern (format "powerline-arrow-%s" (symbol-name dir)))
        (face1 face2 &optional height)
        (when window-system
          (unless height (setq height (frame-char-height)))
          (let* ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
                 (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
-                (dots (1- (/ height 2)))
+                (midwidth (1- (/ height 2)))
                 (width (1- (ceiling height 2)))
-                (odd (not (= dots width))))
+                (seq (number-sequence ,start ,end ,incr))
+                (odd (not (= midwidth width))))
            (create-image
             (concat
              (format "/* XPM */
@@ -125,12 +115,11 @@ static char * arrow_%s[] = {
 \"  c %s\",
 " (symbol-name ',dir) width height (or color1 "None") (or color2 "None"))
              (mapconcat
-              (lambda (d) (,rowfunc d width)) (number-sequence 0 dots) "\n")
-             (and odd "\n")
-             (and odd (,rowfunc (+ dots 1) width))
+              (lambda (d) (pl/xpm-row-string d width ?. ? )) seq "\n")
+             (and odd (concat "\n" (pl/xpm-row-string (+ ,end ,incr) width ?. ? )))
              "\n"
              (mapconcat
-              (lambda (d) (,rowfunc d width)) (number-sequence dots 0 -1) "\n")
+              (lambda (d) (pl/xpm-row-string d width ?. ? )) (reverse seq) "\n")
              "};")
             'xpm t :ascent 'center
             :face (when (and face1 face2) (if (eq ',dir 'left) face1 face2))))))))
@@ -138,8 +127,8 @@ static char * arrow_%s[] = {
 (defun powerline-reset ()
   "Reset memoized functions."
   (interactive)
-  (memoize (pl/arrow-xpm left))
-  (memoize (pl/arrow-xpm right)))
+  (memoize (pl/arrow left))
+  (memoize (pl/arrow right)))
 (powerline-reset)
 
 (defun pl/make-xpm (name color1 color2 data)
