@@ -387,6 +387,7 @@ static char * %s[] = {
                 '("%e"
                   (:eval
                    (let* ((active (powerline-selected-window-active))
+                          (mode-line (if active 'mode-line 'mode-line-inactive))
                           (face1 (if active 'powerline-active1
                                    'powerline-inactive1))
                           (face2 (if active 'powerline-active2
@@ -397,7 +398,7 @@ static char * %s[] = {
                                 (powerline-buffer-id nil 'l)
 
                                 (powerline-raw " ")
-                                (powerline-arrow-right nil face1)
+                                (powerline-arrow-right mode-line face1)
 
                                 (powerline-narrow face1 'l)
 
@@ -409,7 +410,7 @@ static char * %s[] = {
                                 (powerline-raw ":" face1)
                                 (powerline-raw "%3c" face1 'r)
 
-                                (powerline-arrow-left face1 nil)
+                                (powerline-arrow-left face1 mode-line)
                                 (powerline-raw " ")
                                 (powerline-raw "%6p" nil 'r)
                                 (powerline-hud face2 face1)))
@@ -446,6 +447,7 @@ static char * %s[] = {
                 '("%e"
                   (:eval
                    (let* ((active (powerline-selected-window-active))
+                          (mode-line (if active 'mode-line 'mode-line-inactive))
                           (face1 (if active 'powerline-active1
                                    'powerline-inactive1))
                           (face2 (if active 'powerline-active2
@@ -456,7 +458,7 @@ static char * %s[] = {
                                 (powerline-buffer-id nil 'l)
 
                                 (powerline-raw " ")
-                                (powerline-arrow-right nil face1)
+                                (powerline-arrow-right mode-line face1)
 
                                 (when (boundp 'erc-modified-channels-object)
                                   (powerline-raw erc-modified-channels-object
@@ -480,7 +482,7 @@ static char * %s[] = {
                                 (powerline-raw ":" face1)
                                 (powerline-raw "%3c" face1 'r)
 
-                                (powerline-arrow-left face1 nil)
+                                (powerline-arrow-left face1 mode-line)
                                 (powerline-raw " ")
 
                                 (powerline-raw "%6p" nil 'r)
