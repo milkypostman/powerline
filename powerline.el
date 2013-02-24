@@ -33,7 +33,7 @@
 (defcustom powerline-buffer-size-suffix t
   "Display the buffer size suffix."
   :group 'powerline
-  :type 'bool)
+  :type 'boolean)
 
 (defun create-or-get-powerline-cache ()
   "Return a frame-local hash table that acts as a memoization
