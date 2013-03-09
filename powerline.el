@@ -35,7 +35,7 @@
   :group 'powerline
   :type 'boolean)
 
-(defun create-or-get-powerline-cache ()
+(defun pl/create-or-get-cache ()
   "Return a frame-local hash table that acts as a memoization
 cache for powerline. Create one if the frame doesn't have one
 yet."
@@ -46,15 +46,15 @@ yet."
         table)))
 
 ;; from memoize.el @ http://nullprogram.com/blog/2010/07/26/
-(defun memoize (func)
+(defun pl/memoize (func)
   "Memoize FUNC.
 If argument is a symbol then install the memoized function over
 the original function.  Use frame-local memoization."
   (typecase func
-    (symbol (fset func (memoize-wrap-frame-local (symbol-function func))) func)
-    (function (memoize-wrap-frame-local func))))
+    (symbol (fset func (pl/memoize-wrap-frame-local (symbol-function func))) func)
+    (function (pl/memoize-wrap-frame-local func))))
 
-(defun memoize-wrap-frame-local (func)
+(defun pl/memoize-wrap-frame-local (func)
   "Return the memoized version of FUNC.  The memoization cache is
 frame-local."
   (let ((cache-sym (gensym))
@@ -62,7 +62,7 @@ frame-local."
         (args-sym (gensym)))
     `(lambda (&rest ,args-sym)
        ,(concat (documentation func) "\n(memoized function)")
-       (let* ((,cache-sym (create-or-get-powerline-cache))
+       (let* ((,cache-sym (pl/create-or-get-cache))
               (,val-sym (gethash ,args-sym ,cache-sym)))
          (if ,val-sym
              ,val-sym
@@ -127,8 +127,8 @@ static char * arrow_%s[] = {
 (defun powerline-reset ()
   "Reset memoized functions."
   (interactive)
-  (memoize (pl/arrow left))
-  (memoize (pl/arrow right)))
+  (pl/memoize (pl/arrow left))
+  (pl/memoize (pl/arrow right)))
 (powerline-reset)
 
 (defun pl/make-xpm (name color1 color2 data)
@@ -184,7 +184,7 @@ static char * %s[] = {
       (setq i (+ i 1)))
     (pl/make-xpm "percent" color1 color2 (reverse data))))
 
-(memoize 'pl/percent-xpm)
+(pl/memoize 'pl/percent-xpm)
 
 ;;;###autoload
 (defun powerline-hud (face1 face2 &optional width)
