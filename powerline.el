@@ -351,6 +351,8 @@ static char * %s[] = {
    ((listp mode-line-process) (format-mode-line mode-line-process))
    (t mode-line-process)))
 
+(defvar pl/default-mode-line mode-line-format)
+
 (defvar pl/minibuffer-selected-window-list '())
 
 (defun pl/minibuffer-selected-window ()
@@ -438,6 +440,10 @@ static char * %s[] = {
 ;;;###autoload
 (fset 'powerline-default-center 'powerline-center-theme)
 
+(defun powerline-revert ()
+  "Revert to the default Emacs mode-line."
+  (interactive)
+  (setq-default mode-line-format pl/default-mode-line))
 
 ;;;###autoload
 (defun powerline-default-theme ()
