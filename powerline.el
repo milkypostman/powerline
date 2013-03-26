@@ -484,8 +484,8 @@ static char * %s[] = {
 
                                 (powerline-arrow-left face2 face1)
 
-                                (powerline-raw "%4l" face1 'r)
-                                (powerline-raw ":" face1)
+                                (powerline-raw "%4l" face1 'l)
+                                (powerline-raw ":" face1 'l)
                                 (powerline-raw "%3c" face1 'r)
 
                                 (powerline-arrow-left face1 mode-line)
