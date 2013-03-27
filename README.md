@@ -9,112 +9,38 @@ This is a proposed version 2.0 of the original [Emacs Powerline](http://www.emac
 ## Installation
 
     (require 'powerline)
-    (powerline-default)
+    (powerline-default-theme)
     
-The `powerline-default` function provides a *default* mode-line.  You can write your own or copy and modify the `mode-line-format` contents provided.
+The second line customizes `mode-line-format` according to the default theme.
 
-    (setq-default mode-line-format
-                  '("%e"
-                    (:eval
-                     (let* ((active (eq (frame-selected-window) (selected-window)))
-                            (face1 (if active 'powerline-active1 'powerline-inactive1))
-                            (face2 (if active 'powerline-active2 'powerline-inactive2))
-                            (lhs (list
-                                  (powerline-raw "%*" nil 'l)
-                                  (powerline-buffer-size nil 'l)
-                                  (powerline-buffer-id nil 'l)
-  
-                                  (powerline-raw " ")
-                                  (powerline-arrow-right nil face1)
-  
-                                  (powerline-major-mode face1 'l)
-                                  (powerline-minor-modes face1 'l)
-                                  (powerline-raw mode-line-process face1 'l)
-  
-                                  (powerline-narrow face1 'l)
-  
-                                  (powerline-arrow-right face1 face2)
-  
-                                  (powerline-vc face2)
-                                  ))
-                            (rhs (list
-                                  (powerline-raw global-mode-string face2 'r)
-  
-                                  (powerline-arrow-left face2 face1)
-  
-                                  (powerline-raw "%4l" face1 'r)
-                                  (powerline-raw ":" face1)
-                                  (powerline-raw "%3c" face1 'r)
-  
-                                  (powerline-arrow-left face1 nil)
-                                  (powerline-raw " ")
-  
-                                  (powerline-raw "%6p" nil 'r)
-  
-                                  (powerline-hud face2 face1))))
-                       (concat
-                        (powerline-render lhs)
-                        (powerline-fill face2 (powerline-width rhs))
-                        (powerline-render rhs))))))
-                      
-The last line of this is what actually puts it all together.  It makes sure that the XPM images are rendered properly.  But notice we pre-compile the `rhs` of the statusline and this allows us to more accurately right justify the text.  There are currently no other "separators", just the arrows.  I will be introducing more gradually.  This version should be easier to modify.
+There are two builtin themes: `powerline-default-theme` and `powerline-center-theme`.
+
+You can revert back to the original value of `mode-line-format` that was being used when powerline was loaded using `powerline-revert`.
+
+## Faces
+
+The faces that powerline uses for the builtin themes are `powerline-active1` and `powerline-active2` for the active modeline, and `powerline-inactive1` ande `powerline-inactive2` for the inactive modelines. If you create your own theme, you can add as many faces as you want and pass those faces to the corresponding `powerline-*` functions when creating your `mode-line-format`.
 
 
-### Centering
-                      
-You can also setup a default mode-line using,
+## Custom Themes
 
-    (powerline-default-center)
+Please look over the `powerline-default-theme` and `powerline-center-theme` in [`powerline.el`](https://github.com/milkypostman/powerline/blob/master/powerline.el) for examples of themes that involve different justifications of modeline text.
+
+You can write your own powerline theme by simply setting your own `mode-line-format` to be an evaluation (`:eval`) of the powerline functions. Notice in `powerline-default-theme` the `let*` defines two lists: `lhs` and `rhs` which are exactly the lists that define what goes on the left and right sides of the modeline. The `powerline-center-theme` demonstrates how to *center* justify part of the modeline and defines an additional `center` list which is exactly the modeline components to be displayed in the middle section. 
+
+In *most* circumstances you should only need to modify the builtin themes unless you are trying to do a particularly unique layout.
+
+
+### Explanation
+
+This theme does some tricks to improve performance and get all the text justified properly. First, it sets `lhs` and `rhs` to a list of powerline sections. You can easily re-utilize builtin modeline formatting by adding it as a raw powerline section. For example,
+
+    (powerline-raw mode-line-mule-info nil 'l)
     
-which sets up a mode-line demonstrating the ability to *center* mode-line information.  It contains the following setup,
+would add the formatting defined in `mode-line-mule-info` to the modeline as it appears in the default modeline.
 
-    (setq-default mode-line-format
-                  '("%e"
-                    (:eval
-                     (let* ((active (eq (frame-selected-window) (selected-window)))
-                            (face1 (if active 'powerline-active1 'powerline-inactive1))
-                            (face2 (if active 'powerline-active2 'powerline-inactive2))
-                            (lhs (list
-                                  (powerline-raw "%*" nil 'l)
-                                  (powerline-buffer-size nil 'l)
-                                  (powerline-buffer-id nil 'l)
-  
-                                  (powerline-raw " ")
-                                  (powerline-arrow-right nil face1)
-  
-                                  (powerline-raw mode-line-process face1 'l)
-  
-                                  (powerline-narrow face1 'l)
-  
-                                  (powerline-vc face1)
-                                  ))
-                            (rhs (list
-                                  (powerline-raw global-mode-string face2 'r)
-  
-                                  (powerline-raw "%4l" face1 'r)
-                                  (powerline-raw ":" face1)
-                                  (powerline-raw "%3c" face1 'r)
-  
-                                  (powerline-arrow-left face1 nil)
-                                  (powerline-raw " ")
-                                  (powerline-raw "%6p" nil 'r)
-                                  (powerline-hud face2 face1)))
-                            (center (list
-                                     (powerline-raw " " face1)
-                                     (powerline-arrow-right face1 face2)
-                                     (powerline-major-mode face2 'l)
-                                     (powerline-raw " :" face2)
-                                     (powerline-minor-modes face2 'l)
-                                     (powerline-raw " " face2)
-                                     (powerline-arrow-left face2 face1))))
-  
-                       (concat
-                        (powerline-render lhs)
-                        (powerline-fill-center face1 (/ (powerline-width center) 2.0))
-                        (powerline-render center)
-                        (powerline-fill face1 (powerline-width rhs))
-                        (powerline-render rhs))))))                       
-  
+The last line of this is what actually puts it all together, by concatonating the `lhs`, some "fill" space, and `rhs`.  This *must* be done to ensure that the padding in between the left and right sections properly fills the modeline.
+
 
 
 ## Improvements from this rewrite:
