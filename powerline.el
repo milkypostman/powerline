@@ -462,6 +462,10 @@ static char * %s[] = {
                           (lhs (list
                                 (powerline-raw "%*" nil 'l)
                                 (powerline-buffer-size nil 'l)
+
+                                (when which-func-mode
+                                  (powerline-raw which-func-format nil 'l))
+
                                 (powerline-buffer-id nil 'l)
 
                                 (powerline-raw " ")
