@@ -238,21 +238,18 @@ static char * %s[] = {
 (defmacro defpowerline (name body)
   `(defun ,name
      (&optional face pad)
-     (let ((str ,body))
-       (propertize (concat
-                    (when (and str (eq pad 'l)) " ")
-                    str
-                    (when (and str (eq pad 'r)) " "))
-                   'face face))))
+     (powerline-raw ,body face pad)))
 
 ;;;###autoload
 (defun powerline-raw (str &optional face pad)
-  (let ((rendered-str (format-mode-line str)))
-    (propertize  (concat
-                  (when (and rendered-str (eq pad 'l)) " ")
-                  (if (listp str) rendered-str str)
-                  (when (and rendered-str (eq pad 'r)) " "))
-                 'face face)))
+  (let* ((rendered-str (format-mode-line str))
+         (padded-str (concat
+                      (when (and (> (length rendered-str) 0) (eq pad 'l)) " ")
+                      (if (listp str) rendered-str str)
+                      (when (and (> (length rendered-str) 0) (eq pad 'r)) " "))))
+    (if face
+        (propertize padded-str 'face face)
+      padded-str)))
 
 
 ;;;###autoload
