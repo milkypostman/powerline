@@ -277,6 +277,7 @@ static char * %s[] = {
 ;;;###autoload
 (defpowerline powerline-major-mode
   (propertize (format-mode-line mode-name)
+              'mouse-face 'mode-line-highlight
               'help-echo "Major mode\n\ mouse-1: Display major mode menu\n\ mouse-2: Show help for major mode\n\ mouse-3: Toggle minor modes"
               'local-map (let ((map (make-sparse-keymap)))
                            (define-key map [mode-line down-mouse-1]
@@ -290,6 +291,7 @@ static char * %s[] = {
 (defpowerline powerline-minor-modes
   (mapconcat (lambda (mm)
                (propertize mm
+                           'mouse-face 'mode-line-highlight
                            'help-echo "Minor mode\n mouse-1: Display minor mode menu\n mouse-2: Show help for minor mode\n mouse-3: Toggle minor modes"
                            'local-map (let ((map (make-sparse-keymap)))
                                         (define-key map
@@ -318,6 +320,7 @@ static char * %s[] = {
     (when (or (/= real-point-min (point-min))
               (/= real-point-max (point-max)))
       (propertize "Narrow"
+                  'mouse-face 'mode-line-highlight
                   'help-echo "mouse-1: Remove narrowing from the current buffer"
                   'local-map (make-mode-line-mouse-map
                               'mouse-1 'mode-line-widen)))))
@@ -335,6 +338,7 @@ static char * %s[] = {
    (if powerline-buffer-size-suffix
        "%I"
      "%i")
+   'mouse-face 'mode-line-highlight
    'local-map (make-mode-line-mouse-map
                'mouse-1 (lambda () (interactive)
                           (setq powerline-buffer-size-suffix
