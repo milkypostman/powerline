@@ -150,19 +150,19 @@ static char * %s[] = {
       (let ((len  (length data))
             (idx  0))
         (apply 'concat
-               (mapcar '(lambda (dl)
-                          (setq idx (+ idx 1))
-                          (concat
-                           "\""
+               (mapcar #'(lambda (dl)
+                           (setq idx (+ idx 1))
                            (concat
-                            (mapcar '(lambda (d)
-                                       (if (eq d 0)
-                                           (string-to-char " ")
-                                         (string-to-char ".")))
-                                    dl))
-                           (if (eq idx len)
-                               "\"};"
-                             "\",\n")))
+                            "\""
+                            (concat
+                             (mapcar #'(lambda (d)
+                                         (if (eq d 0)
+                                             (string-to-char " ")
+                                           (string-to-char ".")))
+                                     dl))
+                            (if (eq idx len)
+                                "\"};"
+                              "\",\n")))
                        data))))
      'xpm t :ascent 'center)))
 
