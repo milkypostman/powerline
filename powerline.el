@@ -354,12 +354,14 @@ static char * %s[] = {
 
 ;;;###autoload
 (defpowerline powerline-which-func
-  (propertize (format-mode-line which-func-current)
-              'local-map which-func-keymap
-              'mouse-face 'mode-line-highlight
-              'help-echo "mouse-1: go to beginning\n\
+  (format-mode-line
+   `(:propertize which-func-current
+                 local-map ,which-func-keymap
+                 face which-func
+                 mouse-face mode-line-highlight
+                 help-echo "mouse-1: go to beginning\n\
 mouse-2: toggle rest visibility\n\
-mouse-3: go to end"))
+mouse-3: go to end")))
 
 (defvar pl/default-mode-line mode-line-format)
 
