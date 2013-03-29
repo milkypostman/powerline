@@ -463,10 +463,12 @@ static char * %s[] = {
                                 (powerline-raw "%*" nil 'l)
                                 (powerline-buffer-size nil 'l)
 
+                                (powerline-raw mode-line-mule-info nil 'l)
+                                (powerline-buffer-id nil 'l)
+
                                 (when which-func-mode
                                   (powerline-raw which-func-format nil 'l))
 
-                                (powerline-buffer-id nil 'l)
 
                                 (powerline-raw " ")
                                 (powerline-arrow-right mode-line face1)
