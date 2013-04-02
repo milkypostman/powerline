@@ -1,16 +1,19 @@
 ;;; powerline.el --- Rewrite of Powerline
 
-;; Copyright (c) 2012 Donald Ephraim Curtis
+;; Copyright (c) 2013, 2012 Donald Ephraim Curtis
+;; Copyright (c) 2013 Jason Milkins
 ;; Copyright (c) 2012 Nicolas Rougier
 
 ;; Author: Donald Ephraim Curtis <dcurtis@milkbox.net>
 ;; URL: http://github.com/milkypostman/powerline
-;; Version: 2.0
+;; Version: 2.1
 ;; Keywords: mode-line
 
 ;;; Code:
 
 (require 'cl)
+
+(require 'powerline-separators)
 
 (defface powerline-active1 '((t (:background "grey22" :inherit mode-line)))
   "Powerline face 1."
@@ -28,6 +31,13 @@
 (defface powerline-inactive2
   '((t (:background "grey20" :inherit mode-line-inactive)))
   "Powerline face 2."
+  :group 'powerline)
+
+(defcustom powerline-default-separator 'arrow
+  "The separator to use for the default theme.
+
+Valid Values: arrow, wave, brace, roundstub, zigzag, butt,
+chamfer, rounded, contour, slant, curve"
   :group 'powerline)
 
 (defcustom powerline-buffer-size-suffix t
@@ -91,44 +101,33 @@ left by WIDTH out of TOTAL. "
      (t (setq ret nil)))
     (symbol-value 'ret)))
 
-(defmacro pl/arrow (dir)
-  "Generate an arrow xpm function for DIR."
-  (let ((start (if (eq dir 'left) 'width 0))
-        (end (if (eq dir 'left) '(- width midwidth) 'midwidth))
-        (incr (if (eq dir 'left) -1 1)))
-    `(defun ,(intern (format "powerline-arrow-%s" (symbol-name dir)))
-       (face1 face2 &optional height)
-       (when window-system
-         (unless height (setq height (frame-char-height)))
-         (let* ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
-                (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
-                (midwidth (1- (/ height 2)))
-                (width (1- (ceiling height 2)))
-                (seq (number-sequence ,start ,end ,incr))
-                (odd (not (= midwidth width))))
-           (create-image
-            (concat
-             (format "/* XPM */
-static char * arrow_%s[] = {
-\"%s %s 2 1\",
-\". c %s\",
-\"  c %s\",
-" (symbol-name ',dir) width height (or color1 "None") (or color2 "None"))
-             (mapconcat
-              (lambda (d) (pl/xpm-row-string d width ?. ? )) seq "\n")
-             (and odd (concat "\n" (pl/xpm-row-string (+ ,end ,incr) width ?. ? )))
-             "\n"
-             (mapconcat
-              (lambda (d) (pl/xpm-row-string d width ?. ? )) (reverse seq) "\n")
-             "};")
-            'xpm t :ascent 'center
-            :face (when (and face1 face2) (if (eq ',dir 'left) face1 face2))))))))
 
 (defun powerline-reset ()
   "Reset memoized functions."
   (interactive)
   (pl/memoize (pl/arrow left))
-  (pl/memoize (pl/arrow right)))
+  (pl/memoize (pl/arrow right))
+  (fset 'powerline-wave-left (pl/memoize (symbol-function 'pl/wave-left)))
+  (fset 'powerline-wave-right (pl/memoize (symbol-function 'pl/wave-right)))
+  (fset 'powerline-brace-left (pl/memoize (symbol-function 'pl/brace-left)))
+  (fset 'powerline-brace-right (pl/memoize (symbol-function 'pl/brace-right)))
+  (fset 'powerline-roundstub-left (pl/memoize (symbol-function 'pl/roundstub-left)))
+  (fset 'powerline-roundstub-right (pl/memoize (symbol-function 'pl/roundstub-right)))
+  (fset 'powerline-zigzag-left (pl/memoize (symbol-function 'pl/zigzag-left)))
+  (fset 'powerline-zigzag-right (pl/memoize (symbol-function 'pl/zigzag-right)))
+  (fset 'powerline-butt-left (pl/memoize (symbol-function 'pl/butt-left)))
+  (fset 'powerline-butt-right (pl/memoize (symbol-function 'pl/butt-right)))
+  (fset 'powerline-chamfer-left (pl/memoize (symbol-function 'pl/chamfer)))
+  (fset 'powerline-chamfer-right (pl/memoize (symbol-function 'pl/chamfer)))
+  (fset 'powerline-rounded-left (pl/memoize (symbol-function 'pl/rounded)))
+  (fset 'powerline-rounded-right (pl/memoize (symbol-function 'pl/rounded)))
+  (fset 'powerline-contour-left (pl/memoize (symbol-function 'pl/contour-left)))
+  (fset 'powerline-contour-right (pl/memoize (symbol-function 'pl/contour-right)))
+  (fset 'powerline-slant-left (pl/memoize (symbol-function 'pl/slant-left)))
+  (fset 'powerline-slant-right (pl/memoize (symbol-function 'pl/slant-right)))
+  (fset 'powerline-curve-right (pl/memoize (symbol-function 'pl/curve-right)))
+  (fset 'powerline-curve-left (pl/memoize (symbol-function 'pl/curve-left)))
+  )
 (powerline-reset)
 
 (defun pl/make-xpm (name color1 color2 data)
@@ -191,6 +190,8 @@ static char * %s[] = {
   (unless width (setq width 2))
   (let ((color1 (if face1 (face-attribute face1 :background) "None"))
         (color2 (if face2 (face-attribute face2 :background) "None"))
+        (height (max (- (elt (window-pixel-edges) 3) (elt (window-inside-pixel-edges) 3))
+                     (frame-char-height)))
         pmax
         pmin
         (ws (window-start))
@@ -201,7 +202,7 @@ static char * %s[] = {
       (setq pmin (point-min)))
     (propertize (make-string width ? )
                 'display
-                (pl/percent-xpm (frame-char-height) pmax pmin we ws
+                (pl/percent-xpm height pmax pmin we ws
                                 (* (frame-char-width) width) color1 color2))))
 
 
@@ -412,6 +413,8 @@ mouse-3: go to end")))
                                    'powerline-inactive1))
                           (face2 (if active 'powerline-active2
                                    'powerline-inactive2))
+                          (separator-left (intern (format "powerline-%s-left" powerline-default-separator)))
+                          (separator-right (intern (format "powerline-%s-right" powerline-default-separator)))
                           (lhs (list
                                 (powerline-raw "%*" nil 'l)
                                 (powerline-buffer-size nil 'l)
@@ -427,7 +430,7 @@ mouse-3: go to end")))
 
 
                                 (powerline-raw " ")
-                                (powerline-arrow-right mode-line face1)
+                                (funcall separator-left mode-line face1)
 
                                 (when (boundp 'erc-modified-channels-object)
                                   (powerline-raw erc-modified-channels-object
@@ -439,24 +442,25 @@ mouse-3: go to end")))
                                 (powerline-narrow face1 'l)
 
                                 (powerline-raw " " face1)
-                                (powerline-arrow-right face1 face2)
+                                (funcall separator-left face1 face2)
 
                                 (powerline-vc face2 'r)))
                           (rhs (list
                                 (powerline-raw global-mode-string face2 'r)
 
-                                (powerline-arrow-left face2 face1)
+                                (funcall separator-right face2 face1)
 
                                 (powerline-raw "%4l" face1 'l)
                                 (powerline-raw ":" face1 'l)
                                 (powerline-raw "%3c" face1 'r)
 
-                                (powerline-arrow-left face1 mode-line)
+                                (funcall separator-right face1 mode-line)
                                 (powerline-raw " ")
 
                                 (powerline-raw "%6p" nil 'r)
 
                                 (powerline-hud face2 face1))))
+                     ;;(message "%s %s" separator-left (funcall 'powerline-wave-left mode-line face1))
                      (concat
                       (powerline-render lhs)
                       (powerline-fill face2 (powerline-width rhs))
