@@ -499,7 +499,7 @@ mouse-3: go to end")))
                                 (powerline-raw " " face1)
                                 (powerline-arrow-right face1 face2)
 
-                                (powerline-vc face2)))
+                                (powerline-vc face2 'r)))
                           (rhs (list
                                 (powerline-raw global-mode-string face2 'r)
 
