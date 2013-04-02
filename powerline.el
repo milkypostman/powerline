@@ -57,16 +57,16 @@ the original function.  Use frame-local memoization."
 (defun pl/memoize-wrap-frame-local (func)
   "Return the memoized version of FUNC.  The memoization cache is
 frame-local."
-  (let ((cache-sym (gensym))
-        (val-sym (gensym))
-        (args-sym (gensym)))
-    `(lambda (&rest ,args-sym)
-       ,(concat (documentation func) "\n(memoized function)")
-       (let* ((,cache-sym (pl/create-or-get-cache))
-              (,val-sym (gethash ,args-sym ,cache-sym)))
-         (if ,val-sym
-             ,val-sym
-           (puthash ,args-sym (apply ,func ,args-sym) ,cache-sym))))))
+  ;; (message "memoize %s %s %s" cache-sym val-sym args-sym)
+  (let ((funcid (gensym)))
+    `(lambda (&rest args)
+       ,(concat (documentation func) (format "\n(memoized function %s)" funcid))
+       (let* ((cache (pl/create-or-get-cache))
+              (val (gethash (cons ',funcid args) cache)))
+         ;;(message "%s" ,val-sym)
+         (if val
+             val
+           (puthash args (apply ,func args) cache))))))
 
 
 (defun pl/xpm-row-string (width total left right)
