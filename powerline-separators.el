@@ -223,73 +223,59 @@ static char * brace_right[] = {
 
 
 
-(defun pl/roundstub-left (face1 face2)
+(defun pl/roundstub-left (face1 face2 &optional height)
   "Return an XPM roundstub left."
+  (unless height (setq height (pl/separator-height)))
   (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
-        (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None")))
+        (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
+        (fill-height (max (- height 6) 0)))
     (create-image
      (format "/* XPM */
 static char * roundstub_left[] = {
-\"3 18 3 1\",
+\"3 %s 3 1\",
 \"@ c %s\",
 \"# c %s\",
 \"  c %s\",
 \"   \",
 \"@@ \",
 \"@@#\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
+%s
 \"@@#\",
 \"@@ \",
 \"   \"};"
+             height
              (if color1 color1 "None")
              (if (and face1 face2) (pl/interpolate color2 color1) "None")
-             (if color2 color2 "None"))
-     'xpm t :ascent 'center)))
+             (if color2 color2 "None")
+             (apply 'concat (loop repeat fill-height collect "\"@@@\",")))
+     'xpm t :ascent 'center :face face1)))
 
-(defun pl/roundstub-right (face1 face2)
+(defun pl/roundstub-right (face1 face2 &optional height)
   "Return an XPM roundstub right."
+  (unless height (setq height (pl/separator-height)))
   (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
-        (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None")))
+        (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
+        (fill-height (max (- height 6) 0)))
     (create-image
      (format "/* XPM */
 static char * roundstub_right[] = {
-\"3 18 3 1\",
+\"3 %s 3 1\",
 \"@ c %s\",
 \"# c %s\",
 \"  c %s\",
 \"   \",
 \" @@\",
 \"#@@\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
+%s
 \"#@@\",
 \" @@\",
 \"   \"};"
+             height
              (if color2 color2 "None")
              (if (and face1 face2) (pl/interpolate color2 color1) "None")
-             (if color1 color1 "None"))
-     'xpm t :ascent 'center)))
+             (if color1 color1 "None")
+             (apply 'concat (loop repeat fill-height collect "\"@@@\",")))
+     'xpm t :ascent 'center :face face2)))
 
 (defun pl/zigzag-left (face1 face2)
   "Return an XPM zigzag left."
@@ -599,7 +585,7 @@ static char * arrow_%s[] = {
 
 (defun pl/curve-left (face1 face2 &optional height)
   "Return an XPM left curve string representing@"
-  (unless height (setq height (max (pl/separator-height) 16)))
+  (unless height (setq height (max (pl/separator-height) 14)))
   (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
         (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
         (fill-height (max (- height 12) 0)))
@@ -633,7 +619,7 @@ static char * curve_left[] = {
 
 (defun pl/curve-right (face1 face2 &optional height)
   "Return an XPM right curve string representing@"
-  (unless height (setq height (max (pl/separator-height) 16)))
+  (unless height (setq height (max (pl/separator-height) 14)))
   (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
         (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
         (fill-height (max (- height 12) 0)))
