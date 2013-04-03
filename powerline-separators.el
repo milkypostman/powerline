@@ -13,6 +13,29 @@
 
 (require 'cl)
 
+(defun pl/xpm-row-string (width total left right)
+  "Generate a string of two types of characters filled on the
+left by WIDTH out of TOTAL. "
+  (concat "\"" (make-string width left)
+          (make-string (- total width) right)
+          "\","))
+
+(defun pl/hex-color (color)
+  "Gets the hexadecimal value of a color"
+  (let ((ret color))
+    (cond
+     ((string= "#" (substring color 0 1))
+      (setq ret (upcase ret)))
+     ((color-defined-p color)
+      (setq ret (concat "#"
+                        (mapconcat
+                         (lambda(val)
+                           (format "%02X" (* val 255)))
+                         (color-name-to-rgb color) ""))))
+     (t (setq ret nil)))
+    (symbol-value 'ret)))
+
+
 (defmacro pl/arrow (dir)
   "Generate an arrow xpm function for DIR."
   (let ((start (if (eq dir 'right) 'width 0))
@@ -21,7 +44,7 @@
     `(defun ,(intern (format "powerline-arrow-%s" (symbol-name dir)))
        (face1 face2 &optional height)
        (when window-system
-         (unless height (setq height (frame-char-height)))
+         (unless height (setq height (pl/separator-height)))
          (let* ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
                 (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
                 (midwidth (1- (/ height 2)))
@@ -65,28 +88,28 @@ static char * arrow_%s[] = {
     (create-image
      (format "/* XPM */
 static char * wave_left[] = {
-\"12 18 3 1\",
+\"11 18 3 1\",
 \"@ c %s\",
 \"# c %s\",
 \"  c %s\",
-\"@#          \",
-\"@@@         \",
-\"@@@@        \",
-\"@@@@#       \",
-\"@@@@@       \",
-\"@@@@@#      \",
-\"@@@@@@      \",
-\"@@@@@@      \",
-\"@@@@@@#     \",
-\"@@@@@@@     \",
-\"@@@@@@@     \",
-\"@@@@@@@#    \",
-\"@@@@@@@@    \",
-\"@@@@@@@@    \",
-\"@@@@@@@@#   \",
-\"@@@@@@@@@   \",
-\"@@@@@@@@@#  \",
-\"@@@@@@@@@@@#\"};"
+\"#          \",
+\"@@         \",
+\"@@@        \",
+\"@@@#       \",
+\"@@@@       \",
+\"@@@@#      \",
+\"@@@@@      \",
+\"@@@@@      \",
+\"@@@@@#     \",
+\"@@@@@@     \",
+\"@@@@@@     \",
+\"@@@@@@#    \",
+\"@@@@@@@    \",
+\"@@@@@@@    \",
+\"@@@@@@@#   \",
+\"@@@@@@@@   \",
+\"@@@@@@@@#  \",
+\"@@@@@@@@@@#\"};"
              (if color1 color1 "None")
              (if (and face1 face2) (pl/interpolate color1 color2) "None")
              (if color2 color2 "None"))
@@ -99,28 +122,28 @@ static char * wave_left[] = {
     (create-image
      (format "/* XPM */
 static char * wave_right[] = {
-\"12 18 3 1\",
+\"11 18 3 1\",
 \"@ c %s\",
 \"# c %s\",
 \"  c %s\",
-\"          #@\",
-\"         @@@\",
-\"        @@@@\",
-\"       #@@@@\",
-\"       @@@@@\",
-\"      #@@@@@\",
-\"      @@@@@@\",
-\"      @@@@@@\",
-\"     #@@@@@@\",
-\"     @@@@@@@\",
-\"     @@@@@@@\",
-\"    #@@@@@@@\",
-\"    @@@@@@@@\",
-\"    @@@@@@@@\",
-\"   #@@@@@@@@\",
-\"   @@@@@@@@@\",
-\"  @@@@@@@@@@\",
-\"#@@@@@@@@@@@\"};"
+\"          #\",
+\"         @@\",
+\"        @@@\",
+\"       #@@@\",
+\"       @@@@\",
+\"      #@@@@\",
+\"      @@@@@\",
+\"      @@@@@\",
+\"     #@@@@@\",
+\"     @@@@@@\",
+\"     @@@@@@\",
+\"    #@@@@@@\",
+\"    @@@@@@@\",
+\"    @@@@@@@\",
+\"   #@@@@@@@\",
+\"   @@@@@@@@\",
+\"  @@@@@@@@@\",
+\"#@@@@@@@@@@\"};"
              (if color2 color2 "None")
              (if (and face1 face2) (pl/interpolate color2 color1) "None")
              (if color1 color1 "None"))
@@ -207,28 +230,28 @@ static char * brace_right[] = {
     (create-image
      (format "/* XPM */
 static char * roundstub_left[] = {
-\"12 18 3 1\",
+\"3 18 3 1\",
 \"@ c %s\",
 \"# c %s\",
 \"  c %s\",
-\"@@          \",
-\"@@@@        \",
-\"@@@@#       \",
-\"@@@@@       \",
-\"@@@@@       \",
-\"@@@@@       \",
-\"@@@@@       \",
-\"@@@@@       \",
-\"@@@@@       \",
-\"@@@@@       \",
-\"@@@@@       \",
-\"@@@@@       \",
-\"@@@@@       \",
-\"@@@@@       \",
-\"@@@@@       \",
-\"@@@@#       \",
-\"@@@@        \",
-\"@@          \"};"
+\"   \",
+\"@@ \",
+\"@@#\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"@@#\",
+\"@@ \",
+\"   \"};"
              (if color1 color1 "None")
              (if (and face1 face2) (pl/interpolate color2 color1) "None")
              (if color2 color2 "None"))
@@ -241,28 +264,28 @@ static char * roundstub_left[] = {
     (create-image
      (format "/* XPM */
 static char * roundstub_right[] = {
-\"12 18 3 1\",
+\"3 18 3 1\",
 \"@ c %s\",
 \"# c %s\",
 \"  c %s\",
-\"          @@\",
-\"        @@@@\",
-\"       #@@@@\",
-\"       @@@@@\",
-\"       @@@@@\",
-\"       @@@@@\",
-\"       @@@@@\",
-\"       @@@@@\",
-\"       @@@@@\",
-\"       @@@@@\",
-\"       @@@@@\",
-\"       @@@@@\",
-\"       @@@@@\",
-\"       @@@@@\",
-\"       @@@@@\",
-\"       #@@@@\",
-\"        @@@@\",
-\"          @@\"};"
+\"   \",
+\" @@\",
+\"#@@\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"#@@\",
+\" @@\",
+\"   \"};"
              (if color2 color2 "None")
              (if (and face1 face2) (pl/interpolate color2 color1) "None")
              (if color1 color1 "None"))
@@ -275,28 +298,28 @@ static char * roundstub_right[] = {
     (create-image
      (format "/* XPM */
 static char * zigzag_left[] = {
-\"12 18 3 1\",
+\"3 18 3 1\",
 \"@ c %s\",
 \"# c %s\",
 \"  c %s\",
-\"@@@@        \",
-\"@@@@@       \",
-\"@@@@@@      \",
-\"@@@@@@@     \",
-\"@@@@@@      \",
-\"@@@@@       \",
-\"@@@@        \",
-\"@@@@@       \",
-\"@@@@@@      \",
-\"@@@@@@@     \",
-\"@@@@@@      \",
-\"@@@@@       \",
-\"@@@@        \",
-\"@@@@@       \",
-\"@@@@@@      \",
-\"@@@@@@@     \",
-\"@@@@@@      \",
-\"@@@@@       \"};"
+\"   \",
+\"@  \",
+\"@@ \",
+\"@@@\",
+\"@@ \",
+\"@  \",
+\"   \",
+\"@  \",
+\"@@ \",
+\"@@@\",
+\"@@ \",
+\"@  \",
+\"   \",
+\"@  \",
+\"@@ \",
+\"@@@\",
+\"@@ \",
+\"@  \"};"
              (if color1 color1 "None")
              (if (and face1 face2) (pl/interpolate color2 color1) "None")
              (if color2 color2 "None"))
@@ -309,28 +332,28 @@ static char * zigzag_left[] = {
     (create-image
      (format "/* XPM */
 static char * zigzag_right[] = {
-\"12 18 3 1\",
+\"3 18 3 1\",
 \"@ c %s\",
 \"# c %s\",
 \"  c %s\",
-\"        @@@@\",
-\"       @@@@@\",
-\"      @@@@@@\",
-\"     @@@@@@@\",
-\"      @@@@@@\",
-\"       @@@@@\",
-\"        @@@@\",
-\"       @@@@@\",
-\"      @@@@@@\",
-\"     @@@@@@@\",
-\"      @@@@@@\",
-\"       @@@@@\",
-\"        @@@@\",
-\"       @@@@@\",
-\"      @@@@@@\",
-\"     @@@@@@@\",
-\"      @@@@@@\",
-\"       @@@@@\"};"
+\"   \",
+\"  @\",
+\" @@\",
+\"@@@\",
+\" @@\",
+\"  @\",
+\"   \",
+\"  @\",
+\" @@\",
+\"@@@\",
+\" @@\",
+\"  @\",
+\"   \",
+\"  @\",
+\" @@\",
+\"@@@\",
+\" @@\",
+\"  @\"};"
              (if color2 color2 "None")
              (if (and face1 face2) (pl/interpolate color2 color1) "None")
              (if color1 color1 "None"))
@@ -343,28 +366,28 @@ static char * zigzag_right[] = {
     (create-image
      (format "/* XPM */
 static char * butt_left[] = {
-\"12 18 3 1\",
+\"3 18 3 1\",
 \"@ c %s\",
 \"# c %s\",
 \"  c %s\",
-\"@@@@        \",
-\"@@@@@       \",
-\"@@@@@@      \",
-\"@@@@@@@     \",
-\"@@@@@@@     \",
-\"@@@@@@@     \",
-\"@@@@@@@     \",
-\"@@@@@@@     \",
-\"@@@@@@@     \",
-\"@@@@@@@     \",
-\"@@@@@@@     \",
-\"@@@@@@@     \",
-\"@@@@@@@     \",
-\"@@@@@@@     \",
-\"@@@@@@@     \",
-\"@@@@@@      \",
-\"@@@@@       \",
-\"@@@@        \"};"
+\"   \",
+\"@  \",
+\"@@ \",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"@@ \",
+\"@  \",
+\"   \"};"
              (if color1 color1 "None")
              (if (and face1 face2) (pl/interpolate color2 color1) "None")
              (if color2 color2 "None"))
@@ -377,101 +400,119 @@ static char * butt_left[] = {
     (create-image
      (format "/* XPM */
 static char * butt_right[] = {
-\"12 18 3 1\",
+\"3 18 3 1\",
 \"@ c %s\",
 \"# c %s\",
 \"  c %s\",
-\"        @@@@\",
-\"       @@@@@\",
-\"      @@@@@@\",
-\"     @@@@@@@\",
-\"     @@@@@@@\",
-\"     @@@@@@@\",
-\"     @@@@@@@\",
-\"     @@@@@@@\",
-\"     @@@@@@@\",
-\"     @@@@@@@\",
-\"     @@@@@@@\",
-\"     @@@@@@@\",
-\"     @@@@@@@\",
-\"     @@@@@@@\",
-\"     @@@@@@@\",
-\"      @@@@@@\",
-\"       @@@@@\",
-\"        @@@@\"};"
+\"   \",
+\"  @\",
+\" @@\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\"@@@\",
+\" @@\",
+\"  @\",
+\"   \"};"
              (if color2 color2 "None")
              (if (and face1 face2) (pl/interpolate color2 color1) "None")
              (if color1 color1 "None"))
      'xpm t :ascent 'center)))
 
-(defun pl/chamfer (face1 face2)
-  "Return an XPM chamfer string representing."
-  (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
-        (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None")))
-    (create-image
-     (format "/* XPM */
-static char * chamfer[] = {
-\"12 18 3 1\",
+(defmacro pl/chamfer (dir)
+  "Generate an arrow xpm function for DIR."
+  (let ((start (if (eq dir 'right) 'width 0))
+        (end (if (eq dir 'right) 0 'width))
+        (incr (if (eq dir 'right) -1 1)))
+    `(defun ,(intern (format "powerline-chamfer-%s" (symbol-name dir)))
+       (face1 face2 &optional height)
+       (when window-system
+         (unless height (setq height (pl/separator-height)))
+         (let* ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
+                (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
+                (width 3)
+                (fill-height (- height width 1))
+                (seq (number-sequence ,start ,end ,incr)))
+           (message "%s" (+ ,incr ,end))
+           (create-image
+            (concat
+             (format "/* XPM */
+static char * arrow_%s[] = {
+\"%s %s 2 1\",
 \"@ c %s\",
-\"# c %s\",
 \"  c %s\",
-\"@@@@@@      \",
-\"@@@@@@@     \",
-\"@@@@@@@@    \",
-\"@@@@@@@@@   \",
-\"@@@@@@@@@   \",
-\"@@@@@@@@@   \",
-\"@@@@@@@@@   \",
-\"@@@@@@@@@   \",
-\"@@@@@@@@@   \",
-\"@@@@@@@@@   \",
-\"@@@@@@@@@   \",
-\"@@@@@@@@@   \",
-\"@@@@@@@@@   \",
-\"@@@@@@@@@   \",
-\"@@@@@@@@@   \",
-\"@@@@@@@@@   \",
-\"@@@@@@@@@   \",
-\"@@@@@@@@@   \",
-\"@@@@@@@@@   \"};"
-             (if color1 color1 "None")
-             (if (and face1 face2) (pl/interpolate color2 color1) "None")
-             (if color2 color2 "None"))
-     'xpm t :ascent 'center)))
+" (symbol-name ',dir) 3 height (or color1 "None") (or color2 "None"))
+             (mapconcat
+              (lambda (d) (pl/xpm-row-string d width ?@ ? )) seq "\n")
+             (apply 'concat (loop repeat fill-height collect (pl/xpm-row-string ,end width ?@ ? )))
+             "};")
+            'xpm t :ascent 'center
+            :face (when (and face1 face2) (if (eq ',dir 'right) face1 face2))))))))
 
 
-(defun pl/rounded (face1 face2)
+
+(defun pl/rounded-left (face1 face2 &optional height)
   "Return an XPM rounded string representing."
+  (unless height (setq height (pl/separator-height)))
   (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
-        (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None")))
+        (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
+        (fill-height (max (- height 6) 0)))
     (create-image
      (format "/* XPM */
 static char * rounded[] = {
-\"12 18 3 1\",
+\"6 %s 3 1\",
 \"@ c %s\",
 \"# c %s\",
 \"  c %s\",
-\"@@@#        \",
-\"@@@@@#      \",
-\"@@@@@@@     \",
-\"@@@@@@@#    \",
-\"@@@@@@@@    \",
-\"@@@@@@@@#   \",
-\"@@@@@@@@@   \",
-\"@@@@@@@@@   \",
-\"@@@@@@@@@   \",
-\"@@@@@@@@@   \",
-\"@@@@@@@@@   \",
-\"@@@@@@@@@   \",
-\"@@@@@@@@@   \",
-\"@@@@@@@@@   \",
-\"@@@@@@@@@   \",
-\"@@@@@@@@@   \",
-\"@@@@@@@@@   \",
-\"@@@@@@@@@   \"};"
+\"#     \",
+\"@@#   \",
+\"@@@@  \",
+\"@@@@# \",
+\"@@@@@ \",
+\"@@@@@#\",
+%s
+};"
+             height
              (if color1 color1 "None")
              (if (and face1 face2) (pl/interpolate color2 color1) "None")
-             (if color2 color2 "None"))
+             (if color2 color2 "None")
+             (apply 'concat (loop repeat fill-height collect "\"@@@@@@\",")))
+     'xpm t :ascent 'center)))
+
+(defun pl/rounded-right (face1 face2 &optional height)
+  "Return an XPM rounded string representing."
+  (unless height (setq height (pl/separator-height)))
+  (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
+        (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
+        (fill-height (max (- height 6) 0)))
+    (create-image
+     (format "/* XPM */
+static char * rounded[] = {
+\"6 %s 3 1\",
+\"  c %s\",
+\"# c %s\",
+\"@ c %s\",
+\"     #\",
+\"   #@@\",
+\"  @@@@\",
+\" #@@@@\",
+\" @@@@@\",
+\"#@@@@@\",
+%s
+};"
+             height
+             (if color1 color1 "None")
+             (if (and face1 face2) (pl/interpolate color2 color1) "None")
+             (if color2 color2 "None")
+             (apply 'concat (loop repeat fill-height collect "\"@@@@@@\",")))
      'xpm t :ascent 'center)))
 
 
@@ -482,32 +523,32 @@ static char * rounded[] = {
     (create-image
      (format "/* XPM */
 static char * contour_left[] = {
-\"12 18 3 1\",
+\"10 18 3 1\",
 \"@ c %s\",
 \"# c %s\",
 \"  c %s\",
-\"@           \",
-\"@@#         \",
-\"@@@#        \",
-\"@@@@#       \",
-\"@@@@@       \",
-\"@@@@@#      \",
-\"@@@@@@      \",
-\"@@@@@@      \",
-\"@@@@@@      \",
-\"@@@@@@      \",
-\"@@@@@@      \",
-\"@@@@@@      \",
-\"@@@@@@      \",
-\"@@@@@@#     \",
-\"@@@@@@@     \",
-\"@@@@@@@#    \",
-\"@@@@@@@@#   \",
-\"@@@@@@@@@@@ \"};"
+\"          \",
+\"@#        \",
+\"@@#       \",
+\"@@@#      \",
+\"@@@@      \",
+\"@@@@#     \",
+\"@@@@@     \",
+\"@@@@@     \",
+\"@@@@@     \",
+\"@@@@@     \",
+\"@@@@@     \",
+\"@@@@@     \",
+\"@@@@@     \",
+\"@@@@@#    \",
+\"@@@@@@    \",
+\"@@@@@@#   \",
+\"@@@@@@@#  \",
+\"@@@@@@@@@@\"};"
              (if color1 color1 "None")
              (if (and face1 face2) (pl/interpolate color2 color1) "None")
              (if color2 color2 "None"))
-     'xpm t :ascent 'center)))
+     'xpm t :ascent 'center :face face1)))
 
 (defun pl/contour-right (face1 face2)
   "Return an XPM contour-right string representing."
@@ -516,129 +557,90 @@ static char * contour_left[] = {
     (create-image
      (format "/* XPM */
 static char * contour_right[] = {
-\"12 18 3 1\",
+\"10 18 3 1\",
 \"@ c %s\",
 \"# c %s\",
 \"  c %s\",
-\"           @\",
-\"         #@@\",
-\"        #@@@\",
-\"       #@@@@\",
-\"       @@@@@\",
-\"      #@@@@@\",
-\"      @@@@@@\",
-\"      @@@@@@\",
-\"      @@@@@@\",
-\"      @@@@@@\",
-\"      @@@@@@\",
-\"      @@@@@@\",
-\"      @@@@@@\",
-\"     #@@@@@@\",
-\"     @@@@@@@\",
-\"    #@@@@@@@\",
-\"   #@@@@@@@@\",
-\" @@@@@@@@@@@\"};"
+\"          \",
+\"        #@\",
+\"       #@@\",
+\"      #@@@\",
+\"      @@@@\",
+\"     #@@@@\",
+\"     @@@@@\",
+\"     @@@@@\",
+\"     @@@@@\",
+\"     @@@@@\",
+\"     @@@@@\",
+\"     @@@@@\",
+\"     @@@@@\",
+\"    #@@@@@\",
+\"    @@@@@@\",
+\"   #@@@@@@\",
+\"  #@@@@@@@\",
+\"@@@@@@@@@@\"};"
              (if color2 color2 "None")
              (if (and face1 face2) (pl/interpolate color2 color1) "None")
              (if color1 color1 "None"))
-     'xpm t :ascent 'center)))
+     'xpm t :ascent 'center :face face2)))
 
-
-(defun pl/slant-left (face1 face2)
-  "Return an XPM left slant string representing."
-  (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
-        (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None")))
-    (create-image
-     (format "/* XPM */
-static char * slant_left[] = {
-\"12 18 3 1\",
+(defmacro pl/slant (dir)
+  "Generate an arrow xpm function for DIR."
+  (let ((start (if (eq dir 'right) 'width 0))
+        (end (if (eq dir 'right) 0 'width))
+        (incr (if (eq dir 'right) -1 1)))
+    `(defun ,(intern (format "powerline-slant-%s" (symbol-name dir)))
+       (face1 face2 &optional height)
+       (when window-system
+         (unless height (setq height (pl/separator-height)))
+         (let* ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
+                (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
+                (rows (ceiling height 2))
+                (width (1- (ceiling height 2)))
+                (seq (number-sequence ,start ,end ,incr)))
+           (create-image
+            (concat
+             (format "/* XPM */
+static char * arrow_%s[] = {
+\"%s %s 2 1\",
 \"@ c %s\",
-\"# c %s\",
 \"  c %s\",
-\"@@@@         \",
-\"@@@@         \",
-\"@@@@@        \",
-\"@@@@@        \",
-\"@@@@@@       \",
-\"@@@@@@       \",
-\"@@@@@@@      \",
-\"@@@@@@@      \",
-\"@@@@@@@@     \",
-\"@@@@@@@@     \",
-\"@@@@@@@@@    \",
-\"@@@@@@@@@    \",
-\"@@@@@@@@@@   \",
-\"@@@@@@@@@@   \",
-\"@@@@@@@@@@@  \",
-\"@@@@@@@@@@@  \",
-\"@@@@@@@@@@@@ \",
-\"@@@@@@@@@@@@\"};"
-             (if color1 color1 "None")
-             (if (and face1 face2) (pl/interpolate color2 color1) "None")
-             (if color2 color2 "None"))
-     'xpm t :ascent 'center)))
+" (symbol-name ',dir) width (* rows 2) (or color1 "None") (or color2 "None"))
+             (mapconcat
+              (lambda (d) (concat (pl/xpm-row-string d width ?@ ? )
+                                  (pl/xpm-row-string d width ?@ ? ))) seq "\n")
+             "};")
+            'xpm t :ascent 'center
+            :face (when (and face1 face2) (if (eq ',dir 'right) face1 face2))))))))
 
-(defun pl/slant-right (face1 face2)
-  "Return an XPM right slant string representing@"
-  (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
-        (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None")))
-    (create-image
-     (format "/* XPM */
-static char * slant_right[] = {
-\"12 18 3 1\",
-\"@ c %s\",
-\"# c %s\",
-\"  c %s\",
-\"        @@@@\",
-\"        @@@@\",
-\"       @@@@@\",
-\"       @@@@@\",
-\"      @@@@@@\",
-\"      @@@@@@\",
-\"     @@@@@@@\",
-\"     @@@@@@@\",
-\"    @@@@@@@@\",
-\"    @@@@@@@@\",
-\"   @@@@@@@@@\",
-\"   @@@@@@@@@\",
-\"  @@@@@@@@@@\",
-\"  @@@@@@@@@@\",
-\" @@@@@@@@@@@\",
-\" @@@@@@@@@@@\",
-\"@@@@@@@@@@@@\",
-\"@@@@@@@@@@@@\"};"
-             (if color2 color2 "None")
-             (if (and face1 face2) (pl/interpolate color2 color1) "None")
-             (if color1 color1 "None"))
-     'xpm t :ascent 'center)))
 
 
 (defun pl/curve-left (face1 face2 &optional height)
   "Return an XPM left curve string representing@"
-  (unless height (setq height (max (frame-char-height) 16)))
+  (unless height (setq height (max (pl/separator-height) 16)))
   (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
         (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
         (fill-height (max (- height 12) 0)))
     (create-image
      (format "/* XPM */
 static char * curve_left[] = {
-\"5 %s 3 1\",
+\"4 %s 3 1\",
 \"@ c %s\",
 \"# c %s\",
 \"  c %s\",
-\"     \",
-\"@#   \",
-\"@@@  \",
-\"@@@# \",
-\"@@@@ \",
-\"@@@@#\",
+\"    \",
+\"#   \",
+\"@@  \",
+\"@@# \",
+\"@@@ \",
+\"@@@#\",
 %s
-\"@@@@#\",
-\"@@@@ \",
-\"@@@# \",
-\"@@@  \",
-\"@#   \",
-\"     \"};"
+\"@@@#\",
+\"@@@ \",
+\"@@# \",
+\"@@  \",
+\"#   \",
+\"    \"};"
              (+ 12 fill-height)
              (if color1 color1 "None")
              (if (and face1 face2) (pl/interpolate color2 color1) "None")
@@ -649,30 +651,30 @@ static char * curve_left[] = {
 
 (defun pl/curve-right (face1 face2 &optional height)
   "Return an XPM right curve string representing@"
-  (unless height (setq height (max (frame-char-height) 16)))
+  (unless height (setq height (max (pl/separator-height) 16)))
   (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
         (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
         (fill-height (max (- height 12) 0)))
     (create-image
      (format "/* XPM */
 static char * curve_right[] = {
-\"5 %s 3 1\",
+\"4 %s 3 1\",
 \"@ c %s\",
 \"# c %s\",
 \"  c %s\",
-\"     \",
-\"   #@\",
-\"  @@@\",
-\" #@@@\",
-\" @@@@\",
-\"#@@@@\",
+\"    \",
+\"   #\",
+\"  @@\",
+\" #@@\",
+\" @@@\",
+\"#@@@\",
 %s
-\"#@@@@\",
-\" @@@@\",
-\" #@@@\",
-\"  @@@\",
-\"   #@\",
-\"     \"};"
+\"#@@@\",
+\" @@@\",
+\" #@@\",
+\"  @@\",
+\"   #\",
+\"    \"};"
              (+ 12 fill-height)
              (if color2 color2 "None")
              (if (and face1 face2) (pl/interpolate color2 color1) "None")

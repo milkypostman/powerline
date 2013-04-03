@@ -40,6 +40,21 @@ Valid Values: arrow, wave, brace, roundstub, zigzag, butt,
 chamfer, rounded, contour, slant, curve"
   :group 'powerline)
 
+(defcustom powerline-default-separator-dir '(left . right)
+  "The separator direction to use for the default theme.
+
+CONS of the form (DIR . DIR) denoting the lean of the
+separators for the left and right side of the powerline.
+
+DIR must be one of: left, right"
+  :group 'powerline
+  :type '(cons (choice (const left) (const right)) (choice (const left) (const right))))
+
+(defcustom powerline-height nil
+  "Override the mode-line height."
+  :group 'powerline
+  :type '(choice integer (const nil)))
+
 (defcustom powerline-buffer-size-suffix t
   "Display the buffer size suffix."
   :group 'powerline
@@ -50,10 +65,14 @@ chamfer, rounded, contour, slant, curve"
 cache for powerline. Create one if the frame doesn't have one
 yet."
   (or (frame-parameter nil 'powerline-cache)
-      (let ((table (make-hash-table :test 'equal)))
-        ;; Store it as a frame-local variable
-        (modify-frame-parameters nil `((powerline-cache . ,table)))
-        table)))
+      (pl/reset-cache)))
+
+(defun pl/reset-cache ()
+  "Reset and return the frame-local hash table used for a memoization cache."
+  (let ((table (make-hash-table :test 'equal)))
+    ;; Store it as a frame-local variable
+    (modify-frame-parameters nil `((powerline-cache . ,table)))
+    table))
 
 ;; from memoize.el @ http://nullprogram.com/blog/2010/07/26/
 (defun pl/memoize (func)
@@ -65,48 +84,36 @@ the original function.  Use frame-local memoization."
     (function (pl/memoize-wrap-frame-local func))))
 
 (defun pl/memoize-wrap-frame-local (func)
-  "Return the memoized version of FUNC.  The memoization cache is
-frame-local."
+  "Return the memoized version of FUNC.
+The memoization cache is frame-local."
   ;; (message "memoize %s %s %s" cache-sym val-sym args-sym)
   (let ((funcid (gensym)))
     `(lambda (&rest args)
        ,(concat (documentation func) (format "\n(memoized function %s)" funcid))
        (let* ((cache (pl/create-or-get-cache))
-              (val (gethash (cons ',funcid args) cache)))
+              (key (cons ',funcid args))
+              (val (gethash key cache)))
          ;;(message "%s" ,val-sym)
          (if val
              val
-           (puthash args (apply ,func args) cache))))))
+           (puthash key (apply ,func args) cache))))))
 
 
-(defun pl/xpm-row-string (width total left right)
-  "Generate a string of two types of characters filled on the
-left by WIDTH out of TOTAL. "
-  (concat "\"" (make-string width left)
-          (make-string (- total width) right)
-          "\","))
-
-(defun pl/hex-color (color)
-  "Gets the hexadecimal value of a color"
-  (let ((ret color))
-    (cond
-     ((string= "#" (substring color 0 1))
-      (setq ret (upcase ret)))
-     ((color-defined-p color)
-      (setq ret (concat "#"
-                        (mapconcat
-                         (lambda(val)
-                           (format "%02X" (* val 255)))
-                         (color-name-to-rgb color) ""))))
-     (t (setq ret nil)))
-    (symbol-value 'ret)))
+(defun pl/separator-height ()
+  "Get default height for rendering separators."
+  (max (frame-char-height) (or powerline-height 0)))
 
 
 (defun powerline-reset ()
   "Reset memoized functions."
   (interactive)
+  (pl/reset-cache)
   (pl/memoize (pl/arrow left))
   (pl/memoize (pl/arrow right))
+  (pl/memoize (pl/slant left))
+  (pl/memoize (pl/slant right))
+  (pl/memoize (pl/chamfer left))
+  (pl/memoize (pl/chamfer right))
   (fset 'powerline-wave-left (pl/memoize (symbol-function 'pl/wave-left)))
   (fset 'powerline-wave-right (pl/memoize (symbol-function 'pl/wave-right)))
   (fset 'powerline-brace-left (pl/memoize (symbol-function 'pl/brace-left)))
@@ -117,14 +124,10 @@ left by WIDTH out of TOTAL. "
   (fset 'powerline-zigzag-right (pl/memoize (symbol-function 'pl/zigzag-right)))
   (fset 'powerline-butt-left (pl/memoize (symbol-function 'pl/butt-left)))
   (fset 'powerline-butt-right (pl/memoize (symbol-function 'pl/butt-right)))
-  (fset 'powerline-chamfer-left (pl/memoize (symbol-function 'pl/chamfer)))
-  (fset 'powerline-chamfer-right (pl/memoize (symbol-function 'pl/chamfer)))
-  (fset 'powerline-rounded-left (pl/memoize (symbol-function 'pl/rounded)))
-  (fset 'powerline-rounded-right (pl/memoize (symbol-function 'pl/rounded)))
+  (fset 'powerline-rounded-left (pl/memoize (symbol-function 'pl/rounded-left)))
+  (fset 'powerline-rounded-right (pl/memoize (symbol-function 'pl/rounded-right)))
   (fset 'powerline-contour-left (pl/memoize (symbol-function 'pl/contour-left)))
   (fset 'powerline-contour-right (pl/memoize (symbol-function 'pl/contour-right)))
-  (fset 'powerline-slant-left (pl/memoize (symbol-function 'pl/slant-left)))
-  (fset 'powerline-slant-right (pl/memoize (symbol-function 'pl/slant-right)))
   (fset 'powerline-curve-right (pl/memoize (symbol-function 'pl/curve-right)))
   (fset 'powerline-curve-left (pl/memoize (symbol-function 'pl/curve-left)))
   )
@@ -413,8 +416,14 @@ mouse-3: go to end")))
                                    'powerline-inactive1))
                           (face2 (if active 'powerline-active2
                                    'powerline-inactive2))
-                          (separator-left (intern (format "powerline-%s-left" powerline-default-separator)))
-                          (separator-right (intern (format "powerline-%s-right" powerline-default-separator)))
+                          (separator-left
+                           (intern (format "powerline-%s-%s"
+                                           powerline-default-separator
+                                           (car powerline-default-separator-dir))))
+                          (separator-right
+                           (intern (format "powerline-%s-%s"
+                                           powerline-default-separator
+                                           (cdr powerline-default-separator-dir))))
                           (lhs (list
                                 (powerline-raw "%*" nil 'l)
                                 (powerline-buffer-size nil 'l)
@@ -559,6 +568,7 @@ mouse-3: go to end")))
 (defun pl/render (item)
   (cond
    ((and (listp item) (eq 'image (car item)))
+    ;;    (message "%s" (plist-get (cdr item) :face))
     (propertize " " 'display item
                 'face (plist-get (cdr item) :face)))
    (item item)))
