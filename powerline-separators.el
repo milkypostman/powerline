@@ -359,73 +359,59 @@ static char * zigzag_right[] = {
              (if color1 color1 "None"))
      'xpm t :ascent 'center)))
 
-(defun pl/butt-left (face1 face2)
+(defun pl/butt-left (face1 face2 &optional height)
   "Return an XPM butt left."
+  (unless height (setq height (pl/separator-height)))
   (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
-        (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None")))
+        (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
+        (fill-height (max (- height 6) 0)))
     (create-image
      (format "/* XPM */
 static char * butt_left[] = {
-\"3 18 3 1\",
+\"3 %s 3 1\",
 \"@ c %s\",
 \"# c %s\",
 \"  c %s\",
 \"   \",
 \"@  \",
 \"@@ \",
-\"@@@\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
+%s
 \"@@ \",
 \"@  \",
 \"   \"};"
+             height
              (if color1 color1 "None")
              (if (and face1 face2) (pl/interpolate color2 color1) "None")
-             (if color2 color2 "None"))
-     'xpm t :ascent 'center)))
+             (if color2 color2 "None")
+             (apply 'concat (loop repeat fill-height collect "\"@@@\",")))
+     'xpm t :ascent 'center :face face1)))
 
-(defun pl/butt-right (face1 face2)
+(defun pl/butt-right (face1 face2 &optional height)
   "Return an XPM butt right."
+  (unless height (setq height (pl/separator-height)))
   (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
-        (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None")))
+        (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
+        (fill-height (max (- height 6) 0)))
     (create-image
      (format "/* XPM */
 static char * butt_right[] = {
-\"3 18 3 1\",
+\"3 %s 3 1\",
 \"@ c %s\",
 \"# c %s\",
 \"  c %s\",
 \"   \",
 \"  @\",
 \" @@\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
-\"@@@\",
+%s
 \" @@\",
 \"  @\",
 \"   \"};"
+             height
              (if color2 color2 "None")
              (if (and face1 face2) (pl/interpolate color2 color1) "None")
-             (if color1 color1 "None"))
-     'xpm t :ascent 'center)))
+             (if color1 color1 "None")
+             (apply 'concat (loop repeat fill-height collect "\"@@@\",")))
+     'xpm t :ascent 'center :face face2)))
 
 (defmacro pl/chamfer (dir)
   "Generate an arrow xpm function for DIR."
@@ -516,14 +502,16 @@ static char * rounded[] = {
      'xpm t :ascent 'center)))
 
 
-(defun pl/contour-left (face1 face2)
+(defun pl/contour-left (face1 face2 &optional height)
   "Return an XPM contour-left string representing."
+  (unless height (setq height (pl/separator-height)))
   (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
-        (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None")))
+        (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
+        (fill-height (max (- height 11) 0)))
     (create-image
      (format "/* XPM */
 static char * contour_left[] = {
-\"10 18 3 1\",
+\"10 %s 3 1\",
 \"@ c %s\",
 \"# c %s\",
 \"  c %s\",
@@ -533,31 +521,29 @@ static char * contour_left[] = {
 \"@@@#      \",
 \"@@@@      \",
 \"@@@@#     \",
-\"@@@@@     \",
-\"@@@@@     \",
-\"@@@@@     \",
-\"@@@@@     \",
-\"@@@@@     \",
-\"@@@@@     \",
-\"@@@@@     \",
+%s
 \"@@@@@#    \",
 \"@@@@@@    \",
 \"@@@@@@#   \",
 \"@@@@@@@#  \",
 \"@@@@@@@@@@\"};"
+             height
              (if color1 color1 "None")
              (if (and face1 face2) (pl/interpolate color2 color1) "None")
-             (if color2 color2 "None"))
+             (if color2 color2 "None")
+             (apply 'concat (loop repeat fill-height collect "\"@@@@@     \",")))
      'xpm t :ascent 'center :face face1)))
 
-(defun pl/contour-right (face1 face2)
+(defun pl/contour-right (face1 face2 &optional height)
   "Return an XPM contour-right string representing."
+  (unless height (setq height (pl/separator-height)))
   (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
-        (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None")))
+        (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
+        (fill-height (max (- height 11) 0)))
     (create-image
      (format "/* XPM */
 static char * contour_right[] = {
-\"10 18 3 1\",
+\"10 %s 3 1\",
 \"@ c %s\",
 \"# c %s\",
 \"  c %s\",
@@ -567,21 +553,17 @@ static char * contour_right[] = {
 \"      #@@@\",
 \"      @@@@\",
 \"     #@@@@\",
-\"     @@@@@\",
-\"     @@@@@\",
-\"     @@@@@\",
-\"     @@@@@\",
-\"     @@@@@\",
-\"     @@@@@\",
-\"     @@@@@\",
+%s
 \"    #@@@@@\",
 \"    @@@@@@\",
 \"   #@@@@@@\",
 \"  #@@@@@@@\",
 \"@@@@@@@@@@\"};"
+             height
              (if color2 color2 "None")
              (if (and face1 face2) (pl/interpolate color2 color1) "None")
-             (if color1 color1 "None"))
+             (if color1 color1 "None")
+             (apply 'concat (loop repeat fill-height collect "\"     @@@@@\",")))
      'xpm t :ascent 'center :face face2)))
 
 (defmacro pl/slant (dir)
