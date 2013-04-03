@@ -9,19 +9,22 @@
 ;; Version: 2.0
 ;; Keywords: mode-line
 
+
+;;; Commentary:
+;; Powerline separators.
+
 ;;; Code:
 
 (require 'cl)
 
 (defun pl/xpm-row-string (width total left right)
-  "Generate a string of two types of characters filled on the
-left by WIDTH out of TOTAL. "
+  "Give a string of WIDTH filled to TOTAL of LEFT and RIGHT characters."
   (concat "\"" (make-string width left)
           (make-string (- total width) right)
           "\","))
 
 (defun pl/hex-color (color)
-  "Gets the hexadecimal value of a color"
+  "Gets the hexadecimal value COLOR."
   (let ((ret color))
     (cond
      ((string= "#" (substring color 0 1))
@@ -37,7 +40,7 @@ left by WIDTH out of TOTAL. "
 
 
 (defmacro pl/arrow (dir)
-  "Generate an arrow xpm function for DIR."
+  "Generate an arrow XPM function for DIR."
   (let ((start (if (eq dir 'right) 'width 0))
         (end (if (eq dir 'right) '(- width midwidth) 'midwidth))
         (incr (if (eq dir 'right) -1 1)))
@@ -70,7 +73,7 @@ static char * arrow_%s[] = {
             :face (when (and face1 face2) (if (eq ',dir 'right) face1 face2))))))))
 
 (defmacro pl/alternate (dir)
-  "Generate an arrow xpm function for DIR."
+  "Generate an anternate lines XPM function for DIR."
   (let ((even-row (if (eq dir 'left) "\"##  \"," "\"  ##\","))
         (odd-row (if (eq dir 'left) "\"@@##\"," "\"##@@\","))
         (width 4))
@@ -102,6 +105,7 @@ static char * alternate_%s[] = {
 
 
 (defmacro pl/nil (dir)
+  "Generate function to return nil XPM for DIR."
   `(defun ,(intern (format "powerline-nil-%s" (symbol-name dir)))
      (face1 face2 &optional height)
      nil))
@@ -216,7 +220,7 @@ static char * wave_right[] = {
 
 
 (defun pl/brace-left (face1 face2)
-  "Return an XPM brace left."
+  "Return an XPM of a left brace from FACE1 to FACE2."
   (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
         (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None")))
     (create-image
@@ -252,7 +256,7 @@ static char * brace_left[] = {
      'xpm t :ascent 'center)))
 
 (defun pl/brace-right (face1 face2)
-  "Return an XPM brace right."
+  "Return an XPM of a right brace from FACE1 to FACE2."
   (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
         (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None")))
     (create-image
@@ -289,7 +293,7 @@ static char * brace_right[] = {
 
 
 (defun pl/roundstub-left (face1 face2 &optional height)
-  "Return an XPM roundstub left."
+  "Return an XPM of a left roundstub from FACE1 to FACE2 for given HEIGHT."
   (unless height (setq height (pl/separator-height)))
   (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
         (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
@@ -316,7 +320,7 @@ static char * roundstub_left[] = {
      'xpm t :ascent 'center :face face1)))
 
 (defun pl/roundstub-right (face1 face2 &optional height)
-  "Return an XPM roundstub right."
+  "Return an XPM of a right roundstub from FACE1 to FACE2 for given HEIGHT."
   (unless height (setq height (pl/separator-height)))
   (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
         (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
@@ -343,7 +347,7 @@ static char * roundstub_right[] = {
      'xpm t :ascent 'center :face face2)))
 
 (defun pl/zigzag-left (face1 face2)
-  "Return an XPM zigzag left."
+  "Return left zigzag XPM from FACE1 to FACE2."
   (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
         (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None")))
     (create-image
@@ -377,7 +381,7 @@ static char * zigzag_left[] = {
      'xpm t :ascent 'center)))
 
 (defun pl/zigzag-right (face1 face2)
-  "Return an XPM zigzag right."
+  "Return left zigzag XPM from FACE1 to FACE2."
   (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
         (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None")))
     (create-image
@@ -411,7 +415,7 @@ static char * zigzag_right[] = {
      'xpm t :ascent 'center)))
 
 (defun pl/butt-left (face1 face2 &optional height)
-  "Return an XPM butt left."
+  "Return left butt XPM from FACE1 to FACE2 of HEIGHT."
   (unless height (setq height (pl/separator-height)))
   (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
         (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
@@ -438,7 +442,7 @@ static char * butt_left[] = {
      'xpm t :ascent 'center :face face1)))
 
 (defun pl/butt-right (face1 face2 &optional height)
-  "Return an XPM butt right."
+  "Return left butt XPM from FACE1 to FACE2 of HEIGHT."
   (unless height (setq height (pl/separator-height)))
   (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
         (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
@@ -497,7 +501,7 @@ static char * chamfer_%s[] = {
 
 
 (defun pl/rounded-left (face1 face2 &optional height)
-  "Return an XPM rounded string representing."
+  "Return left rounded XPM from FACE1 to FACE2 of HEIGHT."
   (unless height (setq height (pl/separator-height)))
   (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
         (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
@@ -525,7 +529,7 @@ static char * rounded[] = {
      'xpm t :ascent 'center)))
 
 (defun pl/rounded-right (face1 face2 &optional height)
-  "Return an XPM rounded string representing."
+  "Return right rounded XPM from FACE1 to FACE2 of HEIGHT."
   (unless height (setq height (pl/separator-height)))
   (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
         (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
@@ -554,7 +558,7 @@ static char * rounded[] = {
 
 
 (defun pl/contour-left (face1 face2 &optional height)
-  "Return an XPM contour-left string representing."
+  "Return left contour XPM from FACE1 to FACE2 of HEIGHT."
   (unless height (setq height (pl/separator-height)))
   (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
         (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
@@ -586,7 +590,7 @@ static char * contour_left[] = {
      'xpm t :ascent 'center :face face1)))
 
 (defun pl/contour-right (face1 face2 &optional height)
-  "Return an XPM contour-right string representing."
+  "Return right contour XPM from FACE1 to FACE2 of HEIGHT."
   (unless height (setq height (pl/separator-height)))
   (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
         (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
@@ -649,7 +653,7 @@ static char * slant_%s[] = {
 
 
 (defun pl/curve-left (face1 face2 &optional height)
-  "Return an XPM left curve string representing@"
+  "Return left curve XPM from FACE1 to FACE2 of HEIGHT."
   (unless height (setq height (max (pl/separator-height) 14)))
   (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
         (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
@@ -683,7 +687,7 @@ static char * curve_left[] = {
 
 
 (defun pl/curve-right (face1 face2 &optional height)
-  "Return an XPM right curve string representing@"
+  "Return right curved XPM from FACE1 to FACE2 of HEIGHT."
   (unless height (setq height (max (pl/separator-height) 14)))
   (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
         (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))

@@ -9,6 +9,11 @@
 ;; Version: 2.1
 ;; Keywords: mode-line
 
+
+;;; Commentary:
+;; Powerline is library and collection of predefined themes for
+;; customizing the mode-line.
+
 ;;; Code:
 
 (require 'cl)
@@ -77,9 +82,7 @@ DIR must be one of: left, right"
   :type 'boolean)
 
 (defun pl/create-or-get-cache ()
-  "Return a frame-local hash table that acts as a memoization
-cache for powerline. Create one if the frame doesn't have one
-yet."
+  "Return a frame-local hash table that acts as a memoization cache for powerline. Create one if the frame doesn't have one yet."
   (or (frame-parameter nil 'powerline-cache)
       (pl/reset-cache)))
 
@@ -192,7 +195,7 @@ static char * %s[] = {
 
 (defun pl/percent-xpm
   (height pmax pmin winend winstart width color1 color2)
-  "Generate percentage xpm."
+  "Generate percentage xpm of HEIGHT for PMAX to PMIN given WINEND and WINSTART with WIDTH and COLOR1 and COLOR2."
   (let* ((height- (1- height))
          (fillstart (round (* height- (/ (float winstart) (float pmax)))))
          (fillend (round (* height- (/ (float winend) (float pmax)))))
@@ -212,6 +215,7 @@ static char * %s[] = {
 
 ;;;###autoload
 (defun powerline-hud (face1 face2 &optional width)
+  "Return an XPM of relative buffer location using FACE1 and FACE2 of optional WIDTH."
   (unless width (setq width 2))
   (let ((color1 (if face1 (face-attribute face1 :background) "None"))
         (color2 (if face2 (face-attribute face2 :background) "None"))
@@ -233,6 +237,7 @@ static char * %s[] = {
 
 ;;;###autoload
 (defun powerline-mouse (click-group click-type string)
+  "Return mouse handler for CLICK-GROUP given CLICK-TYPE and STRING."
   (cond ((eq click-group 'minor)
          (cond ((eq click-type 'menu)
                 `(lambda (event)
@@ -262,12 +267,14 @@ static char * %s[] = {
 
 ;;;###autoload
 (defmacro defpowerline (name body)
+  "Create function NAME by wrapping BODY with powerline padding an propetization."
   `(defun ,name
      (&optional face pad)
      (powerline-raw ,body face pad)))
 
 ;;;###autoload
 (defun powerline-raw (str &optional face pad)
+  "Render STR as mode-line data using FACE and optionally PAD import on left (l) or right (r)."
   (let* ((rendered-str (format-mode-line str))
          (padded-str (concat
                       (when (and (> (length rendered-str) 0) (eq pad 'l)) " ")
@@ -280,6 +287,7 @@ static char * %s[] = {
 
 ;;;###autoload
 (defun powerline-fill (face reserve)
+  "Return empty space using FACE and leaving RESERVE space on the right."
   (unless reserve
     (setq reserve 20))
   (when (and window-system (eq 'right (get-scroll-bar-mode)))
@@ -289,6 +297,7 @@ static char * %s[] = {
               'face face))
 
 (defun powerline-fill-center (face reserve)
+  "Return empty space using FACE to the center of remaining space leaving RESERVE space on the right."
   (unless reserve
     (setq reserve 20))
   (propertize " "
@@ -399,7 +408,7 @@ mouse-3: go to end")))
     (car pl/minibuffer-selected-window-list)))
 
 (defun pl/minibuffer-setup ()
-  "Save the minibuffer-selected-window to `pl/minibuffer-selected-window'."
+  "Save the `minibuffer-selected-window' to `pl/minibuffer-selected-window'."
   (push (minibuffer-selected-window) pl/minibuffer-selected-window-list))
 
 (add-hook 'minibuffer-setup-hook 'pl/minibuffer-setup)
@@ -588,6 +597,7 @@ mouse-3: go to end")))
 
 
 (defun pl/render (item)
+  "Render a powerline ITEM."
   (cond
    ((and (listp item) (eq 'image (car item)))
     ;;    (message "%s" (plist-get (cdr item) :face))
@@ -596,6 +606,7 @@ mouse-3: go to end")))
    (item item)))
 
 (defun powerline-render (values)
+  "Renter a list of powerline VALUES."
   (mapconcat 'pl/render values ""))
 
 (defun powerline-width (values)
