@@ -419,7 +419,7 @@ static char * butt_right[] = {
            (create-image
             (concat
              (format "/* XPM */
-static char * arrow_%s[] = {
+static char * chamfer_%s[] = {
 \"%s %s 2 1\",
 \"@ c %s\",
 \"  c %s\",
@@ -571,7 +571,7 @@ static char * contour_right[] = {
            (create-image
             (concat
              (format "/* XPM */
-static char * arrow_%s[] = {
+static char * slant_%s[] = {
 \"%s %s 2 1\",
 \"@ c %s\",
 \"  c %s\",
