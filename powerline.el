@@ -123,7 +123,6 @@ The memoization cache is frame-local."
 (defun powerline-reset ()
   "Reset memoized functions."
   (interactive)
-  (pl/reset-cache)
   (pl/memoize (pl/arrow left))
   (pl/memoize (pl/arrow right))
   (pl/memoize (pl/slant left))
@@ -152,6 +151,7 @@ The memoization cache is frame-local."
   (fset 'powerline-contour-right (pl/memoize (symbol-function 'pl/contour-right)))
   (fset 'powerline-curve-right (pl/memoize (symbol-function 'pl/curve-right)))
   (fset 'powerline-curve-left (pl/memoize (symbol-function 'pl/curve-left)))
+  (pl/reset-cache)
   )
 (powerline-reset)
 
