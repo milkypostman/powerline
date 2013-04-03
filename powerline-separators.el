@@ -71,8 +71,8 @@ static char * arrow_%s[] = {
 
 (defmacro pl/alternate (dir)
   "Generate an arrow xpm function for DIR."
-  (let ((even-row (if (eq dir 'left) "\"##  \"," "\"  ##\""))
-        (odd-row (if (eq dir 'left) "\"@@##\"," "\"##@@\""))
+  (let ((even-row (if (eq dir 'left) "\"##  \"," "\"  ##\","))
+        (odd-row (if (eq dir 'left) "\"@@##\"," "\"##@@\","))
         (width 4))
     `(defun ,(intern (format "powerline-alternate-%s" (symbol-name dir)))
        (face1 face2 &optional height)
