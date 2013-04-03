@@ -36,9 +36,21 @@
 (defcustom powerline-default-separator 'arrow
   "The separator to use for the default theme.
 
-Valid Values: arrow, wave, brace, roundstub, zigzag, butt,
-chamfer, rounded, contour, slant, curve"
-  :group 'powerline)
+Valid Values: arrow, slant, chamfer, wave, brace, roundstub,
+zigzag, butt, rounded, contour, curve"
+  :group 'powerline
+  :type '(choice
+          (const arrow)
+          (const slant)
+          (const chamfer)
+          (const wave)
+          (const brace)
+          (const roundstub)
+          (const zigzag)
+          (const butt)
+          (const rounded)
+          (const contour)
+          (const curve)))
 
 (defcustom powerline-default-separator-dir '(left . right)
   "The separator direction to use for the default theme.
@@ -48,7 +60,8 @@ separators for the left and right side of the powerline.
 
 DIR must be one of: left, right"
   :group 'powerline
-  :type '(cons (choice (const left) (const right)) (choice (const left) (const right))))
+  :type '(cons (choice :tag "Left Hand Side" (const left) (const right))
+               (choice :tag "Right Hand Side" (const left) (const right))))
 
 (defcustom powerline-height nil
   "Override the mode-line height."
