@@ -69,6 +69,69 @@ static char * arrow_%s[] = {
             'xpm t :ascent 'center
             :face (when (and face1 face2) (if (eq ',dir 'right) face1 face2))))))))
 
+(defmacro pl/alternate (dir)
+  "Generate an arrow xpm function for DIR."
+  (let ((even-row (if (eq dir 'left) "\"##  \"," "\"  ##\""))
+        (odd-row (if (eq dir 'left) "\"@@##\"," "\"##@@\""))
+        (width 4))
+    `(defun ,(intern (format "powerline-alternate-%s" (symbol-name dir)))
+       (face1 face2 &optional height)
+       (when window-system
+         (unless height (setq height (pl/separator-height)))
+         (let* ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
+                (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
+                (seq (number-sequence 0 (1- height))))
+           (create-image
+            (concat
+             (format "/* XPM */
+static char * alternate_%s[] = {
+\"%s %s 3 1\",
+\"@ c %s\",
+\"# c %s\",
+\"  c %s\",
+"
+                     (symbol-name ',dir) ,width height
+                     (or color1 "None")
+                     (if (and face1 face2) (pl/interpolate color1 color2) "None")
+                     (or color2 "None"))
+             (mapconcat
+              (lambda (d) (if (oddp d) ,odd-row ,even-row)) seq "\n")
+             "};")
+            'xpm t :ascent 'center
+            :face (when (and face1 face2) (if (eq ',dir 'right) face1 face2))))))))
+
+
+(defmacro pl/nil (dir)
+  `(defun ,(intern (format "powerline-nil-%s" (symbol-name dir)))
+     (face1 face2 &optional height)
+     nil))
+
+(defmacro pl/bar (dir)
+  "Generate an arrow xpm function for DIR."
+  (let* ((fill "\"##\",")
+         (width (- (length fill) 3)))
+    `(defun ,(intern (format "powerline-bar-%s" (symbol-name dir)))
+       (face1 face2 &optional height)
+       (when window-system
+         (unless height (setq height (pl/separator-height)))
+         (let* ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
+                (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
+                (seq (number-sequence 0 (1- height))))
+           (create-image
+            (concat
+             (format "/* XPM */
+static char * bar_%s[] = {
+\"%s %s 1 1\",
+\"# c %s\",
+"
+                     (symbol-name ',dir) ,width height
+                     (if (and face1 face2) (pl/interpolate color1 color2) "None"))
+             (mapconcat
+              (lambda (d) ,fill) seq "\n")
+             "};")
+            'xpm t :ascent 'center
+            :face (when (and face1 face2) (if (eq ',dir 'right) face1 face2))))))))
+
 (defun pl/interpolate (color1 color2)
   "Interpolate between COLOR1 and COLOR2.
 
