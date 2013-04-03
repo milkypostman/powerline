@@ -70,7 +70,9 @@ static char * arrow_%s[] = {
             :face (when (and face1 face2) (if (eq ',dir 'right) face1 face2))))))))
 
 (defun pl/interpolate (color1 color2)
-  "Interpolate between two hex colors, they must be supplied as hex colors with leading #"
+  "Interpolate between COLOR1 and COLOR2.
+
+COLOR1 and COLOR2 must be supplied as hex strings with leading #."
   (let* (
          (c1 (replace-regexp-in-string "#" "" color1))
          (c2 (replace-regexp-in-string "#" "" color2))
