@@ -39,6 +39,14 @@
     (symbol-value 'ret)))
 
 
+(defun pl/xpm-row-fade-string (width1 width2 total left center right)
+  "Generate a string three characters filled WIDTH1 and WIDTH2 out of TOTAL for LEFT, CENTER, RIGHT respectively."
+  (concat "\"" (make-string width1 left)
+          (make-string width2 center)
+          (make-string (- total width1 width2) right)
+          "\","))
+
+
 (defmacro pl/arrow (dir)
   "Generate an arrow XPM function for DIR."
   (let ((start (if (eq dir 'right) 'width 0))
@@ -68,6 +76,45 @@ static char * arrow_%s[] = {
              "\n"
              (mapconcat
               (lambda (d) (pl/xpm-row-string d width ?. ? )) (reverse seq) "\n")
+             "};")
+            'xpm t :ascent 'center
+            :face (when (and face1 face2) (if (eq ',dir 'right) face1 face2))))))))
+
+(defmacro pl/arrow-fade (dir)
+  "Generate an arrow-fade XPM function for DIR."
+  (let ((start (if (eq dir 'right) 'width 0))
+        (end (if (eq dir 'right) '(- width midwidth) 'midwidth))
+        (incr (if (eq dir 'right) -1 1)))
+    `(defun ,(intern (format "powerline-arrow-fade-%s" (symbol-name dir)))
+       (face1 face2 &optional height)
+       (when window-system
+         (unless height (setq height (pl/separator-height)))
+         (let* ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
+                (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
+                (midwidth (1- (/ height 2)))
+                (width (1- (ceiling height 2)))
+                (row-width (+ width 2))
+                (seq (number-sequence ,start ,end ,incr))
+                (odd (not (= midwidth width))))
+           (create-image
+            (concat
+             (format "/* XPM */
+static char * arrow_fade_%s[] = {
+\"%s %s 3 1\",
+\"@ c %s\",
+\"# c %s\",
+\"  c %s\",
+"
+                     (symbol-name ',dir) row-width height
+                     (or color1 "None")
+                     (if (and face1 face2) (pl/interpolate color1 color2) "None")
+                     (or color2 "None"))
+             (mapconcat
+              (lambda (d) (pl/xpm-row-fade-string d 2 row-width ?@ ?# ? )) seq "\n")
+             (and odd (concat "\n" (pl/xpm-row-fade-string (+ ,end ,incr) 2 row-width ?@ ?# ? )))
+             "\n"
+             (mapconcat
+              (lambda (d) (pl/xpm-row-fade-string d 2 row-width ?@ ?# ? )) (reverse seq) "\n")
              "};")
             'xpm t :ascent 'center
             :face (when (and face1 face2) (if (eq ',dir 'right) face1 face2))))))))

@@ -128,6 +128,8 @@ The memoization cache is frame-local."
   (interactive)
   (pl/memoize (pl/arrow left))
   (pl/memoize (pl/arrow right))
+  (pl/memoize (pl/arrow-fade left))
+  (pl/memoize (pl/arrow-fade right))
   (pl/memoize (pl/slant left))
   (pl/memoize (pl/slant right))
   (pl/memoize (pl/chamfer left))
