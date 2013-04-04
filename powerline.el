@@ -76,6 +76,16 @@ DIR must be one of: left, right"
   :group 'powerline
   :type '(choice integer (const nil)))
 
+(defcustom powerline-text-scale-factor nil
+  "Scale of mode-line font size to default text size.
+
+Smaller mode-line fonts will be a float value less that 1.
+Larger mode-line fonts require a float value greater than 1.
+
+This is needed to make sure that text is properly aligned."
+  :group 'powerline
+  :type '(choice float integer (const nil)))
+
 (defcustom powerline-buffer-size-suffix t
   "Display the buffer size suffix."
   :group 'powerline
@@ -293,6 +303,8 @@ static char * %s[] = {
   "Return empty space using FACE and leaving RESERVE space on the right."
   (unless reserve
     (setq reserve 20))
+  (when powerline-text-scale-factor
+    (setq reserve (* powerline-text-scale-factor reserve)))
   (when (and window-system (eq 'right (get-scroll-bar-mode)))
     (setq reserve (- reserve 3)))
   (propertize " "
@@ -303,6 +315,8 @@ static char * %s[] = {
   "Return empty space using FACE to the center of remaining space leaving RESERVE space on the right."
   (unless reserve
     (setq reserve 20))
+  (when powerline-text-scale-factor
+    (setq reserve (* powerline-text-scale-factor reserve)))
   (propertize " "
               'display `((space :align-to (- (+ center (.5 . right-margin)) ,reserve
                                              (.5 . left-margin))))
