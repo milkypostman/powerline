@@ -479,7 +479,7 @@ mouse-3: go to end")))
                                 (powerline-raw mode-line-mule-info nil 'l)
                                 (powerline-buffer-id nil 'l)
 
-                                (when which-func-mode
+                                (when which-function-mode
                                   (concat
                                    " ["
                                    (powerline-which-func 'which-func nil)
