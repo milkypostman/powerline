@@ -341,7 +341,7 @@ static char * brace_right[] = {
 
 (defun pl/roundstub-left (face1 face2 &optional height)
   "Return an XPM of a left roundstub from FACE1 to FACE2 for given HEIGHT."
-  (unless height (setq height (pl/separator-height)))
+  (unless height (setq height (max (pl/separator-height) 6)))
   (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
         (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
         (fill-height (max (- height 6) 0)))
@@ -368,7 +368,7 @@ static char * roundstub_left[] = {
 
 (defun pl/roundstub-right (face1 face2 &optional height)
   "Return an XPM of a right roundstub from FACE1 to FACE2 for given HEIGHT."
-  (unless height (setq height (pl/separator-height)))
+  (unless height (setq height (max (pl/separator-height) 6)))
   (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
         (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
         (fill-height (max (- height 6) 0)))
@@ -463,7 +463,7 @@ static char * zigzag_right[] = {
 
 (defun pl/butt-left (face1 face2 &optional height)
   "Return left butt XPM from FACE1 to FACE2 of HEIGHT."
-  (unless height (setq height (pl/separator-height)))
+  (unless height (setq height (max (pl/separator-height) 6)))
   (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
         (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
         (fill-height (max (- height 6) 0)))
@@ -490,7 +490,7 @@ static char * butt_left[] = {
 
 (defun pl/butt-right (face1 face2 &optional height)
   "Return left butt XPM from FACE1 to FACE2 of HEIGHT."
-  (unless height (setq height (pl/separator-height)))
+  (unless height (setq height (max (pl/separator-height) 6)))
   (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
         (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
         (fill-height (max (- height 6) 0)))
@@ -549,7 +549,7 @@ static char * chamfer_%s[] = {
 
 (defun pl/rounded-left (face1 face2 &optional height)
   "Return left rounded XPM from FACE1 to FACE2 of HEIGHT."
-  (unless height (setq height (pl/separator-height)))
+  (unless height (setq height (max (pl/separator-height) 6)))
   (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
         (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
         (fill-height (max (- height 6) 0)))
@@ -577,7 +577,7 @@ static char * rounded[] = {
 
 (defun pl/rounded-right (face1 face2 &optional height)
   "Return right rounded XPM from FACE1 to FACE2 of HEIGHT."
-  (unless height (setq height (pl/separator-height)))
+  (unless height (setq height (max (pl/separator-height) 6)))
   (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
         (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
         (fill-height (max (- height 6) 0)))
@@ -606,7 +606,7 @@ static char * rounded[] = {
 
 (defun pl/contour-left (face1 face2 &optional height)
   "Return left contour XPM from FACE1 to FACE2 of HEIGHT."
-  (unless height (setq height (pl/separator-height)))
+  (unless height (setq height (max (pl/separator-height) 12)))
   (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
         (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
         (fill-height (max (- height 11) 0)))
@@ -638,7 +638,7 @@ static char * contour_left[] = {
 
 (defun pl/contour-right (face1 face2 &optional height)
   "Return right contour XPM from FACE1 to FACE2 of HEIGHT."
-  (unless height (setq height (pl/separator-height)))
+  (unless height (setq height (max (pl/separator-height) 12)))
   (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
         (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
         (fill-height (max (- height 11) 0)))
