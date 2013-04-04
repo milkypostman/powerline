@@ -321,6 +321,38 @@ static char * %s[] = {
                            (define-key map [mode-line down-mouse-3] mode-line-mode-menu)
                            map)))
 
+(defun powerline-mode-list-to-string-list (ml)
+  (typecase ml
+    (string (list ml))
+    (symbol
+     (if ml
+         (powerline-mode-list-to-string-list (symbol-value ml) )
+       nil))
+    ((or function subr) (powerline-mode-list-to-string-list (list (funcall ml))))
+    (cons
+     (let ((kar (car ml))
+           (kdr (cdr ml)))
+       (typecase kar
+         (symbol
+          (let ((val (symbol-value kar))
+                (kadr (if (listp kdr) (car kdr) nil)))
+            (case val
+              (:eval (powerline-mode-list-to-string-list (eval kadr) ))
+              ;; propertize?
+              (:propertize (powerline-mode-list-to-string-list kdr ))
+              (t
+               (if val
+                   (powerline-mode-list-to-string-list kadr)
+                 (powerline-mode-list-to-string-list (cdr kdr)))))))
+         (integer
+          ;; now do nothing, must clamp to width if < 0 or do padding if > 0
+          (powerline-mode-list-to-string-list kdr ))
+         (t (append (powerline-mode-list-to-string-list kar ) (powerline-mode-list-to-string-list kdr ))))))
+    ;; unknown
+    (t ;;(message "mode-list-to-string-error Unknown: type: %s;\nval: %s" ml (type-of ml))
+     (list (format "%s" ml)))))
+
+
 ;;;###autoload
 (defpowerline powerline-minor-modes
   (mapconcat (lambda (mm)
@@ -341,7 +373,8 @@ static char * %s[] = {
                                           [header-line down-mouse-3]
                                           (powerline-mouse 'minor 'menu mm))
                                         map)))
-             (split-string (format-mode-line minor-mode-alist)) " "))
+             ;;(split-string (format-mode-line minor-mode-alist)) " "))
+             (mode-list-to-string-list minor-mode-alist) ""))
 
 
 ;;;###autoload
