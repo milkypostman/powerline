@@ -47,6 +47,34 @@
           "\","))
 
 
+(defun pl/pattern-defun (name dir width pattern)
+  `(defun ,(intern (format "powerline-%s-%s" name (symbol-name dir)))
+     (face1 face2 &optional height)
+     (when window-system
+       (unless height (setq height (pl/separator-height)))
+       (let* ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
+              (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
+              (seq (number-sequence 0 (1- height))))
+         (create-image
+          (concat
+           (format "/* XPM */
+static char * bar_%s[] = {
+\"%s %s 2 1\",
+\"@ c %s\",
+\"  c %s\",
+"
+                   (symbol-name ',dir) ,width height
+                   (if color1 color1 "None")
+                   (if color2 color2 "None")
+                   )
+           (loop for i in (subseq ',pattern 0 15)
+                 concat (pl/xpm-row-string i ,width ?@ ? ))
+
+           "};")
+          'xpm t :ascent 'center
+          :face (when (and face1 face2) (if (eq ',dir 'right) face1 face2)))))))
+
+
 (defmacro pl/arrow (dir)
   "Generate an arrow XPM function for DIR."
   (let ((start (if (eq dir 'right) 'width 0))
@@ -394,34 +422,17 @@ static char * roundstub_right[] = {
      'xpm t :ascent 'center :face face2)))
 
 (defmacro pl/zigzag (dir)
-  "Generate an arrow xpm function for DIR."
-  (let* ((pattern (if (eq dir 'left) '#1=(0 1 2 3 2 1 . #1#) '#1=(3 2 1 0 1 2 . #1#)))
-         (width 3))
-    `(defun ,(intern (format "powerline-zigzag-%s" (symbol-name dir)))
-       (face1 face2 &optional height)
-       (when window-system
-         (unless height (setq height (pl/separator-height)))
-         (let* ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
-                (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
-                (seq (number-sequence 0 (1- height))))
-           (create-image
-            (concat
-             (format "/* XPM */
-static char * bar_%s[] = {
-\"%s %s 2 1\",
-\"@ c %s\",
-\"  c %s\",
-"
-                     (symbol-name ',dir) ,width height
-                     (if color1 color1 "None")
-                     (if color2 color2 "None")
-                     )
-             (loop for i in (subseq ',pattern 0 15)
-                   concat (pl/xpm-row-string i ,width ?@ ? ))
+  "Generate an box xpm function for DIR."
+  (pl/pattern-defun
+   "zigzag" dir 3
+   (if (eq dir 'left) '#1=(0 1 2 3 2 1 . #1#) '#1=(3 2 1 0 1 2 . #1#))))
 
-             "};")
-            'xpm t :ascent 'center
-            :face (when (and face1 face2) (if (eq ',dir 'right) face1 face2))))))))
+
+(defmacro pl/box (dir)
+  "Generate an box xpm function for DIR."
+  (pl/pattern-defun
+   "box" dir 2
+   (if (eq dir 'left) '#1=(0 0 2 2 . #1#) '#1=(2 2 0 0 . #1#))))
 
 
 (defun pl/butt-left (face1 face2 &optional height)

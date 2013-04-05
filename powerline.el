@@ -153,6 +153,8 @@ The memoization cache is frame-local."
   (pl/memoize (pl/nil right))
   (pl/memoize (pl/zigzag left))
   (pl/memoize (pl/zigzag right))
+  (pl/memoize (pl/box left))
+  (pl/memoize (pl/box right))
   (fset 'powerline-wave-left (pl/memoize (symbol-function 'pl/wave-left)))
   (fset 'powerline-wave-right (pl/memoize (symbol-function 'pl/wave-right)))
   (fset 'powerline-brace-left (pl/memoize (symbol-function 'pl/brace-left)))
