@@ -185,8 +185,8 @@ static char * %s[] = {
               (downcase (replace-regexp-in-string " " "_" name))
               (length (car data))
               (length data)
-              (or color1 "None")
-              (or color2 "None"))
+              (or (pl/hex-color color1) "None")
+              (or (pl/hex-color color2) "None"))
       (let ((len  (length data))
             (idx  0))
         (apply 'concat
