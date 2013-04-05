@@ -538,13 +538,21 @@ mouse-3: go to end")))
                                    'powerline-inactive1))
                           (face2 (if active 'powerline-active2
                                    'powerline-inactive2))
+                          (separator-left
+                           (intern (format "powerline-%s-%s"
+                                           powerline-default-separator
+                                           (car powerline-default-separator-dir))))
+                          (separator-right
+                           (intern (format "powerline-%s-%s"
+                                           powerline-default-separator
+                                           (cdr powerline-default-separator-dir))))
                           (lhs (list
                                 (powerline-raw "%*" nil 'l)
                                 (powerline-buffer-size nil 'l)
                                 (powerline-buffer-id nil 'l)
 
                                 (powerline-raw " ")
-                                (powerline-arrow-right mode-line face1)
+                                (funcall separator-left mode-line face1)
 
                                 (powerline-narrow face1 'l)
 
@@ -556,13 +564,13 @@ mouse-3: go to end")))
                                 (powerline-raw ":" face1)
                                 (powerline-raw "%3c" face1 'r)
 
-                                (powerline-arrow-left face1 mode-line)
+                                (funcall separator-right face1 mode-line)
                                 (powerline-raw " ")
                                 (powerline-raw "%6p" nil 'r)
                                 (powerline-hud face2 face1)))
                           (center (list
                                    (powerline-raw " " face1)
-                                   (powerline-arrow-right face1 face2)
+                                   (funcall separator-left face1 face2)
                                    (when (boundp 'erc-modified-channels-object)
                                      (powerline-raw erc-modified-channels-object
                                                     face2 'l))
@@ -571,7 +579,7 @@ mouse-3: go to end")))
                                    (powerline-raw " :" face2)
                                    (powerline-minor-modes face2 'l)
                                    (powerline-raw " " face2)
-                                   (powerline-arrow-left face2 face1))))
+                                   (funcall separator-right face2 face1))))
 
                      (concat
                       (powerline-render lhs)
