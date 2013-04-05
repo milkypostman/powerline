@@ -537,7 +537,7 @@ static char * chamfer_%s[] = {
 \"%s %s 2 1\",
 \"@ c %s\",
 \"  c %s\",
-" (symbol-name ',dir) 3 height (or color1 "None") (or color2 "None"))
+" (symbol-name ',dir) width height (or color1 "None") (or color2 "None"))
              (mapconcat
               (lambda (d) (pl/xpm-row-string d width ?@ ? )) seq "\n")
              (apply 'concat (loop repeat fill-height collect (pl/xpm-row-string ,end width ?@ ? )))
