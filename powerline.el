@@ -232,9 +232,7 @@ static char * %s[] = {
   (unless width (setq width 2))
   (let ((color1 (if face1 (face-attribute face1 :background) "None"))
         (color2 (if face2 (face-attribute face2 :background) "None"))
-        (height (or powerline-height
-                    (max (- (elt (window-pixel-edges) 3) (elt (window-inside-pixel-edges) 3))
-                         (frame-char-height))))
+        (height (or powerline-height (frame-char-height)))
         pmax
         pmin
         (ws (window-start))
