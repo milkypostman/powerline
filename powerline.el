@@ -241,10 +241,8 @@ static char * %s[] = {
       (widen)
       (setq pmax (point-max))
       (setq pmin (point-min)))
-    (propertize (make-string width ? )
-                'display
-                (pl/percent-xpm height pmax pmin we ws
-                                (* (frame-char-width) width) color1 color2))))
+    (pl/percent-xpm height pmax pmin we ws
+                    (* (frame-char-width) width) color1 color2)))
 
 
 ;;;###autoload
