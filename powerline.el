@@ -46,11 +46,12 @@ zigzag, butt, rounded, contour, curve"
   :group 'powerline
   :type '(choice
           (const arrow)
+          (const arrow-fade)
           (const slant)
           (const chamfer)
           (const alternate)
-          (const nil)
           (const bar)
+          (const nil)
           (const wave)
           (const brace)
           (const roundstub)
