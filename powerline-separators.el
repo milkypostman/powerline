@@ -393,73 +393,36 @@ static char * roundstub_right[] = {
              (apply 'concat (loop repeat fill-height collect "\"@@@\",")))
      'xpm t :ascent 'center :face face2)))
 
-(defun pl/zigzag-left (face1 face2)
-  "Return left zigzag XPM from FACE1 to FACE2."
-  (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
-        (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None")))
-    (create-image
-     (format "/* XPM */
-static char * zigzag_left[] = {
-\"3 18 3 1\",
+(defmacro pl/zigzag (dir)
+  "Generate an arrow xpm function for DIR."
+  (let* ((pattern (if (eq dir 'left) '#1=(0 1 2 3 2 1 . #1#) '#1=(3 2 1 0 1 2 . #1#)))
+         (width 3))
+    `(defun ,(intern (format "powerline-zigzag-%s" (symbol-name dir)))
+       (face1 face2 &optional height)
+       (when window-system
+         (unless height (setq height (pl/separator-height)))
+         (let* ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
+                (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
+                (seq (number-sequence 0 (1- height))))
+           (create-image
+            (concat
+             (format "/* XPM */
+static char * bar_%s[] = {
+\"%s %s 2 1\",
 \"@ c %s\",
-\"# c %s\",
 \"  c %s\",
-\"   \",
-\"@  \",
-\"@@ \",
-\"@@@\",
-\"@@ \",
-\"@  \",
-\"   \",
-\"@  \",
-\"@@ \",
-\"@@@\",
-\"@@ \",
-\"@  \",
-\"   \",
-\"@  \",
-\"@@ \",
-\"@@@\",
-\"@@ \",
-\"@  \"};"
-             (if color1 color1 "None")
-             (if (and face1 face2) (pl/interpolate color2 color1) "None")
-             (if color2 color2 "None"))
-     'xpm t :ascent 'center)))
+"
+                     (symbol-name ',dir) ,width height
+                     (if color1 color1 "None")
+                     (if color2 color2 "None")
+                     )
+             (loop for i in (subseq ',pattern 0 15)
+                   concat (pl/xpm-row-string i ,width ?@ ? ))
 
-(defun pl/zigzag-right (face1 face2)
-  "Return left zigzag XPM from FACE1 to FACE2."
-  (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
-        (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None")))
-    (create-image
-     (format "/* XPM */
-static char * zigzag_right[] = {
-\"3 18 3 1\",
-\"@ c %s\",
-\"# c %s\",
-\"  c %s\",
-\"   \",
-\"  @\",
-\" @@\",
-\"@@@\",
-\" @@\",
-\"  @\",
-\"   \",
-\"  @\",
-\" @@\",
-\"@@@\",
-\" @@\",
-\"  @\",
-\"   \",
-\"  @\",
-\" @@\",
-\"@@@\",
-\" @@\",
-\"  @\"};"
-             (if color2 color2 "None")
-             (if (and face1 face2) (pl/interpolate color2 color1) "None")
-             (if color1 color1 "None"))
-     'xpm t :ascent 'center)))
+             "};")
+            'xpm t :ascent 'center
+            :face (when (and face1 face2) (if (eq ',dir 'right) face1 face2))))))))
+
 
 (defun pl/butt-left (face1 face2 &optional height)
   "Return left butt XPM from FACE1 to FACE2 of HEIGHT."
