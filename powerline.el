@@ -287,14 +287,16 @@ static char * %s[] = {
 ;;;###autoload
 (defun powerline-raw (str &optional face pad)
   "Render STR as mode-line data using FACE and optionally PAD import on left (l) or right (r)."
-  (let* ((rendered-str (format-mode-line str))
-         (padded-str (concat
-                      (when (and (> (length rendered-str) 0) (eq pad 'l)) " ")
-                      (if (listp str) rendered-str str)
-                      (when (and (> (length rendered-str) 0) (eq pad 'r)) " "))))
-    (if face
-        (propertize padded-str 'face face)
-      padded-str)))
+  (when str
+    (let* ((rendered-str (format-mode-line str))
+           (padded-str (concat
+                        (when (and (> (length rendered-str) 0) (eq pad 'l)) " ")
+                        (if (listp str) rendered-str str)
+                        (when (and (> (length rendered-str) 0) (eq pad 'r)) " "))))
+
+      (if face
+          (propertize padded-str 'face face)
+        padded-str))))
 
 
 ;;;###autoload
