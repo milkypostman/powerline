@@ -55,10 +55,12 @@ COLOR1 and COLOR2 must be supplied as hex strings with leading #."
 
 
 (defun pl/pattern-to-string (pattern)
+  "Convert a PATTERN into a string that can be used in an xpm."
   (concat "\"" (mapconcat 'number-to-string pattern "") "\","))
 
 
 (defun pl/reverse-pattern (pattern)
+  "Reverse each line in PATTERN."
   (mapcar 'reverse pattern))
 
 
