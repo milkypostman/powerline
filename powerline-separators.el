@@ -17,11 +17,18 @@
 
 (require 'cl)
 
-(defun pl/xpm-row-string (width total left right)
-  "Give a string of WIDTH filled to TOTAL of LEFT and RIGHT characters."
-  (concat "\"" (make-string width left)
-          (make-string (- total width) right)
-          "\","))
+(defun pl/interpolate (color1 color2)
+  "Interpolate between COLOR1 and COLOR2.
+
+COLOR1 and COLOR2 must be supplied as hex strings with leading #."
+  (let* ((c1 (replace-regexp-in-string "#" "" color1))
+         (c2 (replace-regexp-in-string "#" "" color2))
+         (c1r (string-to-number (substring c1 0 2) 16)) (c1b (string-to-number (substring c1 2 4) 16)) (c1g (string-to-number (substring c1 4 6) 16))
+         (c2r (string-to-number (substring c2 0 2) 16)) (c2b (string-to-number (substring c2 2 4) 16)) (c2g (string-to-number (substring c2 4 6) 16))
+         (red (/ (+ c1r c2r) 2)) (grn (/ (+ c1g c2g) 2)) (blu (/ (+ c1b c2b) 2)))
+
+    (format "#%02X%02X%02X" red grn blu)))
+
 
 (defun pl/hex-color (color)
   "Gets the hexadecimal value COLOR."
@@ -39,144 +46,102 @@
     (symbol-value 'ret)))
 
 
-(defun pl/xpm-row-fade-string (width1 width2 total left center right)
-  "Generate a string three characters filled WIDTH1 and WIDTH2 out of TOTAL for LEFT, CENTER, RIGHT respectively."
-  (concat "\"" (make-string width1 left)
-          (make-string width2 center)
-          (make-string (- total width1 width2) right)
-          "\","))
+
+(defun pl/pattern (lst)
+  "Turn LST into an infinite pattern."
+  (when lst
+    (let ((pattern (copy-list lst)))
+      (setcdr (last pattern) pattern))))
 
 
-(defun pl/pattern-defun (name dir width pattern)
-  `(defun ,(intern (format "powerline-%s-%s" name (symbol-name dir)))
-     (face1 face2 &optional height)
-     (when window-system
-       (unless height (setq height (pl/separator-height)))
-       (let* ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
-              (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
-              (seq (number-sequence 0 (1- height))))
-         (create-image
-          (concat
-           (format "/* XPM */
-static char * bar_%s[] = {
-\"%s %s 2 1\",
-\"@ c %s\",
-\"  c %s\",
-"
-                   (symbol-name ',dir) ,width height
-                   (if color1 color1 "None")
-                   (if color2 color2 "None")
-                   )
-           (loop for i in (subseq ',pattern 0 15)
-                 concat (pl/xpm-row-string i ,width ?@ ? ))
-
-           "};")
-          'xpm t :ascent 'center
-          :face (when (and face1 face2) (if (eq ',dir 'right) face1 face2)))))))
+(defun pl/pattern-to-string (pattern)
+  (concat "\"" (mapconcat 'number-to-string pattern "") "\","))
 
 
-(defmacro pl/arrow (dir)
-  "Generate an arrow XPM function for DIR."
-  (let ((start (if (eq dir 'right) 'width 0))
-        (end (if (eq dir 'right) '(- width midwidth) 'midwidth))
-        (incr (if (eq dir 'right) -1 1)))
-    `(defun ,(intern (format "powerline-arrow-%s" (symbol-name dir)))
+(defun pl/reverse-pattern (pattern)
+  (mapcar 'reverse pattern))
+
+
+(defun pl/pattern-defun (name dir width &rest patterns)
+  "Create a powerline defun for NAME and DIR of WIDTH for given PATTERNS.
+
+PATTERNS is of the form (PATTERN HEADER FOOTER SECOND-PATTERN CENTER).
+PATTERN is required and all other compontents are optional.
+
+All generated functions generate the form,
+
+HEADER
+PATTERN ...
+CENTER
+SECOND-PATTERN ...
+FOOTER
+
+PATTERN and SECOND-PATTERN repeat infinitely to fill the needed
+space to generate a full height XPM.
+
+PATTERN, HEADER, FOOTER, SECOND-PATTERN, CENTER are of the
+form ((COLOR ...) (COLOR ...) ...)
+
+COLOR can be one of 0, 1, 2 where 0 is the source color, 1 is the
+destionation color, and 2 is the interpolated color between 0 and
+1."
+  (when (eq dir 'right) (setq patterns (mapcar 'pl/reverse-pattern patterns)))
+  (let* ((pattern (pl/pattern (mapcar 'pl/pattern-to-string (car patterns))))
+         (header (mapcar 'pl/pattern-to-string (nth 1 patterns)))
+         (footer (mapcar 'pl/pattern-to-string (nth 2 patterns)))
+         (second-pattern (pl/pattern (mapcar 'pl/pattern-to-string (nth 3 patterns))))
+         (center (mapcar 'pl/pattern-to-string (nth 4 patterns)))
+         (reserve (+ (length header) (length footer) (length center))))
+    (pl/wrap-defun
+     name dir width
+
+     `((pattern-height (max (- height ,reserve) 0))
+       (second-pattern-height (/ pattern-height 2))
+       (pattern-height ,(if second-pattern
+                            '(ceiling pattern-height 2)
+                          'pattern-height)))
+
+     `((mapconcat 'identity ',header "")
+       (mapconcat 'identity (subseq ',pattern 0 pattern-height) "")
+       (mapconcat 'identity ',center "")
+       (mapconcat 'identity (subseq ',second-pattern 0 second-pattern-height) "")
+       (mapconcat 'identity ',footer "")))))
+
+
+
+(defun pl/wrap-defun (name dir width let-vars body)
+  "Return powerline function list of NAME in DIR with WIDTH using LET-VARS and BODY."
+  (let* ((src-face (if (eq dir 'left) 'face1 'face2))
+         (dst-face (if (eq dir 'left) 'face2 'face1)))
+    `(defun ,(intern (format "powerline-%s-%s" name (symbol-name dir)))
        (face1 face2 &optional height)
        (when window-system
+         (message "generating new separator")
          (unless height (setq height (pl/separator-height)))
-         (let* ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
-                (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
-                (midwidth (1- (/ height 2)))
-                (width (1- (ceiling height 2)))
-                (seq (number-sequence ,start ,end ,incr))
-                (odd (not (= midwidth width))))
+         (let* ,(append
+                 `((color1 (if ,src-face (pl/hex-color (face-attribute ,src-face :background)) "None"))
+                   (color2 (if ,dst-face (pl/hex-color (face-attribute ,dst-face :background)) "None")))
+                 let-vars)
            (create-image
-            (concat
-             (format "/* XPM */
-static char * arrow_%s[] = {
-\"%s %s 2 1\",
-\". c %s\",
-\"  c %s\",
-" (symbol-name ',dir) width height (or color1 "None") (or color2 "None"))
-             (mapconcat
-              (lambda (d) (pl/xpm-row-string d width ?. ? )) seq "\n")
-             (and odd (concat "\n" (pl/xpm-row-string (+ ,end ,incr) width ?. ? )))
-             "\n"
-             (mapconcat
-              (lambda (d) (pl/xpm-row-string d width ?. ? )) (reverse seq) "\n")
-             "};")
-            'xpm t :ascent 'center
-            :face (when (and face1 face2) (if (eq ',dir 'right) face1 face2))))))))
-
-(defmacro pl/arrow-fade (dir)
-  "Generate an arrow-fade XPM function for DIR."
-  (let ((start (if (eq dir 'right) 'width 0))
-        (end (if (eq dir 'right) '(- width midwidth) 'midwidth))
-        (incr (if (eq dir 'right) -1 1)))
-    `(defun ,(intern (format "powerline-arrow-fade-%s" (symbol-name dir)))
-       (face1 face2 &optional height)
-       (when window-system
-         (unless height (setq height (pl/separator-height)))
-         (let* ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
-                (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
-                (midwidth (1- (/ height 2)))
-                (width (1- (ceiling height 2)))
-                (row-width (+ width 2))
-                (seq (number-sequence ,start ,end ,incr))
-                (odd (not (= midwidth width))))
-           (create-image
-            (concat
-             (format "/* XPM */
-static char * arrow_fade_%s[] = {
+            ,(append
+              `(concat
+                (format "/* XPM */
+static char * %s_%s[] = {
 \"%s %s 3 1\",
-\"@ c %s\",
-\"# c %s\",
-\"  c %s\",
+\"0 c %s\",
+\"1 c %s\",
+\"2 c %s\",
 "
-                     (symbol-name ',dir) row-width height
-                     (or color1 "None")
-                     (if (and face1 face2) (pl/interpolate color1 color2) "None")
-                     (or color2 "None"))
-             (mapconcat
-              (lambda (d) (pl/xpm-row-fade-string d 2 row-width ?@ ?# ? )) seq "\n")
-             (and odd (concat "\n" (pl/xpm-row-fade-string (+ ,end ,incr) 2 row-width ?@ ?# ? )))
-             "\n"
-             (mapconcat
-              (lambda (d) (pl/xpm-row-fade-string d 2 row-width ?@ ?# ? )) (reverse seq) "\n")
-             "};")
+                        ,(replace-regexp-in-string "-" "_" name) (symbol-name ',dir)
+                        ,width height
+                        (if color1 color1 "None")
+                        (if color2 color2 "None")
+                        (if (and face1 face2) (pl/interpolate color1 color2) "None")))
+              body
+              '("};"))
             'xpm t :ascent 'center
-            :face (when (and face1 face2) (if (eq ',dir 'right) face1 face2))))))))
+            :face (when (and face1 face2) ,dst-face)))))))
 
-(defmacro pl/alternate (dir)
-  "Generate an anternate lines XPM function for DIR."
-  (let ((even-row (if (eq dir 'left) "\"##  \"," "\"  ##\","))
-        (odd-row (if (eq dir 'left) "\"@@##\"," "\"##@@\","))
-        (width 4))
-    `(defun ,(intern (format "powerline-alternate-%s" (symbol-name dir)))
-       (face1 face2 &optional height)
-       (when window-system
-         (unless height (setq height (pl/separator-height)))
-         (let* ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
-                (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
-                (seq (number-sequence 0 (1- height))))
-           (create-image
-            (concat
-             (format "/* XPM */
-static char * alternate_%s[] = {
-\"%s %s 3 1\",
-\"@ c %s\",
-\"# c %s\",
-\"  c %s\",
-"
-                     (symbol-name ',dir) ,width height
-                     (or color1 "None")
-                     (if (and face1 face2) (pl/interpolate color1 color2) "None")
-                     (or color2 "None"))
-             (mapconcat
-              (lambda (d) (if (oddp d) ,odd-row ,even-row)) seq "\n")
-             "};")
-            'xpm t :ascent 'center
-            :face (when (and face1 face2) (if (eq ',dir 'right) face1 face2))))))))
 
 
 (defmacro pl/nil (dir)
@@ -185,560 +150,228 @@ static char * alternate_%s[] = {
      (face1 face2 &optional height)
      nil))
 
+
 (defmacro pl/bar (dir)
-  "Generate an arrow xpm function for DIR."
-  (let* ((fill "\"##\",")
-         (width (- (length fill) 3)))
-    `(defun ,(intern (format "powerline-bar-%s" (symbol-name dir)))
-       (face1 face2 &optional height)
-       (when window-system
-         (unless height (setq height (pl/separator-height)))
-         (let* ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
-                (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
-                (seq (number-sequence 0 (1- height))))
-           (create-image
-            (concat
-             (format "/* XPM */
-static char * bar_%s[] = {
-\"%s %s 1 1\",
-\"# c %s\",
-"
-                     (symbol-name ',dir) ,width height
-                     (if (and face1 face2) (pl/interpolate color1 color2) "None"))
-             (mapconcat
-              (lambda (d) ,fill) seq "\n")
-             "};")
-            'xpm t :ascent 'center
-            :face (when (and face1 face2) (if (eq ',dir 'right) face1 face2))))))))
-
-(defun pl/interpolate (color1 color2)
-  "Interpolate between COLOR1 and COLOR2.
-
-COLOR1 and COLOR2 must be supplied as hex strings with leading #."
-  (let* (
-         (c1 (replace-regexp-in-string "#" "" color1))
-         (c2 (replace-regexp-in-string "#" "" color2))
-         (c1r (string-to-number (substring c1 0 2) 16)) (c1b (string-to-number (substring c1 2 4) 16)) (c1g (string-to-number (substring c1 4 6) 16))
-         (c2r (string-to-number (substring c2 0 2) 16)) (c2b (string-to-number (substring c2 2 4) 16)) (c2g (string-to-number (substring c2 4 6) 16))
-         (red (/ (+ c1r c2r) 2)) (grn (/ (+ c1g c2g) 2)) (blu (/ (+ c1b c2b) 2)))
-
-    (format "#%02X%02X%02X" red grn blu))
-  )
-
-(defun pl/wave-left (face1 face2)
-  "Return an XPM wave left from FACE1 to FACE2."
-  (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
-        (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None")))
-    (create-image
-     (format "/* XPM */
-static char * wave_left[] = {
-\"11 18 3 1\",
-\"@ c %s\",
-\"# c %s\",
-\"  c %s\",
-\"#          \",
-\"@@         \",
-\"@@@        \",
-\"@@@#       \",
-\"@@@@       \",
-\"@@@@#      \",
-\"@@@@@      \",
-\"@@@@@      \",
-\"@@@@@#     \",
-\"@@@@@@     \",
-\"@@@@@@     \",
-\"@@@@@@#    \",
-\"@@@@@@@    \",
-\"@@@@@@@    \",
-\"@@@@@@@#   \",
-\"@@@@@@@@   \",
-\"@@@@@@@@#  \",
-\"@@@@@@@@@@#\"};"
-             (if color1 color1 "None")
-             (if (and face1 face2) (pl/interpolate color1 color2) "None")
-             (if color2 color2 "None"))
-     'xpm t :ascent 'center)))
-
-(defun pl/wave-right (face1 face2)
-  "Return an XPM wave right from FACE1 to FACE2."
-  (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
-        (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None")))
-    (create-image
-     (format "/* XPM */
-static char * wave_right[] = {
-\"11 18 3 1\",
-\"@ c %s\",
-\"# c %s\",
-\"  c %s\",
-\"          #\",
-\"         @@\",
-\"        @@@\",
-\"       #@@@\",
-\"       @@@@\",
-\"      #@@@@\",
-\"      @@@@@\",
-\"      @@@@@\",
-\"     #@@@@@\",
-\"     @@@@@@\",
-\"     @@@@@@\",
-\"    #@@@@@@\",
-\"    @@@@@@@\",
-\"    @@@@@@@\",
-\"   #@@@@@@@\",
-\"   @@@@@@@@\",
-\"  @@@@@@@@@\",
-\"#@@@@@@@@@@\"};"
-             (if color2 color2 "None")
-             (if (and face1 face2) (pl/interpolate color2 color1) "None")
-             (if color1 color1 "None"))
-     'xpm t :ascent 'center)))
+  "Generate an bar xpm function for DIR."
+  (pl/pattern-defun
+   "bar" dir 2
+   '((2 2))))
 
 
-(defun pl/brace-left (face1 face2)
-  "Return an XPM of a left brace from FACE1 to FACE2."
-  (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
-        (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None")))
-    (create-image
-     (format "/* XPM */
-static char * brace_left[] = {
-\"4 19 3 1\",
-\"@ c %s\",
-\"# c %s\",
-\"  c %s\",
-\"    \",
-\"#   \",
-\"@   \",
-\"@   \",
-\"@   \",
-\"@   \",
-\"@#  \",
-\"@#  \",
-\"@@# \",
-\"@@@@\",
-\"@@# \",
-\"@#  \",
-\"@#  \",
-\"@   \",
-\"@   \",
-\"@   \",
-\"@   \",
-\"#   \",
-\"    \"
-};"
-             (if color1 color1 "None")
-             (if (and face1 face2) (pl/interpolate color2 color1) "None")
-             (if color2 color2 "None"))
-     'xpm t :ascent 'center)))
+(defmacro pl/alternate (dir)
+  "Generate an alternating pattern xpm function for DIR."
+  (pl/pattern-defun
+   "alternate" dir 4
+   '((2 2 1 1)
+     (0 0 2 2))))
 
-(defun pl/brace-right (face1 face2)
-  "Return an XPM of a right brace from FACE1 to FACE2."
-  (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
-        (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None")))
-    (create-image
-     (format "/* XPM */
-static char * brace_right[] = {
-\"4 19 3 1\",
-\"@ c %s\",
-\"# c %s\",
-\"  c %s\",
-\"    \",
-\"   #\",
-\"   @\",
-\"   @\",
-\"   @\",
-\"   @\",
-\"  #@\",
-\"  #@\",
-\" #@@\",
-\"@@@@\",
-\" #@@\",
-\"  #@\",
-\"  #@\",
-\"   @\",
-\"   @\",
-\"   @\",
-\"   @\",
-\"   #\",
-\"    \"};"
-             (if color2 color2 "None")
-             (if (and face1 face2) (pl/interpolate color2 color1) "None")
-             (if color1 color1 "None"))
-     'xpm t :ascent 'center)))
-
-
-
-(defun pl/roundstub-left (face1 face2 &optional height)
-  "Return an XPM of a left roundstub from FACE1 to FACE2 for given HEIGHT."
-  (unless height (setq height (max (pl/separator-height) 6)))
-  (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
-        (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
-        (fill-height (max (- height 6) 0)))
-    (create-image
-     (format "/* XPM */
-static char * roundstub_left[] = {
-\"3 %s 3 1\",
-\"@ c %s\",
-\"# c %s\",
-\"  c %s\",
-\"   \",
-\"@@ \",
-\"@@#\",
-%s
-\"@@#\",
-\"@@ \",
-\"   \"};"
-             height
-             (if color1 color1 "None")
-             (if (and face1 face2) (pl/interpolate color2 color1) "None")
-             (if color2 color2 "None")
-             (apply 'concat (loop repeat fill-height collect "\"@@@\",")))
-     'xpm t :ascent 'center :face face1)))
-
-(defun pl/roundstub-right (face1 face2 &optional height)
-  "Return an XPM of a right roundstub from FACE1 to FACE2 for given HEIGHT."
-  (unless height (setq height (max (pl/separator-height) 6)))
-  (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
-        (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
-        (fill-height (max (- height 6) 0)))
-    (create-image
-     (format "/* XPM */
-static char * roundstub_right[] = {
-\"3 %s 3 1\",
-\"@ c %s\",
-\"# c %s\",
-\"  c %s\",
-\"   \",
-\" @@\",
-\"#@@\",
-%s
-\"#@@\",
-\" @@\",
-\"   \"};"
-             height
-             (if color2 color2 "None")
-             (if (and face1 face2) (pl/interpolate color2 color1) "None")
-             (if color1 color1 "None")
-             (apply 'concat (loop repeat fill-height collect "\"@@@\",")))
-     'xpm t :ascent 'center :face face2)))
 
 (defmacro pl/zigzag (dir)
-  "Generate an box xpm function for DIR."
+  "Generate an zigzag pattern xpm function for DIR."
   (pl/pattern-defun
    "zigzag" dir 3
-   (if (eq dir 'left) '#1=(0 1 2 3 2 1 . #1#) '#1=(3 2 1 0 1 2 . #1#))))
+   '((1 1 1)
+     (0 1 1)
+     (0 0 1)
+     (0 0 0)
+     (0 0 1)
+     (0 1 1))))
 
 
 (defmacro pl/box (dir)
   "Generate an box xpm function for DIR."
   (pl/pattern-defun
    "box" dir 2
-   (if (eq dir 'left) '#1=(0 0 2 2 . #1#) '#1=(2 2 0 0 . #1#))))
+   '((0 0)
+     (0 0)
+     (1 1)
+     (1 1))))
+
+(defmacro pl/curve (dir)
+  "Generate an curve xpm function for DIR."
+  (pl/pattern-defun
+   "curve" dir 4
+   '((0 0 0 0))
+   '((1 1 1 1)
+     (2 1 1 1)
+     (0 0 1 1)
+     (0 0 2 1)
+     (0 0 0 1)
+     (0 0 0 2))
+   '((0 0 0 2)
+     (0 0 0 1)
+     (0 0 2 1)
+     (0 0 1 1)
+     (2 1 1 1)
+     (1 1 1 1))))
 
 
-(defun pl/butt-left (face1 face2 &optional height)
-  "Return left butt XPM from FACE1 to FACE2 of HEIGHT."
-  (unless height (setq height (max (pl/separator-height) 6)))
-  (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
-        (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
-        (fill-height (max (- height 6) 0)))
-    (create-image
-     (format "/* XPM */
-static char * butt_left[] = {
-\"3 %s 3 1\",
-\"@ c %s\",
-\"# c %s\",
-\"  c %s\",
-\"   \",
-\"@  \",
-\"@@ \",
-%s
-\"@@ \",
-\"@  \",
-\"   \"};"
-             height
-             (if color1 color1 "None")
-             (if (and face1 face2) (pl/interpolate color2 color1) "None")
-             (if color2 color2 "None")
-             (apply 'concat (loop repeat fill-height collect "\"@@@\",")))
-     'xpm t :ascent 'center :face face1)))
+(defmacro pl/roundstub (dir)
+  "Generate an roundstub xpm function for DIR."
+  (pl/pattern-defun
+   "roundstub" dir 3
+   '((0 0 0))
+   '((1 1 1)
+     (0 0 1)
+     (0 0 2))
+   '((0 0 2)
+     (0 0 1)
+     (1 1 1))))
 
-(defun pl/butt-right (face1 face2 &optional height)
-  "Return left butt XPM from FACE1 to FACE2 of HEIGHT."
-  (unless height (setq height (max (pl/separator-height) 6)))
-  (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
-        (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
-        (fill-height (max (- height 6) 0)))
-    (create-image
-     (format "/* XPM */
-static char * butt_right[] = {
-\"3 %s 3 1\",
-\"@ c %s\",
-\"# c %s\",
-\"  c %s\",
-\"   \",
-\"  @\",
-\" @@\",
-%s
-\" @@\",
-\"  @\",
-\"   \"};"
-             height
-             (if color2 color2 "None")
-             (if (and face1 face2) (pl/interpolate color2 color1) "None")
-             (if color1 color1 "None")
-             (apply 'concat (loop repeat fill-height collect "\"@@@\",")))
-     'xpm t :ascent 'center :face face2)))
+(defmacro pl/butt (dir)
+  "Generate an butt xpm function for DIR."
+  (pl/pattern-defun
+   "butt" dir 3
+   '((0 0 0))
+   '((1 1 1)
+     (0 1 1)
+     (0 0 1))
+   '((0 0 1)
+     (0 1 1)
+     (1 1 1))))
 
 (defmacro pl/chamfer (dir)
-  "Generate an arrow xpm function for DIR."
-  (let ((start (if (eq dir 'right) 'width 0))
-        (end (if (eq dir 'right) 0 'width))
-        (incr (if (eq dir 'right) -1 1)))
-    `(defun ,(intern (format "powerline-chamfer-%s" (symbol-name dir)))
-       (face1 face2 &optional height)
-       (when window-system
-         (unless height (setq height (pl/separator-height)))
-         (let* ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
-                (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
-                (width 3)
-                (fill-height (- height width 1))
-                (seq (number-sequence ,start ,end ,incr)))
-           (message "%s" (+ ,incr ,end))
-           (create-image
-            (concat
-             (format "/* XPM */
-static char * chamfer_%s[] = {
-\"%s %s 2 1\",
-\"@ c %s\",
-\"  c %s\",
-" (symbol-name ',dir) width height (or color1 "None") (or color2 "None"))
-             (mapconcat
-              (lambda (d) (pl/xpm-row-string d width ?@ ? )) seq "\n")
-             (apply 'concat (loop repeat fill-height collect (pl/xpm-row-string ,end width ?@ ? )))
-             "};")
-            'xpm t :ascent 'center
-            :face (when (and face1 face2) (if (eq ',dir 'right) face1 face2))))))))
+  "Generate an chamfer xpm function for DIR."
+  (pl/pattern-defun
+   "chamfer" dir 3
+   '((0 0 0))
+   '((1 1 1)
+     (0 1 1)
+     (0 0 1))))
+
+(defmacro pl/rounded (dir)
+  "Generate an rounded xpm function for DIR."
+  (pl/pattern-defun
+   "rounded" dir 6
+   '((0 0 0 0 0 0))
+   '((2 1 1 1 1 1)
+     (0 0 2 1 1 1)
+     (0 0 0 0 1 1)
+     (0 0 0 0 2 1)
+     (0 0 0 0 0 1)
+     (0 0 0 0 0 2))))
+
+(defmacro pl/contour (dir)
+  "Generate an contour xpm function for DIR."
+  (pl/pattern-defun
+   "contour" dir 10
+   '((0 0 0 0 0 1 1 1 1 1))
+
+   '((1 1 1 1 1 1 1 1 1 1)
+     (0 2 1 1 1 1 1 1 1 1)
+     (0 0 2 1 1 1 1 1 1 1)
+     (0 0 0 2 1 1 1 1 1 1)
+     (0 0 0 0 1 1 1 1 1 1)
+     (0 0 0 0 2 1 1 1 1 1))
+
+   '((0 0 0 0 0 2 1 1 1 1)
+     (0 0 0 0 0 0 1 1 1 1)
+     (0 0 0 0 0 0 2 1 1 1)
+     (0 0 0 0 0 0 0 2 1 1)
+     (0 0 0 0 0 0 0 0 0 0))))
+
+(defmacro pl/wave (dir)
+  "Generate an wave xpm function for DIR."
+  (pl/pattern-defun
+   "wave" dir 11
+   '((0 0 0 0 0 0 1 1 1 1 1 ))
+
+   '((2 1 1 1 1 1 1 1 1 1 1 )
+     (0 0 1 1 1 1 1 1 1 1 1 )
+     (0 0 0 1 1 1 1 1 1 1 1 )
+     (0 0 0 2 1 1 1 1 1 1 1 )
+     (0 0 0 0 1 1 1 1 1 1 1 )
+     (0 0 0 0 2 1 1 1 1 1 1 )
+     (0 0 0 0 0 1 1 1 1 1 1 )
+     (0 0 0 0 0 1 1 1 1 1 1 )
+     (0 0 0 0 0 2 1 1 1 1 1 ))
+
+   '((0 0 0 0 0 0 2 1 1 1 1 )
+     (0 0 0 0 0 0 0 1 1 1 1 )
+     (0 0 0 0 0 0 0 1 1 1 1 )
+     (0 0 0 0 0 0 0 2 1 1 1 )
+     (0 0 0 0 0 0 0 0 1 1 1 )
+     (0 0 0 0 0 0 0 0 2 1 1 )
+     (0 0 0 0 0 0 0 0 0 0 2 ))))
+
+(defmacro pl/brace (dir)
+  "Generate an brace xpm function for DIR."
+  (pl/pattern-defun
+   "brace" dir 4
+
+   '((0 1 1 1))
+
+   '((1 1 1 1)
+     (2 1 1 1))
+
+   '((2 1 1 1)
+     (1 1 1 1))
+
+   '((0 1 1 1))
+
+   '((0 2 1 1)
+     (0 2 1 1)
+     (0 0 2 1)
+     (0 0 0 0)
+     (0 0 2 1)
+     (0 2 1 1)
+     (0 2 1 1))))
 
 
 
-(defun pl/rounded-left (face1 face2 &optional height)
-  "Return left rounded XPM from FACE1 to FACE2 of HEIGHT."
-  (unless height (setq height (max (pl/separator-height) 6)))
-  (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
-        (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
-        (fill-height (max (- height 6) 0)))
-    (create-image
-     (format "/* XPM */
-static char * rounded[] = {
-\"6 %s 3 1\",
-\"@ c %s\",
-\"# c %s\",
-\"  c %s\",
-\"#     \",
-\"@@#   \",
-\"@@@@  \",
-\"@@@@# \",
-\"@@@@@ \",
-\"@@@@@#\",
-%s
-};"
-             height
-             (if color1 color1 "None")
-             (if (and face1 face2) (pl/interpolate color2 color1) "None")
-             (if color2 color2 "None")
-             (apply 'concat (loop repeat fill-height collect "\"@@@@@@\",")))
-     'xpm t :ascent 'center)))
 
-(defun pl/rounded-right (face1 face2 &optional height)
-  "Return right rounded XPM from FACE1 to FACE2 of HEIGHT."
-  (unless height (setq height (max (pl/separator-height) 6)))
-  (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
-        (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
-        (fill-height (max (- height 6) 0)))
-    (create-image
-     (format "/* XPM */
-static char * rounded[] = {
-\"6 %s 3 1\",
-\"  c %s\",
-\"# c %s\",
-\"@ c %s\",
-\"     #\",
-\"   #@@\",
-\"  @@@@\",
-\" #@@@@\",
-\" @@@@@\",
-\"#@@@@@\",
-%s
-};"
-             height
-             (if color1 color1 "None")
-             (if (and face1 face2) (pl/interpolate color2 color1) "None")
-             (if color2 color2 "None")
-             (apply 'concat (loop repeat fill-height collect "\"@@@@@@\",")))
-     'xpm t :ascent 'center)))
+(defun pl/row-pattern (fill total &optional fade)
+  "Make a list that has FILL 0s out of TOTAL 1s with FADE 2s to the right of the fill."
+  (unless fade (setq fade 0))
+  (let ((fill (min fill total))
+        (fade (min fade (max (- total fill) 0))))
+    (append (make-list fill 0)
+            (make-list fade 2)
+            (make-list (- total fill fade) 1))))
 
 
-(defun pl/contour-left (face1 face2 &optional height)
-  "Return left contour XPM from FACE1 to FACE2 of HEIGHT."
-  (unless height (setq height (max (pl/separator-height) 12)))
-  (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
-        (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
-        (fill-height (max (- height 11) 0)))
-    (create-image
-     (format "/* XPM */
-static char * contour_left[] = {
-\"10 %s 3 1\",
-\"@ c %s\",
-\"# c %s\",
-\"  c %s\",
-\"          \",
-\"@#        \",
-\"@@#       \",
-\"@@@#      \",
-\"@@@@      \",
-\"@@@@#     \",
-%s
-\"@@@@@#    \",
-\"@@@@@@    \",
-\"@@@@@@#   \",
-\"@@@@@@@#  \",
-\"@@@@@@@@@@\"};"
-             height
-             (if color1 color1 "None")
-             (if (and face1 face2) (pl/interpolate color2 color1) "None")
-             (if color2 color2 "None")
-             (apply 'concat (loop repeat fill-height collect "\"@@@@@     \",")))
-     'xpm t :ascent 'center :face face1)))
 
-(defun pl/contour-right (face1 face2 &optional height)
-  "Return right contour XPM from FACE1 to FACE2 of HEIGHT."
-  (unless height (setq height (max (pl/separator-height) 12)))
-  (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
-        (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
-        (fill-height (max (- height 11) 0)))
-    (create-image
-     (format "/* XPM */
-static char * contour_right[] = {
-\"10 %s 3 1\",
-\"@ c %s\",
-\"# c %s\",
-\"  c %s\",
-\"          \",
-\"        #@\",
-\"       #@@\",
-\"      #@@@\",
-\"      @@@@\",
-\"     #@@@@\",
-%s
-\"    #@@@@@\",
-\"    @@@@@@\",
-\"   #@@@@@@\",
-\"  #@@@@@@@\",
-\"@@@@@@@@@@\"};"
-             height
-             (if color2 color2 "None")
-             (if (and face1 face2) (pl/interpolate color2 color1) "None")
-             (if color1 color1 "None")
-             (apply 'concat (loop repeat fill-height collect "\"     @@@@@\",")))
-     'xpm t :ascent 'center :face face2)))
+(defmacro pl/arrow (dir)
+  "Generate an arrow XPM function for DIR."
+  (let ((row-modifier (if (eq dir 'left) 'identity 'reverse)))
+    (pl/wrap-defun "arrow" dir 'middle-width
+                   '((width (1- (/ height 2)))
+                     (middle-width (1- (ceiling height 2))))
+                   `((loop for i from 0 to width
+                           concat (pl/pattern-to-string (,row-modifier (pl/row-pattern i middle-width))))
+                     (when (oddp height) (pl/pattern-to-string (make-list middle-width 0)))
+                     (loop for i from width downto 0
+                           concat (pl/pattern-to-string (,row-modifier (pl/row-pattern i middle-width))))
+                     ))))
+
+
+(defmacro pl/arrow-fade (dir)
+  "Generate an arrow-fade XPM function for DIR."
+  (let* ((row-modifier (if (eq dir 'left) 'identity 'reverse)))
+    (pl/wrap-defun
+     "arrow-fade" dir 'middle-width
+     '((width (1- (/ height 2)))
+       (middle-width (1+ (ceiling height 2))))
+     `((loop for i from 0 to width
+             concat (pl/pattern-to-string (,row-modifier (pl/row-pattern i middle-width 2))))
+       (when (oddp height) (pl/pattern-to-string (,row-modifier (pl/row-pattern (1+ width) middle-width 2))))
+       (loop for i from width downto 0
+             concat (pl/pattern-to-string (,row-modifier (pl/row-pattern i middle-width 2))))))))
+
 
 (defmacro pl/slant (dir)
-  "Generate an arrow xpm function for DIR."
-  (let ((start (if (eq dir 'right) 'width 0))
-        (end (if (eq dir 'right) 0 'width))
-        (incr (if (eq dir 'right) -1 1)))
-    `(defun ,(intern (format "powerline-slant-%s" (symbol-name dir)))
-       (face1 face2 &optional height)
-       (when window-system
-         (unless height (setq height (pl/separator-height)))
-         (let* ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
-                (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
-                (rows (ceiling height 2))
-                (width (1- (ceiling height 2)))
-                (seq (number-sequence ,start ,end ,incr)))
-           (create-image
-            (concat
-             (format "/* XPM */
-static char * slant_%s[] = {
-\"%s %s 2 1\",
-\"@ c %s\",
-\"  c %s\",
-" (symbol-name ',dir) width (* rows 2) (or color1 "None") (or color2 "None"))
-             (mapconcat
-              (lambda (d) (concat (pl/xpm-row-string d width ?@ ? )
-                                  (pl/xpm-row-string d width ?@ ? ))) seq "\n")
-             "};")
-            'xpm t :ascent 'center
-            :face (when (and face1 face2) (if (eq ',dir 'right) face1 face2))))))))
+  "Generate an slant XPM function for DIR."
+  (let* ((row-modifier (if (eq dir 'left) 'identity 'reverse)))
+    (pl/wrap-defun
+     "slant" dir 'width
+     '((width (1- (ceiling height 2))))
+     `((loop for i from 0 to height
+             concat (pl/pattern-to-string
+                     (,row-modifier (pl/row-pattern (/ i 2) width))))))))
 
 
 
-(defun pl/curve-left (face1 face2 &optional height)
-  "Return left curve XPM from FACE1 to FACE2 of HEIGHT."
-  (unless height (setq height (max (pl/separator-height) 14)))
-  (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
-        (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
-        (fill-height (max (- height 12) 0)))
-    (create-image
-     (format "/* XPM */
-static char * curve_left[] = {
-\"4 %s 3 1\",
-\"@ c %s\",
-\"# c %s\",
-\"  c %s\",
-\"    \",
-\"#   \",
-\"@@  \",
-\"@@# \",
-\"@@@ \",
-\"@@@#\",
-%s
-\"@@@#\",
-\"@@@ \",
-\"@@# \",
-\"@@  \",
-\"#   \",
-\"    \"};"
-             (+ 12 fill-height)
-             (if color1 color1 "None")
-             (if (and face1 face2) (pl/interpolate color2 color1) "None")
-             (if color2 color2 "None")
-             (apply 'concat (loop repeat fill-height collect "\"@@@@@\",")))
-     'xpm t :ascent 'center :face face2)))
 
-
-(defun pl/curve-right (face1 face2 &optional height)
-  "Return right curved XPM from FACE1 to FACE2 of HEIGHT."
-  (unless height (setq height (max (pl/separator-height) 14)))
-  (let ((color1 (if face1 (pl/hex-color (face-attribute face1 :background)) "None"))
-        (color2 (if face2 (pl/hex-color (face-attribute face2 :background)) "None"))
-        (fill-height (max (- height 12) 0)))
-    (create-image
-     (format "/* XPM */
-static char * curve_right[] = {
-\"4 %s 3 1\",
-\"@ c %s\",
-\"# c %s\",
-\"  c %s\",
-\"    \",
-\"   #\",
-\"  @@\",
-\" #@@\",
-\" @@@\",
-\"#@@@\",
-%s
-\"#@@@\",
-\" @@@\",
-\" #@@\",
-\"  @@\",
-\"   #\",
-\"    \"};"
-             (+ 12 fill-height)
-             (if color2 color2 "None")
-             (if (and face1 face2) (pl/interpolate color2 color1) "None")
-             (if color1 color1 "None")
-             (apply 'concat (loop repeat fill-height collect "\"@@@@@\",")))
-     'xpm t :ascent 'center :face face2)))
 
 
 
