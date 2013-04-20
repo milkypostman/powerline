@@ -372,10 +372,11 @@ static char * %s_%s[] = {
                      (,row-modifier (pl/row-pattern (/ i 2) width))))))))
 
 
+(defun powerline-utf-8-left (f1 f2 &optional height)
+  (powerline-raw (char-to-string powerline-utf-8-separator-left) (list :foreground (face-attribute f2 :foreground) :background (face-attribute f1 :foreground))))
 
-
-
-
+(defun powerline-utf-8-right (f1 f2 &optional height)
+  (powerline-raw (char-to-string powerline-utf-8-separator-right) (list :foreground (face-attribute f1 :foreground) :background (face-attribute f2 :foreground))))
 
 (provide 'powerline-separators)
 
