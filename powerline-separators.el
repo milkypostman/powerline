@@ -34,7 +34,7 @@ COLOR1 and COLOR2 must be supplied as hex strings with leading #."
   "Gets the hexadecimal value COLOR."
   (let ((ret color))
     (cond
-     ((string= "#" (substring color 0 1))
+     ((and (stringp color) (string= "#" (substring color 0 1)))
       (setq ret (upcase ret)))
      ((color-defined-p color)
       (setq ret (concat "#"
