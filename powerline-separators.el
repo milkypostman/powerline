@@ -121,8 +121,14 @@ destionation color, and 2 is the interpolated color between 0 and
          (message "pl/ generating new separator")
          (unless height (setq height (pl/separator-height)))
          (let* ,(append
-                 `((color1 (if ,src-face (pl/hex-color (face-attribute ,src-face :background)) "None"))
-                   (color2 (if ,dst-face (pl/hex-color (face-attribute ,dst-face :background)) "None")))
+                 `((color1 (when ,src-face
+                             (pl/hex-color (face-attribute ,src-face :background))))
+                   (color2 (when ,dst-face
+                             (pl/hex-color (face-attribute ,dst-face :background))))
+                   (colori (when (and color1 color2) (pl/interpolate color1 color2)))
+                   (color1 (or color1 "None"))
+                   (color2 (or color2 "None"))
+                   (colori (or colori "None")))
                  let-vars)
            (create-image
             ,(append
@@ -138,7 +144,7 @@ static char * %s_%s[] = {
                         ,width height
                         color1
                         color2
-                        (if (and face1 face2) (pl/interpolate color1 color2) "None")))
+                        colori))
               body
               '("};"))
             'xpm t :ascent 'center
