@@ -136,8 +136,8 @@ static char * %s_%s[] = {
 "
                         ,(replace-regexp-in-string "-" "_" name) (symbol-name ',dir)
                         ,width height
-                        (if color1 color1 "None")
-                        (if color2 color2 "None")
+                        color1
+                        color2
                         (if (and face1 face2) (pl/interpolate color1 color2) "None")))
               body
               '("};"))
