@@ -118,7 +118,7 @@ destionation color, and 2 is the interpolated color between 0 and
     `(defun ,(intern (format "powerline-%s-%s" name (symbol-name dir)))
        (face1 face2 &optional height)
        (when window-system
-         (message "generating new separator")
+         (message "pl/ generating new separator")
          (unless height (setq height (pl/separator-height)))
          (let* ,(append
                  `((color1 (if ,src-face (pl/hex-color (face-attribute ,src-face :background)) "None"))
