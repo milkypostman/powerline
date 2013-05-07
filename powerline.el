@@ -797,6 +797,8 @@ mouse-3: go to end")))
            (powerline-width (cdr values))))
     0))
 
+(message "powerlne loaded")
+
 (provide 'powerline)
 
 
