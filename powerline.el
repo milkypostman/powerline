@@ -428,16 +428,6 @@ static char * %s[] = {
    ((listp mode-line-process) (format-mode-line mode-line-process))
    (t mode-line-process)))
 
-;;;###autoload
-(defpowerline powerline-which-func
-  (format-mode-line
-   `(:propertize which-func-current
-                 local-map ,which-func-keymap
-                 face which-func
-                 mouse-face mode-line-highlight
-                 help-echo "mouse-1: go to beginning\n\
-mouse-2: toggle rest visibility\n\
-mouse-3: go to end")))
 
 (defvar pl/default-mode-line mode-line-format)
 
@@ -576,12 +566,7 @@ mouse-3: go to end")))
                                 (powerline-raw mode-line-mule-info nil 'l)
                                 (powerline-buffer-id nil 'l)
 
-                                (when which-function-mode
-                                  (concat
-                                   " ["
-                                   (powerline-which-func 'which-func nil)
-                                   "]"))
-
+                                (powerline-raw which-func-format nil 'l)
 
                                 (powerline-raw " ")
                                 (funcall separator-left mode-line face1)
@@ -657,11 +642,7 @@ mouse-3: go to end")))
 
                                 ;; (powerline-raw (concat "[" (mode-line-eol-desc) "]") mode-line)
 
-                                (when which-function-mode
-                                  (concat
-                                   " ["
-                                   (powerline-which-func 'which-func nil)
-                                   "]"))
+                                (powerline-raw which-func-format nil 'l)
 
 
                                 (when (boundp 'erc-modified-channels-object)
