@@ -290,11 +290,11 @@ static char * %s[] = {
   (when str
     (let* ((rendered-str (format-mode-line str))
            (padded-str (concat
-                        (when (and (> (length rendered-str) 0) (eq pad 'l)) " ")
+                        (when (and (> (length rendered-str) 0) (eq pad 'l)) (propertize " " 'face face))
                         (if (listp str) rendered-str str)
-                        (when (and (> (length rendered-str) 0) (eq pad 'r)) " "))))
+                        (when (and (> (length rendered-str) 0) (eq pad 'r)) (propertize " " 'face face)))))
 
-      (if face
+      (if (and face (not (get-text-property 0 'face str)))
           (propertize padded-str 'face face)
         padded-str))))
 
