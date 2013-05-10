@@ -116,14 +116,12 @@ the original function.  Use frame-local memoization."
 (defun pl/memoize-wrap-frame-local (func)
   "Return the memoized version of FUNC.
 The memoization cache is frame-local."
-  ;; (message "memoize %s %s %s" cache-sym val-sym args-sym)
   (let ((funcid (gensym)))
     `(lambda (&rest args)
        ,(concat (documentation func) (format "\n(memoized function %s)" funcid))
        (let* ((cache (pl/create-or-get-cache))
               (key (cons ',funcid args))
               (val (gethash key cache)))
-         ;;(message "%s" ,val-sym)
          (if val
              val
            (puthash key (apply ,func args) cache))))))
@@ -616,7 +614,6 @@ mouse-3: go to end")))
                                 (powerline-raw "%6p" nil 'r)
 
                                 (powerline-hud face2 face1))))
-                     ;;(message "%s %s" separator-left (funcall 'powerline-wave-left mode-line face1))
                      (concat
                       (powerline-render lhs)
                       (powerline-fill face2 (powerline-width rhs))
@@ -693,7 +690,6 @@ mouse-3: go to end")))
                                 (powerline-raw (format-mode-line '(10 "%c")))
 
                                 (powerline-raw (replace-regexp-in-string  "%" "%%" (format-mode-line '(-3 "%p"))) mode-line 'r))))
-                     ;;(message "%s %s" separator-left (funcall 'powerline-wave-left mode-line face1))
                      (concat
                       (powerline-render lhs)
                       (powerline-fill mode-line (powerline-width rhs))
@@ -801,7 +797,6 @@ mouse-3: go to end")))
   "Render a powerline ITEM."
   (cond
    ((and (listp item) (eq 'image (car item)))
-    ;;    (message "%s" (plist-get (cdr item) :face))
     (propertize " " 'display item
                 'face (plist-get (cdr item) :face)))
    (item item)))
