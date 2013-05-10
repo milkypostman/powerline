@@ -284,18 +284,42 @@ static char * %s[] = {
      (&optional face pad)
      (powerline-raw ,body face pad)))
 
+(defun pl/property-substrings (str prop)
+  "Return a list of substrings of STR when PROP change."
+  (let ((beg 0) (end 0)
+        (len (length str))
+        (out))
+    (while (< end (length str))
+      (setq end (or (next-single-property-change beg prop str) len))
+      (setq out (append out (list (substring str beg (setq beg end))))))
+    out))
+
+(defun pl/assure-list (item)
+  "Assure that ITEM is a list."
+  (if (listp item)
+      item
+    (list item)))
+
+(defun pl/add-text-property (str prop val)
+  (mapconcat
+   (lambda (mm)
+     (let ((cur (pl/assure-list (get-text-property 0 'face mm))))
+       (propertize mm 'face (append cur (list val)))))
+   (pl/property-substrings str prop)
+   ""))
+
 ;;;###autoload
 (defun powerline-raw (str &optional face pad)
   "Render STR as mode-line data using FACE and optionally PAD import on left (l) or right (r)."
   (when str
     (let* ((rendered-str (format-mode-line str))
            (padded-str (concat
-                        (when (and (> (length rendered-str) 0) (eq pad 'l)) (propertize " " 'face face))
+                        (when (and (> (length rendered-str) 0) (eq pad 'l)) " ")
                         (if (listp str) rendered-str str)
-                        (when (and (> (length rendered-str) 0) (eq pad 'r)) (propertize " " 'face face)))))
+                        (when (and (> (length rendered-str) 0) (eq pad 'r)) " "))))
 
-      (if (and face (not (get-text-property 0 'face str)))
-          (propertize padded-str 'face face)
+      (if face
+          (pl/add-text-property padded-str 'face face)
         padded-str))))
 
 
@@ -337,16 +361,10 @@ static char * %s[] = {
                            (define-key map [mode-line down-mouse-3] mode-line-mode-menu)
                            map)))
 
-(defun pl/cons (first second)
-  (if first
-      (cons first second)
-    (cons second nil)))
-
 ;;;###autoload
 (defpowerline powerline-minor-modes
   (mapconcat (lambda (mm)
                (propertize mm
-                           'face (pl/cons (get-text-property 0 'face mm) face)
                            'mouse-face 'mode-line-highlight
                            'help-echo "Minor mode\n mouse-1: Display minor mode menu\n mouse-2: Show help for minor mode\n mouse-3: Toggle minor modes"
                            'local-map (let ((map (make-sparse-keymap)))
