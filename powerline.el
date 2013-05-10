@@ -337,10 +337,16 @@ static char * %s[] = {
                            (define-key map [mode-line down-mouse-3] mode-line-mode-menu)
                            map)))
 
+(defun pl/cons (first second)
+  (if first
+      (cons first second)
+    (cons second nil)))
+
 ;;;###autoload
 (defpowerline powerline-minor-modes
   (mapconcat (lambda (mm)
                (propertize mm
+                           'face (pl/cons (get-text-property 0 'face mm) face)
                            'mouse-face 'mode-line-highlight
                            'help-echo "Minor mode\n mouse-1: Display minor mode menu\n mouse-2: Show help for minor mode\n mouse-3: Toggle minor modes"
                            'local-map (let ((map (make-sparse-keymap)))
@@ -357,7 +363,8 @@ static char * %s[] = {
                                           [header-line down-mouse-3]
                                           (powerline-mouse 'minor 'menu mm))
                                         map)))
-             (split-string (format-mode-line minor-mode-alist)) " "))
+             (split-string (format-mode-line minor-mode-alist))
+             (propertize " " 'face face)))
 
 
 ;;;###autoload
