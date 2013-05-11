@@ -566,7 +566,7 @@ static char * %s[] = {
                                 (powerline-raw mode-line-mule-info nil 'l)
                                 (powerline-buffer-id nil 'l)
 
-                                (when (and (boundp which-func-mode) which-func-mode)
+                                (when (and (boundp 'which-func-mode) which-func-mode)
                                   (powerline-raw which-func-format nil 'l))
 
                                 (powerline-raw " ")
@@ -643,7 +643,7 @@ static char * %s[] = {
 
                                 ;; (powerline-raw (concat "[" (mode-line-eol-desc) "]") mode-line)
 
-                                (when (and (boundp which-func-mode) which-func-mode)
+                                (when (and (boundp 'which-func-mode) which-func-mode)
                                   (powerline-raw which-func-format nil 'l))
 
 
