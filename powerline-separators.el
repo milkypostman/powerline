@@ -18,6 +18,7 @@
 
 ;;; Code:
 
+(require 'cl-lib)
 
 (defun pl/interpolate (color1 color2)
   "Interpolate between COLOR1 and COLOR2.
@@ -54,7 +55,7 @@ COLOR1 and COLOR2 must be supplied as hex strings with a leading #."
 (defun pl/pattern (lst)
   "Turn LST into an infinite pattern."
   (when lst
-    (let ((pattern (copy-list lst)))
+    (let ((pattern (cl-copy-list lst)))
       (setcdr (last pattern) pattern))))
 
 (defun pl/pattern-to-string (pattern)

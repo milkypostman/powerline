@@ -8,6 +8,7 @@
 ;; URL: http://github.com/milkypostman/powerline/
 ;; Version: 2.1
 ;; Keywords: mode-line
+;; Package-Requires: ((cl-lib "0.2"))
 
 ;;; Commentary:
 ;;
@@ -21,6 +22,7 @@
 (require 'powerline-themes)
 (require 'powerline-separators)
 
+(require 'cl-lib)
 
 (defface powerline-active1 '((t (:background "grey22" :inherit mode-line)))
   "Powerline face 1."
@@ -111,14 +113,14 @@ This is needed to make sure that text is properly aligned."
   "Memoize FUNC.
 If argument is a symbol then install the memoized function over
 the original function.  Use frame-local memoization."
-  (typecase func
+  (cl-typecase func
     (symbol (fset func (pl/memoize-wrap-frame-local (symbol-function func))) func)
     (function (pl/memoize-wrap-frame-local func))))
 
 (defun pl/memoize-wrap-frame-local (func)
   "Return the memoized version of FUNC.
 The memoization cache is frame-local."
-  (let ((funcid (gensym)))
+  (let ((funcid (cl-gensym)))
     `(lambda (&rest args)
        ,(concat (documentation func) (format "\n(memoized function %s)" funcid))
        (let* ((cache (pl/create-or-get-cache))
