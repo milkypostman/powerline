@@ -161,12 +161,12 @@ destination color, and 2 is the interpolated color between 0 and 1."
     (pl/wrap-defun "arrow" dir 'middle-width
                    '((width (1- (/ height 2)))
                      (middle-width (1- (ceiling height 2))))
-                   `((loop for i from 0 to width
-                           concat (pl/pattern-to-string (,row-modifier (pl/row-pattern i middle-width))))
-                     (when (oddp height)
+                   `((cl-loop for i from 0 to width
+                              concat (pl/pattern-to-string (,row-modifier (pl/row-pattern i middle-width))))
+                     (when (cl-oddp height)
                        (pl/pattern-to-string (make-list middle-width 0)))
-                     (loop for i from width downto 0
-                           concat (pl/pattern-to-string (,row-modifier (pl/row-pattern i middle-width))))))))
+                     (cl-loop for i from width downto 0
+                              concat (pl/pattern-to-string (,row-modifier (pl/row-pattern i middle-width))))))))
 
 (defmacro pl/arrow-fade (dir)
   "Generate an arrow-fade XPM function for DIR."
@@ -174,12 +174,12 @@ destination color, and 2 is the interpolated color between 0 and 1."
     (pl/wrap-defun "arrow-fade" dir 'middle-width
                    '((width (1- (/ height 2)))
                      (middle-width (1+ (ceiling height 2))))
-                   `((loop for i from 0 to width
-                           concat (pl/pattern-to-string (,row-modifier (pl/row-pattern i middle-width 2))))
-                     (when (oddp height)
+                   `((cl-loop for i from 0 to width
+                              concat (pl/pattern-to-string (,row-modifier (pl/row-pattern i middle-width 2))))
+                     (when (cl-oddp height)
                        (pl/pattern-to-string (,row-modifier (pl/row-pattern (1+ width) middle-width 2))))
-                     (loop for i from width downto 0
-                           concat (pl/pattern-to-string (,row-modifier (pl/row-pattern i middle-width 2))))))))
+                     (cl-loop for i from width downto 0
+                              concat (pl/pattern-to-string (,row-modifier (pl/row-pattern i middle-width 2))))))))
 
 (defmacro pl/bar (dir)
   "Generate a bar XPM function for DIR."
@@ -290,8 +290,8 @@ destination color, and 2 is the interpolated color between 0 and 1."
   (let* ((row-modifier (if (eq dir 'left) 'identity 'reverse)))
     (pl/wrap-defun "slant" dir 'width
                    '((width (1- (ceiling height 2))))
-                   `((loop for i from 0 to height
-                           concat (pl/pattern-to-string (,row-modifier (pl/row-pattern (/ i 2) width))))))))
+                   `((cl-loop for i from 0 to height
+                              concat (pl/pattern-to-string (,row-modifier (pl/row-pattern (/ i 2) width))))))))
 
 (defmacro pl/wave (dir)
   "Generate a wave XPM function for DIR."
