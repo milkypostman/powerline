@@ -121,7 +121,6 @@ destination color, and 2 is the interpolated color between 0 and 1."
     `(defun ,(intern (format "powerline-%s-%s" name (symbol-name dir)))
        (face1 face2 &optional height)
        (when window-system
-         (message "pl/ generating new separator")
          (unless height
            (setq height (pl/separator-height)))
          (let* ,(append `((color1 (when ,src-face
