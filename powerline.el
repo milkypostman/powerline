@@ -483,9 +483,6 @@ static char * %s[] = {
     0))
 
 
-;; weird hack to fix bug #29
-(message "powerlne loaded")
-
 (provide 'powerline)
 
 ;;; powerline.el ends here
