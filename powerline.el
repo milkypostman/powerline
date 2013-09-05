@@ -420,6 +420,7 @@ static char * %s[] = {
 ;;;###autoload
 (defpowerline powerline-process
   (cond
+   ((symbolp mode-line-process) (symbol-value mode-line-process))
    ((listp mode-line-process) (format-mode-line mode-line-process))
    (t mode-line-process)))
 
