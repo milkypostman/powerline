@@ -19,6 +19,7 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'color)
 
 (defun pl/interpolate (color1 color2)
   "Interpolate between COLOR1 and COLOR2.
