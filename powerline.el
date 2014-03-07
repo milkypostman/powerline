@@ -445,14 +445,22 @@ static char * %s[] = {
 
 (add-hook 'minibuffer-exit-hook 'pl/minibuffer-exit)
 
+(defun set-powerline-selected-window ()
+  "sets the variable `powerline-selected-window` appropriately"
+  (when (not (minibuffer-window-active-p (frame-selected-window)))
+    (setq powerline-selected-window (frame-selected-window))))
+
+(add-hook 'window-configuration-change-hook 'set-powerline-selected-window)
+(add-hook 'focus-in-hook 'set-powerline-selected-window)
+(add-hook 'focus-out-hook 'set-powerline-selected-window)
+
+(defadvice select-window (after powerline-select-window activate)
+  "makes powerline aware of window changes"
+  (set-powerline-selected-window))
+
 (defun powerline-selected-window-active ()
   "Return whether the current window is active."
-  (or (eq (frame-selected-window)
-          (selected-window))
-      (and (minibuffer-window-active-p
-            (frame-selected-window))
-           (eq (pl/minibuffer-selected-window)
-               (selected-window)))))
+  (eq powerline-selected-window (selected-window)))
 
 (defun powerline-revert ()
   "Revert to the default Emacs mode-line."
