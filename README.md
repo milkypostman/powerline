@@ -24,7 +24,7 @@ The faces that powerline uses for the builtin themes are `powerline-active1` and
 
 ## Custom Themes
 
-Please look over the `powerline-default-theme` and `powerline-center-theme` in [`powerline.el`](https://github.com/milkypostman/powerline/blob/master/powerline.el) for examples of themes that involve different justifications of modeline text.
+Please look over the `powerline-default-theme` and `powerline-center-theme` in [`powerline-themes.el`](https://github.com/milkypostman/powerline/blob/master/powerline-themes.el) for examples of themes that involve different justifications of modeline text.
 
 You can write your own powerline theme by simply setting your own `mode-line-format` to be an evaluation (`:eval`) of the powerline functions. Notice in `powerline-default-theme` the `let*` defines two lists: `lhs` and `rhs` which are exactly the lists that define what goes on the left and right sides of the modeline. The `powerline-center-theme` demonstrates how to *center* justify part of the modeline and defines an additional `center` list which is exactly the modeline components to be displayed in the middle section. 
 
