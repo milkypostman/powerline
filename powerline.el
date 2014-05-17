@@ -208,7 +208,7 @@ static char * %s[] = {
      'xpm t :ascent 'center)))
 
 (defun pl/percent-xpm
-  (height pmax pmin winend winstart width color1 color2)
+    (height pmax pmin winend winstart width color1 color2)
   "Generate percentage xpm of HEIGHT for PMAX to PMIN given WINEND and WINSTART with WIDTH and COLOR1 and COLOR2."
   (let* ((height- (1- height))
          (fillstart (round (* height- (/ (float winstart) (float pmax)))))
@@ -231,8 +231,8 @@ static char * %s[] = {
 (defun powerline-hud (face1 face2 &optional width)
   "Return an XPM of relative buffer location using FACE1 and FACE2 of optional WIDTH."
   (unless width (setq width 2))
-  (let ((color1 (if face1 (face-attribute face1 :background) "None"))
-        (color2 (if face2 (face-attribute face2 :background) "None"))
+  (let ((color1 (if face1 (face-background face1) "None"))
+        (color2 (if face2 (face-background face2) "None"))
         (height (or powerline-height (frame-char-height)))
         pmax
         pmin
@@ -278,7 +278,7 @@ static char * %s[] = {
 (defmacro defpowerline (name body)
   "Create function NAME by wrapping BODY with powerline padding an propetization."
   `(defun ,name
-     (&optional face pad)
+       (&optional face pad)
      (powerline-raw ,body face pad)))
 
 (defun pl/property-substrings (str prop)
