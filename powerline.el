@@ -41,7 +41,9 @@
   "Powerline face 2."
   :group 'powerline)
 
-(defcustom powerline-default-separator 'utf-8
+(defcustom powerline-default-separator (if (window-system)
+                                           'arrow
+                                         'utf-8)
     "The separator to use for the default theme.
 
 Valid Values: arrow, slant, chamfer, wave, brace, roundstub,
