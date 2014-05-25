@@ -54,6 +54,8 @@
                                      (powerline-vc face2 'r)))
                           (rhs (list (powerline-raw global-mode-string face2 'r)
                                      (funcall separator-right face2 face1)
+                                     (if (null window-system)
+                                             (powerline-raw (concat " " (char-to-string #xe0a1)) face1))
                                      (powerline-raw "%4l" face1 'l)
                                      (powerline-raw ":" face1 'l)
                                      (powerline-raw "%3c" face1 'r)

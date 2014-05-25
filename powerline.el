@@ -407,9 +407,12 @@ static char * %s[] = {
 
 ;;;###autoload
 (defpowerline powerline-vc
-  (when (and (buffer-file-name (current-buffer))
-             vc-mode)
-    (format-mode-line '(vc-mode vc-mode))))
+    (when (and (buffer-file-name (current-buffer)) vc-mode)
+        (if (null window-system)
+                (let ((backend (vc-backend (buffer-file-name (current-buffer)))))
+                    (when backend
+                        (concat " " (char-to-string #xe0a0) " " (vc-working-revision (buffer-file-name (current-buffer)) backend))))
+            (format-mode-line '(vc-mode vc-mode)))))
 
 ;;;###autoload
 (defpowerline powerline-buffer-size
