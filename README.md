@@ -5,6 +5,7 @@ Emacs version of the Vim powerline.
 
 This is a proposed version 2.0 of the original [Emacs Powerline](http://www.emacswiki.org/emacs/PowerLine) which is a fork of [vim-powerline](https://github.com/Lokaltog/vim-powerline).  
 
+This version has utf-8 support merged in, fixed and enabled by default, so the separators will display properly under mintty for example - as long as you have [patched fonts](https://github.com/Lokaltog/powerline-fonts) installed.
 
 ## Installation
 
