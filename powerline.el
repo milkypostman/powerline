@@ -41,11 +41,11 @@
   "Powerline face 2."
   :group 'powerline)
 
-(defcustom powerline-default-separator 'arrow
-  "The separator to use for the default theme.
+(defcustom powerline-default-separator 'utf-8
+    "The separator to use for the default theme.
 
 Valid Values: arrow, slant, chamfer, wave, brace, roundstub,
-zigzag, butt, rounded, contour, curve"
+zigzag, butt, rounded, contour, curve, utf-8"
   :group 'powerline
   :type '(choice (const alternate)
                  (const arrow)
@@ -62,7 +62,8 @@ zigzag, butt, rounded, contour, curve"
                  (const slant)
                  (const wave)
                  (const zigzag)
-                 (const nil)))
+                 (const nil)
+                 (const utf-8)))
 
 (defcustom powerline-default-separator-dir '(left . right)
   "The separator direction to use for the default theme.
@@ -74,6 +75,16 @@ DIR must be one of: left, right"
   :group 'powerline
   :type '(cons (choice :tag "Left Hand Side" (const left) (const right))
                (choice :tag "Right Hand Side" (const left) (const right))))
+
+(defcustom powerline-utf-8-separator-left #xe0b0
+    "The unicode character number for the left facing separator"
+    :group 'powerline
+    :type  '(choice integer (const nil)))
+
+(defcustom powerline-utf-8-separator-right #xe0b2
+    "The unicode character number for the right facing separator"
+    :group 'powerline
+    :type  '(choice integer (const nil)))
 
 (defcustom powerline-height nil
   "Override the mode-line height."
