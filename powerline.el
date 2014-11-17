@@ -343,7 +343,7 @@ static char * %s[] = {
                                              (.5 . left-margin))))
               'face face))
 
-;;;###autoload
+;;;###autoload (autoload 'powerline-major-mode "powerline")
 (defpowerline powerline-major-mode
   (propertize (format-mode-line mode-name)
               'mouse-face 'mode-line-highlight
@@ -356,7 +356,7 @@ static char * %s[] = {
                            (define-key map [mode-line down-mouse-3] mode-line-mode-menu)
                            map)))
 
-;;;###autoload
+;;;###autoload (autoload 'powerline-minor-modes "powerline")
 (defpowerline powerline-minor-modes
   (mapconcat (lambda (mm)
                (propertize mm
@@ -379,7 +379,7 @@ static char * %s[] = {
              (split-string (format-mode-line minor-mode-alist))
              (propertize " " 'face face)))
 
-;;;###autoload
+;;;###autoload (autoload 'powerline-narrow "powerline")
 (defpowerline powerline-narrow
   (let (real-point-min real-point-max)
     (save-excursion
@@ -394,13 +394,13 @@ static char * %s[] = {
                   'local-map (make-mode-line-mouse-map
                               'mouse-1 'mode-line-widen)))))
 
-;;;###autoload
+;;;###autoload (autoload 'powerline-vc "powerline")
 (defpowerline powerline-vc
   (when (and (buffer-file-name (current-buffer))
              vc-mode)
     (format-mode-line '(vc-mode vc-mode))))
 
-;;;###autoload
+;;;###autoload (autoload 'powerline-buffer-size "powerline")
 (defpowerline powerline-buffer-size
   (propertize
    (if powerline-buffer-size-suffix
@@ -413,11 +413,11 @@ static char * %s[] = {
                                 (not powerline-buffer-size-suffix))
                           (force-mode-line-update)))))
 
-;;;###autoload
+;;;###autoload (autoload 'powerline-buffer-id "powerline")
 (defpowerline powerline-buffer-id
   (format-mode-line mode-line-buffer-identification))
 
-;;;###autoload
+;;;###autoload (autoload 'powerline-process "powerline")
 (defpowerline powerline-process
   (cond
    ((symbolp mode-line-process) (symbol-value mode-line-process))
