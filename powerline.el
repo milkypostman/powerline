@@ -107,6 +107,16 @@ This is needed to make sure that text is properly aligned."
     (modify-frame-parameters nil `((powerline-cache . ,table)))
     table))
 
+;;
+;; the frame-local powerline cache causes problems if included in a saved desktop,
+;; so delete it before the desktop is saved.
+;;
+;; see https://github.com/milkypostman/powerline/issues/58
+;;
+(defun powerline-delete-cache ()
+  (set-frame-parameter nil 'powerline-cache nil))
+(add-hook 'desktop-save-hook 'powerline-delete-cache)
+
 ;; from memoize.el @ http://nullprogram.com/blog/2010/07/26/
 (defun pl/memoize (func)
   "Memoize FUNC.
