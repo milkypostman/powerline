@@ -468,6 +468,7 @@ static char * %s[] = {
   "makes powerline aware of window changes"
   (powerline-set-selected-window))
 
+;;;###autoload (autoload 'powerline-selected-window-active "powerline")
 (defun powerline-selected-window-active ()
   "Return whether the current window is active."
   (eq powerline-selected-window (selected-window)))
