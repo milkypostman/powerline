@@ -314,6 +314,9 @@ destination color, and 2 is the interpolated color between 0 and 1."
        (face1 face2 &optional height)
      nil))
 
+(defun powerline-utf-8-right (f1 f2 &optional height) (powerline-raw (char-to-string powerline-utf-8-separator-right) (list :foreground (face-attribute f2 :background) :background (face-attribute f1 :background))))
+
+(defun powerline-utf-8-left (f1 f2 &optional height) (powerline-raw (char-to-string powerline-utf-8-separator-left) (list :foreground (face-attribute f1 :background) :background (face-attribute f2 :background))))
 
 (provide 'powerline-separators)
 

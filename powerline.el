@@ -41,11 +41,13 @@
   "Powerline face 2."
   :group 'powerline)
 
-(defcustom powerline-default-separator 'arrow
-  "The separator to use for the default theme.
+(defcustom powerline-default-separator (if (window-system)
+                                           'arrow
+                                         'utf-8)
+    "The separator to use for the default theme.
 
 Valid Values: arrow, slant, chamfer, wave, brace, roundstub,
-zigzag, butt, rounded, contour, curve"
+zigzag, butt, rounded, contour, curve, utf-8"
   :group 'powerline
   :type '(choice (const alternate)
                  (const arrow)
@@ -62,7 +64,8 @@ zigzag, butt, rounded, contour, curve"
                  (const slant)
                  (const wave)
                  (const zigzag)
-                 (const nil)))
+                 (const nil)
+                 (const utf-8)))
 
 (defcustom powerline-default-separator-dir '(left . right)
   "The separator direction to use for the default theme.
@@ -74,6 +77,16 @@ DIR must be one of: left, right"
   :group 'powerline
   :type '(cons (choice :tag "Left Hand Side" (const left) (const right))
                (choice :tag "Right Hand Side" (const left) (const right))))
+
+(defcustom powerline-utf-8-separator-left #xe0b0
+    "The unicode character number for the left facing separator"
+    :group 'powerline
+    :type  '(choice integer (const nil)))
+
+(defcustom powerline-utf-8-separator-right #xe0b2
+    "The unicode character number for the right facing separator"
+    :group 'powerline
+    :type  '(choice integer (const nil)))
 
 (defcustom powerline-height nil
   "Override the mode-line height."
@@ -406,9 +419,12 @@ static char * %s[] = {
 
 ;;;###autoload (autoload 'powerline-vc "powerline")
 (defpowerline powerline-vc
-  (when (and (buffer-file-name (current-buffer))
-             vc-mode)
-    (format-mode-line '(vc-mode vc-mode))))
+    (when (and (buffer-file-name (current-buffer)) vc-mode)
+        (if (null window-system)
+                (let ((backend (vc-backend (buffer-file-name (current-buffer)))))
+                    (when backend
+                        (concat " " (char-to-string #xe0a0) " " (vc-working-revision (buffer-file-name (current-buffer)) backend))))
+            (format-mode-line '(vc-mode vc-mode)))))
 
 ;;;###autoload (autoload 'powerline-buffer-size "powerline")
 (defpowerline powerline-buffer-size
