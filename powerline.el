@@ -62,7 +62,18 @@ zigzag, butt, rounded, contour, curve"
                  (const slant)
                  (const wave)
                  (const zigzag)
+		 (const utf-8)
                  (const nil)))
+
+(defcustom powerline-utf-8-separator-left #xe0b0
+  "The unicode character number for the left facing separator"
+  :group 'powerline
+  :type  '(choice integer (const nil)))
+
+(defcustom powerline-utf-8-separator-right #xe0b2
+  "The unicode character number for the right facing separator"
+  :group 'powerline
+  :type  '(choice integer (const nil)))
 
 (defcustom powerline-default-separator-dir '(left . right)
   "The separator direction to use for the default theme.
@@ -178,6 +189,8 @@ The memoization cache is frame-local."
   (pl/memoize (pl/zigzag right))
   (pl/memoize (pl/nil left))
   (pl/memoize (pl/nil right))
+  (pl/utf-8 left)
+  (pl/utf-8 right)
   (pl/reset-cache))
 
 (powerline-reset)
@@ -218,7 +231,7 @@ static char * %s[] = {
      'xpm t :ascent 'center)))
 
 (defun pl/percent-xpm
-    (height pmax pmin winend winstart width color1 color2)
+  (height pmax pmin winend winstart width color1 color2)
   "Generate percentage xpm of HEIGHT for PMAX to PMIN given WINEND and WINSTART with WIDTH and COLOR1 and COLOR2."
   (let* ((height- (1- height))
          (fillstart (round (* height- (/ (float winstart) (float pmax)))))
@@ -288,7 +301,7 @@ static char * %s[] = {
 (defmacro defpowerline (name body)
   "Create function NAME by wrapping BODY with powerline padding an propetization."
   `(defun ,name
-       (&optional face pad)
+     (&optional face pad)
      (powerline-raw ,body face pad)))
 
 (defun pl/property-substrings (str prop)
