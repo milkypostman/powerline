@@ -30,10 +30,10 @@
                           (face1 (if active 'powerline-active1 'powerline-inactive1))
                           (face2 (if active 'powerline-active2 'powerline-inactive2))
                           (separator-left (intern (format "powerline-%s-%s"
-                                                          powerline-default-separator
+							  (powerline-current-separator)
                                                           (car powerline-default-separator-dir))))
                           (separator-right (intern (format "powerline-%s-%s"
-                                                           powerline-default-separator
+                                                           (powerline-current-separator)
                                                            (cdr powerline-default-separator-dir))))
                           (lhs (list (powerline-raw "%*" nil 'l)
                                      (powerline-buffer-size nil 'l)
@@ -77,10 +77,10 @@
                           (face1 (if active 'powerline-active1 'powerline-inactive1))
                           (face2 (if active 'powerline-active2 'powerline-inactive2))
                           (separator-left (intern (format "powerline-%s-%s"
-                                                          powerline-default-separator
+                                                          (powerline-current-separator)
                                                           (car powerline-default-separator-dir))))
                           (separator-right (intern (format "powerline-%s-%s"
-                                                           powerline-default-separator
+                                                           (powerline-current-separator)
                                                            (cdr powerline-default-separator-dir))))
                           (lhs (list (powerline-raw "%*" nil 'l)
                                      (powerline-buffer-size nil 'l)
@@ -124,10 +124,10 @@
                           (face1 (if active 'powerline-active1 'powerline-inactive1))
                           (face2 (if active 'powerline-active2 'powerline-inactive2))
                           (separator-left (intern (format "powerline-%s-%s"
-                                                          powerline-default-separator
+                                                          (powerline-current-separator)
                                                           (car powerline-default-separator-dir))))
                           (separator-right (intern (format "powerline-%s-%s"
-                                                           powerline-default-separator
+                                                           (powerline-current-separator)
                                                            (cdr powerline-default-separator-dir))))
                           (lhs (list (powerline-raw "%*" nil 'l)
                                      (powerline-buffer-size nil 'l)
@@ -180,10 +180,10 @@
                           (face1 (if active 'powerline-active1 'powerline-inactive1))
                           (face2 (if active 'powerline-active2 'powerline-inactive2))
                           (separator-left (intern (format "powerline-%s-%s"
-                                                          powerline-default-separator
+                                                          (powerline-current-separator)
                                                           (car powerline-default-separator-dir))))
                           (separator-right (intern (format "powerline-%s-%s"
-                                                           powerline-default-separator
+                                                           (powerline-current-separator)
                                                            (cdr powerline-default-separator-dir))))
                           (lhs (list (powerline-buffer-id `(mode-line-buffer-id ,mode-line) 'l)
                                      (powerline-raw "[" mode-line 'l)

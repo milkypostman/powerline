@@ -118,6 +118,12 @@ This is needed to make sure that text is properly aligned."
     (modify-frame-parameters nil `((powerline-cache . ,table)))
     table))
 
+(defun powerline-current-separator ()
+  "Get the current default separator. Always returns utf-8 in non-gui mode."
+  (if window-system
+      powerline-default-separator
+    'utf-8))
+
 ;;
 ;; the frame-local powerline cache causes problems if included in a saved desktop,
 ;; so delete it before the desktop is saved.

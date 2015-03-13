@@ -7,6 +7,8 @@ This is a proposed version 2.0 of the original [Emacs Powerline](http://www.emac
 
 This version has utf-8 support enabled. The `utf-8` separators will display a unicode character properly under mintty for example - as long as you have [patched fonts](https://github.com/Lokaltog/powerline-fonts) installed.
 
+By default, any terminal mode emacs will use the `utf-8` separators.
+
 ## Installation
 
     (require 'powerline)
