@@ -447,9 +447,15 @@ static char * %s[] = {
                                 (not powerline-buffer-size-suffix))
                           (force-mode-line-update)))))
 
+(defsubst powerline-trim (s)
+  "Remove whitespace at the beginning and the end of string S."
+  (replace-regexp-in-string
+   "\\`[ \t\n\r]+" ""
+   (replace-regexp-in-string "[ \t\n\r]+\\'" "" s)))
+
 ;;;###autoload (autoload 'powerline-buffer-id "powerline")
 (defpowerline powerline-buffer-id
-  (format-mode-line mode-line-buffer-identification))
+    (powerline-trim (format-mode-line mode-line-buffer-identification)))
 
 ;;;###autoload (autoload 'powerline-process "powerline")
 (defpowerline powerline-process
