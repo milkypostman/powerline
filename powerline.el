@@ -479,6 +479,7 @@ static char * %s[] = {
 
 (add-hook 'minibuffer-exit-hook 'pl/minibuffer-exit)
 
+(defvar powerline-selected-window (frame-selected-window))
 (defun powerline-set-selected-window ()
   "sets the variable `powerline-selected-window` appropriately"
   (when (not (minibuffer-window-active-p (frame-selected-window)))
