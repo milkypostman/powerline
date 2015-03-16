@@ -62,7 +62,7 @@ COLOR1 and COLOR2 must be supplied as hex strings with a leading #."
             (make-list (- total fill fade) 1))))
 
 
-(defmacro pl/pattern-defun (name dir width &rest patterns)
+(defun pl/pattern-defun (name dir width &rest patterns)
   "Create a powerline function of NAME in DIR with WIDTH for PATTERNS.
 
 PATTERNS is of the form (PATTERN HEADER FOOTER SECOND-PATTERN CENTER).
