@@ -51,7 +51,9 @@
                                      (powerline-narrow face1 'l)
                                      (powerline-raw " " face1)
                                      (funcall separator-left face1 face2)
-                                     (powerline-vc face2 'r)))
+                                     (powerline-vc face2 'r)
+                                     (when (bound-and-true-p nyan-mode)
+                                       (powerline-raw (list (nyan-create)) face2 'l))))
                           (rhs (list (powerline-raw global-mode-string face2 'r)
                                      (funcall separator-right face2 face1)
 				     (unless window-system
