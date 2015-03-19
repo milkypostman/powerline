@@ -17,6 +17,17 @@
 
 ;;; Code:
 
+(defcustom powerline-display-buffer-size t
+  "When non-nil, display the buffer size."
+  :type 'boolean)
+
+(defcustom powerline-display-mule-info t
+  "When non-nil, display the mule info."
+  :type 'boolean)
+
+(defcustom powerline-display-hud t
+  "When non-nil, display the hud."
+  :type 'boolean)
 
 ;;;###autoload
 (defun powerline-default-theme ()
@@ -36,8 +47,10 @@
                                                            (powerline-current-separator)
                                                            (cdr powerline-default-separator-dir))))
                           (lhs (list (powerline-raw "%*" nil 'l)
-                                     (powerline-buffer-size nil 'l)
-                                     (powerline-raw mode-line-mule-info nil 'l)
+                                     (when powerline-display-buffer-size
+                                       (powerline-buffer-size nil 'l))
+                                     (when powerline-display-mule-info
+                                       (powerline-raw mode-line-mule-info nil 'l))
                                      (powerline-buffer-id nil 'l)
                                      (when (and (boundp 'which-func-mode) which-func-mode)
                                        (powerline-raw which-func-format nil 'l))
@@ -51,7 +64,9 @@
                                      (powerline-narrow face1 'l)
                                      (powerline-raw " " face1)
                                      (funcall separator-left face1 face2)
-                                     (powerline-vc face2 'r)))
+                                     (powerline-vc face2 'r)
+                                     (when (bound-and-true-p nyan-mode)
+                                       (powerline-raw (list (nyan-create)) face2 'l))))
                           (rhs (list (powerline-raw global-mode-string face2 'r)
                                      (funcall separator-right face2 face1)
 				     (unless window-system
@@ -62,7 +77,8 @@
 				     (funcall separator-right face1 mode-line)
 				     (powerline-raw " ")
 				     (powerline-raw "%6p" nil 'r)
-				     (powerline-hud face2 face1))))
+                                     (when powerline-display-hud
+                                       (powerline-hud face2 face1)))))
 		     (concat (powerline-render lhs)
 			     (powerline-fill face2 (powerline-width rhs))
 			     (powerline-render rhs)))))))
