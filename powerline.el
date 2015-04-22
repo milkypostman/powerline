@@ -18,8 +18,8 @@
 
 ;;; Code:
 
-(require 'powerline-themes)
-(require 'powerline-separators)
+(eval-and-compile (require 'powerline-themes))
+(eval-and-compile (require 'powerline-separators))
 
 (require 'cl-lib)
 
