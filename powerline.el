@@ -108,8 +108,8 @@ This is needed to make sure that text is properly aligned."
 
 (defun pl/create-or-get-cache ()
   "Return a frame-local hash table that acts as a memoization cache for powerline. Create one if the frame doesn't have one yet."
-  (or (frame-parameter nil 'powerline-cache)
-      (pl/reset-cache)))
+  (let ((table (frame-parameter nil 'powerline-cache)))
+    (if (hash-table-p table) table (pl/reset-cache))))
 
 (defun pl/reset-cache ()
   "Reset and return the frame-local hash table used for a memoization cache."
@@ -130,9 +130,22 @@ This is needed to make sure that text is properly aligned."
 ;;
 ;; see https://github.com/milkypostman/powerline/issues/58
 ;;
-(defun powerline-delete-cache ()
-  (set-frame-parameter nil 'powerline-cache nil))
-(add-hook 'desktop-save-hook 'powerline-delete-cache)
+;; It is better to put the following code into your init file for Emacs 24.4 or later.
+;; (require 'frameset)
+;; (push '(powerline-cache . :never) frameset-filter-alist)
+;;
+(defun powerline-delete-cache (&optional frame)
+  "Set the FRAME cache to nil."
+  (set-frame-parameter frame 'powerline-cache nil))
+
+(defun powerline-desktop-save-delete-cache ()
+  "Set all caches to nil unless `frameset-filter-alist' has :never for powerline-cache."
+  (unless (and (boundp 'frameset-filter-alist)
+               (eq (cdr (assq 'powerline-cache frameset-filter-alist))
+                   :never))
+    (dolist (fr (frame-list)) (powerline-delete-cache fr))))
+
+(add-hook 'desktop-save-hook 'powerline-desktop-save-delete-cache)
 
 ;; from memoize.el @ http://nullprogram.com/blog/2010/07/26/
 (defun pl/memoize (func)
