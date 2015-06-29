@@ -93,11 +93,11 @@ destination color, and 2 is the interpolated color between 0 and 1."
                    `((pattern-height (max (- height ,reserve) 0))
                      (second-pattern-height (/ pattern-height 2))
                      (pattern-height ,(if second-pattern '(ceiling pattern-height 2) 'pattern-height)))
-                   `((mapconcat 'identity ',header "")
-                     (mapconcat 'identity (cl-subseq ',pattern 0 pattern-height) "")
-                     (mapconcat 'identity ',center "")
-                     (mapconcat 'identity (cl-subseq ',second-pattern 0 second-pattern-height) "")
-                     (mapconcat 'identity ',footer "")))))
+                   (list (when header `(mapconcat 'identity ',header ""))
+                         `(mapconcat 'identity (cl-subseq ',pattern 0 pattern-height) "")
+                         (when center `(mapconcat 'identity ',center ""))
+                         (when second-pattern `(mapconcat 'identity (cl-subseq ',second-pattern 0 second-pattern-height) ""))
+                         (when footer `(mapconcat 'identity ',footer ""))))))
 
 (defun pl/background-color (face)
   (face-attribute face
