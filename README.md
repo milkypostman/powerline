@@ -16,7 +16,12 @@ By default, any terminal mode emacs will use the `utf-8` separators.
     
 The second line customizes `mode-line-format` according to the default theme.
 
-There are two builtin themes: `powerline-default-theme` and `powerline-center-theme`.
+There are five builtin themes: 
+- `powerline-default-theme`
+- `powerline-center-theme`
+- `powerline-center-evil-theme`
+- `powerline-vim-theme`
+- `powerline-nano-theme`
 
 You can revert back to the original value of `mode-line-format` that was being used when powerline was loaded using `powerline-revert`.
 
