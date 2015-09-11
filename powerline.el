@@ -106,6 +106,11 @@ This is needed to make sure that text is properly aligned."
   :group 'powerline
   :type 'boolean)
 
+(defcustom powerline-glyphs nil
+  "Enable/disable glyphs for powerline."
+  :group 'powerline
+  :type 'boolean)
+
 (defun pl/create-or-get-cache ()
   "Return a frame-local hash table that acts as a memoization cache for powerline. Create one if the frame doesn't have one yet."
   (let ((table (frame-parameter nil 'powerline-cache)))
