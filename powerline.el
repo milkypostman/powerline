@@ -62,7 +62,7 @@ zigzag, butt, rounded, contour, curve"
                  (const slant)
                  (const wave)
                  (const zigzag)
-		 (const utf-8)
+                 (const utf-8)
                  (const nil)))
 
 (defcustom powerline-utf-8-separator-left #xe0b0
@@ -103,6 +103,11 @@ This is needed to make sure that text is properly aligned."
 
 (defcustom powerline-buffer-size-suffix t
   "Display the buffer size suffix."
+  :group 'powerline
+  :type 'boolean)
+
+(defcustom powerline-glyphs nil
+  "Enable/disable glyphs for powerline."
   :group 'powerline
   :type 'boolean)
 
@@ -438,14 +443,13 @@ static char * %s[] = {
 
 ;;;###autoload (autoload 'powerline-vc "powerline")
 (defpowerline powerline-vc
+  (let ((file-name (buffer-file-name (current-buffer))))
   (when (and (buffer-file-name (current-buffer)) vc-mode)
-    (if window-system
-	(format-mode-line '(vc-mode vc-mode))
-      (let ((backend (vc-backend (buffer-file-name (current-buffer)))))
-	(when backend
-	  (format " %s %s"
-		  (char-to-string #xe0a0)
-		  (vc-working-revision (buffer-file-name (current-buffer)) backend)))))))
+    (if powerline-glyphs
+        (format " %s %s"
+                (char-to-string #xe0a0)
+                (vc-working-revision file-name (vc-backend file-name)))
+      (format-mode-line '(vc-mode vc-mode))))))
 
 ;;;###autoload (autoload 'powerline-buffer-size "powerline")
 (defpowerline powerline-buffer-size
