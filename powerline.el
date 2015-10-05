@@ -44,8 +44,9 @@
 (defcustom powerline-default-separator 'arrow
   "The separator to use for the default theme.
 
-Valid Values: arrow, slant, chamfer, wave, brace, roundstub,
-zigzag, butt, rounded, contour, curve"
+Valid Values: alternate, arrow, arrow-fade, bar, box, brace,
+butt, chamfer, contour, curve, rounded, roundstub, wave, zigzag,
+utf-8."
   :group 'powerline
   :type '(choice (const alternate)
                  (const arrow)
