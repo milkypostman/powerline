@@ -19,14 +19,17 @@
 
 (defcustom powerline-display-buffer-size t
   "When non-nil, display the buffer size."
+  :group 'powerline
   :type 'boolean)
 
 (defcustom powerline-display-mule-info t
   "When non-nil, display the mule info."
+  :group 'powerline
   :type 'boolean)
 
 (defcustom powerline-display-hud t
   "When non-nil, display the hud."
+  :group 'powerline
   :type 'boolean)
 
 ;;;###autoload
