@@ -505,9 +505,25 @@ static char * %s[] = {
   (when (not (minibuffer-window-active-p (frame-selected-window)))
     (setq powerline-selected-window (frame-selected-window))))
 
+(defun powerline-unset-selected-window ()
+  "Unsets the variable `powerline-selected-window` and updates the modeline"
+  (setq powerline-selected-window nil)
+  (force-mode-line-update))
+
 (add-hook 'window-configuration-change-hook 'powerline-set-selected-window)
+
+;; focus-in-hook was introduced in emacs v24.4.
+;; Gets evaluated in the last frame's environment.
 (add-hook 'focus-in-hook 'powerline-set-selected-window)
-(add-hook 'focus-out-hook 'powerline-set-selected-window)
+
+;; focus-out-hook was introduced in emacs v24.4.
+(add-hook 'focus-out-hook 'powerline-unset-selected-window)
+
+;; Executes after the window manager requests that the user's events
+;; be directed to a different frame.
+(defadvice handle-switch-frame
+    (after powerline-set-selected-window-after-switch-frame activate)
+  (powerline-set-selected-window))
 
 (defadvice select-window (after powerline-select-window activate)
   "makes powerline aware of window changes"
