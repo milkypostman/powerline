@@ -100,12 +100,16 @@ destination color, and 2 is the interpolated color between 0 and 1."
                          (when footer `(mapconcat 'identity ',footer ""))))))
 
 (defun pl/background-color (face)
-  (face-attribute face
-                  (if (face-attribute face :inverse-video nil 'default)
-                      :foreground
-                    :background)
-                  nil
-                  'default))
+  (let ((face face)
+	(fa (assoc face face-remapping-alist)))
+    (when fa
+      (setq face (car (cdr fa))))
+    (face-attribute face
+		    (if (face-attribute face :inverse-video nil 'default)
+			:foreground
+		      :background)
+		    nil
+		    'default)))
 
 (defun pl/wrap-defun (name dir width let-vars body)
   "Generate a powerline function of NAME in DIR with WIDTH using LET-VARS and BODY."
