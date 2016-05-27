@@ -95,6 +95,7 @@
 		'("%e"
 		  (:eval
 		   (let* ((active (powerline-selected-window-active))
+                          (mode-line-buffer-id (if active 'mode-line-buffer-id 'mode-line-buffer-id-inactive))
 			  (mode-line (if active 'mode-line 'mode-line-inactive))
 			  (face1 (if active 'powerline-active1 'powerline-inactive1))
 			  (face2 (if active 'powerline-active2 'powerline-inactive2))
@@ -104,9 +105,9 @@
 			  (separator-right (intern (format "powerline-%s-%s"
 							   (powerline-current-separator)
 							   (cdr powerline-default-separator-dir))))
-			  (lhs (list (powerline-raw "%*" nil 'l)
-				     (powerline-buffer-size nil 'l)
-				     (powerline-buffer-id nil 'l)
+			  (lhs (list (powerline-raw "%*" mode-line 'l)
+				     (powerline-buffer-size mode-line 'l)
+				     (powerline-buffer-id mode-line-buffer-id 'l)
 				     (powerline-raw " ")
 				     (funcall separator-left mode-line face1)
 				     (powerline-narrow face1 'l)
@@ -117,7 +118,7 @@
 				     (powerline-raw "%3c" face1 'r)
 				     (funcall separator-right face1 mode-line)
 				     (powerline-raw " ")
-				     (powerline-raw "%6p" nil 'r)
+				     (powerline-raw "%6p" mode-line 'r)
 				     (powerline-hud face2 face1)))
 			  (center (list (powerline-raw " " face1)
 					(funcall separator-left face1 face2)
@@ -142,6 +143,7 @@
 		'("%e"
 		  (:eval
 		   (let* ((active (powerline-selected-window-active))
+                          (mode-line-buffer-id (if active 'mode-line-buffer-id 'mode-line-buffer-id-inactive))
 			  (mode-line (if active 'mode-line 'mode-line-inactive))
 			  (face1 (if active 'powerline-active1 'powerline-inactive1))
 			  (face2 (if active 'powerline-active2 'powerline-inactive2))
@@ -151,9 +153,9 @@
 			  (separator-right (intern (format "powerline-%s-%s"
 							   (powerline-current-separator)
 							   (cdr powerline-default-separator-dir))))
-			  (lhs (list (powerline-raw "%*" nil 'l)
-				     (powerline-buffer-size nil 'l)
-				     (powerline-buffer-id nil 'l)
+			  (lhs (list (powerline-raw "%*" mode-line 'l)
+				     (powerline-buffer-size mode-line 'l)
+				     (powerline-buffer-id mode-line-buffer-id 'l)
 				     (powerline-raw " ")
 				     (funcall separator-left mode-line face1)
 				     (powerline-narrow face1 'l)
@@ -164,7 +166,7 @@
 				     (powerline-raw "%3c" face1 'r)
 				     (funcall separator-right face1 mode-line)
 				     (powerline-raw " ")
-				     (powerline-raw "%6p" nil 'r)
+				     (powerline-raw "%6p" mode-line 'r)
 				     (powerline-hud face2 face1)))
 			  (center (append (list (powerline-raw " " face1)
 						(funcall separator-left face1 face2)
