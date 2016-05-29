@@ -41,6 +41,11 @@
   "Powerline face 2."
   :group 'powerline)
 
+(defface mode-line-buffer-id-inactive
+  '((t (:inherit mode-line-buffer-id)))
+  "Powerline mode-line face"
+  :group 'powerline)
+
 (defcustom powerline-default-separator 'arrow
   "The separator to use for the default theme.
 
@@ -467,9 +472,13 @@ static char * %s[] = {
    "\\`[ \t\n\r]+" ""
    (replace-regexp-in-string "[ \t\n\r]+\\'" "" s)))
 
+(defun powerline-strip-text-properties (txt)
+  (set-text-properties 0 (length txt) nil txt)
+  txt)
+
 ;;;###autoload (autoload 'powerline-buffer-id "powerline")
 (defpowerline powerline-buffer-id
-    (powerline-trim (format-mode-line mode-line-buffer-identification)))
+    (powerline-strip-text-properties (powerline-trim (format-mode-line mode-line-buffer-identification))))
 
 ;;;###autoload (autoload 'powerline-process "powerline")
 (defpowerline powerline-process
