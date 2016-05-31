@@ -112,6 +112,11 @@ This is needed to make sure that text is properly aligned."
   :group 'powerline
   :type 'boolean)
 
+(defcustom powerline-gui-use-vcs-glyph nil
+  "Display a unicode character to represent a version control system. Not always supported in GUI."
+  :group 'powerline
+  :type 'boolean)
+
 (defun pl/create-or-get-cache ()
   "Return a frame-local hash table that acts as a memoization cache for powerline. Create one if the frame doesn't have one yet."
   (let ((table (frame-parameter nil 'powerline-cache)))
@@ -445,9 +450,11 @@ static char * %s[] = {
 ;;;###autoload (autoload 'powerline-vc "powerline")
 (defpowerline powerline-vc
   (when (and (buffer-file-name (current-buffer)) vc-mode)
-	  (format " %s %s"
-		  (char-to-string #xe0a0)
-		  (format-mode-line '(vc-mode vc-mode)))))
+    (if (and window-system (not powerline-gui-use-vcs-glyph))
+	(format-mode-line '(vc-mode vc-mode))
+      (format " %s%s"
+	      (char-to-string #xe0a0)
+	      (format-mode-line '(vc-mode vc-mode))))))
 
 ;;;###autoload (autoload 'powerline-buffer-size "powerline")
 (defpowerline powerline-buffer-size
