@@ -568,7 +568,7 @@ static char * %s[] = {
   (if values
       (let ((val (car values)))
         (+ (cond
-            ((stringp val) (length (format-mode-line val)))
+            ((stringp val) (string-width (format-mode-line val)))
             ((and (listp val) (eq 'image (car val)))
              (car (image-size val)))
             (t 0))
