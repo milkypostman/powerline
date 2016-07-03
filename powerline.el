@@ -6,7 +6,7 @@
 
 ;; Author: Donald Ephraim Curtis <dcurtis@milkbox.net>
 ;; URL: http://github.com/milkypostman/powerline/
-;; Version: 2.3
+;; Version: 2.4
 ;; Keywords: mode-line
 ;; Package-Requires: ((cl-lib "0.2"))
 

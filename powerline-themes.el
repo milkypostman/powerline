@@ -4,11 +4,6 @@
 ;; Copyright (C) 2013 Jason Milkins
 ;; Copyright (C) 2012 Nicolas Rougier
 
-;; Author: Donald Ephraim Curtis <dcurtis@milkbox.net>
-;; URL: http://github.com/milkypostman/powerline/
-;; Version: 2.0
-;; Keywords: mode-line
-
 ;;; Commentary:
 ;;
 ;; Themes for Powerline.
