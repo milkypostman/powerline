@@ -68,7 +68,7 @@ utf-8."
                  (const slant)
                  (const wave)
                  (const zigzag)
-		 (const utf-8)
+                 (const utf-8)
                  (const nil)))
 
 (defcustom powerline-utf-8-separator-left #xe0b0
