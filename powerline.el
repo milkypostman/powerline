@@ -545,7 +545,9 @@ static char * %s[] = {
 ;;;###autoload (autoload 'powerline-selected-window-active "powerline")
 (defun powerline-selected-window-active ()
   "Return whether the current window is active."
-  (eq powerline-selected-window (selected-window)))
+  (eq (if (boundp 'powerline-selected-window)
+	  powerline-selected-window
+	(powerline-set-selected-window)) (selected-window)))
 
 (defun powerline-revert ()
   "Revert to the default Emacs mode-line."
