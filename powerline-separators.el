@@ -27,10 +27,25 @@ COLOR1 and COLOR2 must be supplied as hex strings with a leading #."
          (blue (/ (+ (nth 2 c1) (nth 2 c2)) 2)))
     (color-rgb-to-hex red green blue)))
 
+(defun pl/color-xyz-to-apple-rgb (X Y Z)
+  "Convert CIE X Y Z colors to Apple RGB color space."
+  (let ((r (+ (* 3.2404542 X) (* -1.5371385 Y) (* -0.4985314 Z)))
+        (g (+ (* -0.9692660 X) (* 1.8760108 Y) (* 0.0415560 Z)))
+        (b (+ (* 0.0556434 X) (* -0.2040259 Y) (* 1.0572252 Z))))
+    (list (expt r (/ 1.8)) (expt g (/ 1.8)) (expt b (/ 1.8)))))
+
+(defun pl/color-srgb-to-apple-rgb (red green blue)
+  "Convert RED GREEN BLUE colors from sRGB color space to Apple RGB.
+RED, GREEN and BLUE should be between 0.0 and 1.0, inclusive."
+  (apply 'pl/color-xyz-to-apple-rgb (color-srgb-to-xyz red green blue)))
+
 (defun pl/hex-color (color)
   "Get the hexadecimal value of COLOR."
   (when color
-    (apply 'color-rgb-to-hex (color-name-to-rgb color))))
+    (let ((srgb-color (color-name-to-rgb color)))
+      (if powerline-image-apple-rgb
+          (apply 'color-rgb-to-hex (apply 'pl/color-srgb-to-apple-rgb srgb-color))
+        (apply 'color-rgb-to-hex srgb-color)))))
 
 (defun pl/pattern (lst)
   "Turn LST into an infinite pattern."
