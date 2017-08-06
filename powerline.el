@@ -126,6 +126,11 @@ converted to equivalent Apple RGB colors before image generation."
   :group 'powerline
   :type 'boolean)
 
+(defcustom powerline-narrowed-indicator "Narrow"
+  "A string to display in the mode-line when the buffer is narrowed."
+  :group 'powerline
+  :type 'string)
+
 (defun pl/create-or-get-cache ()
   "Return a frame-local hash table that acts as a memoization cache for powerline. Create one if the frame doesn't have one yet."
   (let ((table (frame-parameter nil 'powerline-cache)))
@@ -443,18 +448,13 @@ static char * %s[] = {
 
 ;;;###autoload (autoload 'powerline-narrow "powerline")
 (defpowerline powerline-narrow
-  (let (real-point-min real-point-max)
-    (save-excursion
-      (save-restriction
-        (widen)
-        (setq real-point-min (point-min) real-point-max (point-max))))
-    (when (or (/= real-point-min (point-min))
-              (/= real-point-max (point-max)))
-      (propertize "Narrow"
-                  'mouse-face 'mode-line-highlight
-                  'help-echo "mouse-1: Remove narrowing from the current buffer"
-                  'local-map (make-mode-line-mouse-map
-                              'mouse-1 'mode-line-widen)))))
+  (when ;; (buffer-narrowed-p) introduced in Emacs 24.3.
+      (/= (- (point-max) (point-min)) (buffer-size))
+    (propertize powerline-narrowed-indicator
+                'mouse-face 'mode-line-highlight
+                'help-echo "mouse-1: Remove narrowing from the current buffer"
+                'local-map (make-mode-line-mouse-map
+                            'mouse-1 'mode-line-widen))))
 
 ;;;###autoload (autoload 'powerline-vc "powerline")
 (defpowerline powerline-vc
