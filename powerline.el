@@ -23,6 +23,10 @@
 
 (require 'cl-lib)
 
+(defgroup powerline nil
+  "Powerline, a prettier mode line."
+  :group 'mode-line)
+
 (defface powerline-active1 '((t (:background "grey22" :inherit mode-line)))
   "Powerline face 1."
   :group 'powerline)
