@@ -27,12 +27,21 @@
   "Powerline, a prettier mode line."
   :group 'mode-line)
 
-(defface powerline-active1 '((t (:background "grey22" :inherit mode-line)))
+(defface powerline-active0 '((t (:inherit mode-line)))
+  "Powerline face 0."
+  :group 'powerline)
+
+(defface powerline-active1 '((t (:background "grey17" :foreground "white" :inherit mode-line)))
   "Powerline face 1."
   :group 'powerline)
 
-(defface powerline-active2 '((t (:background "grey40" :inherit mode-line)))
+(defface powerline-active2 '((t (:background "grey40" :foreground "white" :inherit mode-line)))
   "Powerline face 2."
+  :group 'powerline)
+
+(defface powerline-inactive0
+  '((t (:inherit mode-line-inactive)))
+  "Powerline face 0."
   :group 'powerline)
 
 (defface powerline-inactive1
@@ -468,6 +477,14 @@ static char * %s[] = {
       (format " %s%s"
 	      (char-to-string #xe0a0)
 	      (format-mode-line '(vc-mode vc-mode))))))
+
+;;;###autoload (autoload 'powerline-encoding "powerline")
+(defpowerline powerline-encoding
+  (let ((buf-coding (format "%s" buffer-file-coding-system)))
+    (if (string-match "\\(dos\\|unix\\|mac\\)" buf-coding)
+        (match-string 1 buf-coding)
+      buf-coding)))
+
 
 ;;;###autoload (autoload 'powerline-buffer-size "powerline")
 (defpowerline powerline-buffer-size
