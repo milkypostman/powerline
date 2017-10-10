@@ -504,7 +504,7 @@ static char * %s[] = {
   (powerline-raw
    (format-mode-line
     (concat " " (propertize
-		 "%b"
+		 (format-mode-line mode-line-buffer-identification)
 		 'face face
 		 'mouse-face 'mode-line-highlight
 		 'help-echo "Buffer name\n\ mouse-1: Previous buffer\n\ mouse-3: Next buffer"
