@@ -536,44 +536,15 @@ static char * %s[] = {
 
 (defvar pl/default-mode-line mode-line-format)
 
-(defvar pl/minibuffer-selected-window-list '())
-
-(defun pl/minibuffer-selected-window ()
-  "Return the selected window when entereing the minibuffer."
-  (when pl/minibuffer-selected-window-list
-    (car pl/minibuffer-selected-window-list)))
-
-(defun pl/minibuffer-setup ()
-  "Save the `minibuffer-selected-window' to `pl/minibuffer-selected-window'."
-  (push (minibuffer-selected-window) pl/minibuffer-selected-window-list))
-
-(add-hook 'minibuffer-setup-hook 'pl/minibuffer-setup)
-
-(defun pl/minibuffer-exit ()
-  "Set `pl/minibuffer-selected-window' to nil."
-  (pop pl/minibuffer-selected-window-list))
-
-(add-hook 'minibuffer-exit-hook 'pl/minibuffer-exit)
-
 (defvar powerline-selected-window (frame-selected-window))
 (defun powerline-set-selected-window ()
   "sets the variable `powerline-selected-window` appropriately"
-  (when (not (minibuffer-window-active-p (frame-selected-window)))
-    (setq powerline-selected-window (frame-selected-window))))
-
-(defun powerline-unset-selected-window ()
-  "Unsets the variable `powerline-selected-window` and updates the modeline"
-  (setq powerline-selected-window nil)
-  (force-mode-line-update))
-
-(add-hook 'window-configuration-change-hook 'powerline-set-selected-window)
-
-;; focus-in-hook was introduced in emacs v24.4.
-;; Gets evaluated in the last frame's environment.
-(add-hook 'focus-in-hook 'powerline-set-selected-window)
-
-;; focus-out-hook was introduced in emacs v24.4.
-(add-hook 'focus-out-hook 'powerline-unset-selected-window)
+  (let ((w (if (eq (active-minibuffer-window) (selected-window))
+		(minibuffer-selected-window)
+	      (selected-window))))
+    (unless (eq powerline-selected-window w)
+      (setq powerline-selected-window w)
+      (force-mode-line-update t))))
 
 ;; Executes after the window manager requests that the user's events
 ;; be directed to a different frame.
