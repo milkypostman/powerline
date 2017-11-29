@@ -487,9 +487,11 @@ static char * %s[] = {
   (when (and (buffer-file-name (current-buffer)) vc-mode)
     (if (and window-system (not powerline-gui-use-vcs-glyph))
 	(format-mode-line '(vc-mode vc-mode))
-      (format " %s%s"
+      (format " %s %s"
 	      (char-to-string #xe0a0)
-	      (format-mode-line '(vc-mode vc-mode))))))
+          (if (featurep 'magit)
+              (magit-get-current-branch)
+            (format-mode-line '(vc-mode vc-mode)))))))
 
 ;;;###autoload (autoload 'powerline-encoding "powerline")
 (defpowerline powerline-encoding
