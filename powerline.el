@@ -559,7 +559,8 @@ static char * %s[] = {
 (defun powerline-set-selected-window ()
   "sets the variable `powerline-selected-window` appropriately"
   (when (not (minibuffer-window-active-p (frame-selected-window)))
-    (setq powerline-selected-window (frame-selected-window))))
+    (setq powerline-selected-window (frame-selected-window))
+    (force-mode-line-update)))
 
 (defun powerline-unset-selected-window ()
   "Unsets the variable `powerline-selected-window` and updates the modeline"
