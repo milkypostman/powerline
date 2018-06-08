@@ -29,7 +29,7 @@
 (require 'cl-lib)
 (require 'color)
 
-(defvar powerline-image-apple-rgb)
+(defvar powerline-image-apple-rgb (eq (window-system) 'ns))
 
 (defun pl/interpolate (color1 color2)
   "Interpolate between COLOR1 and COLOR2.

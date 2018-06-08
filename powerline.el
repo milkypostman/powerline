@@ -138,15 +138,6 @@ This is needed to make sure that text is properly aligned."
   :group 'powerline
   :type 'boolean)
 
-(defcustom powerline-image-apple-rgb nil
-  "When t, Use Apple RGB colors for image generation.
-
-On MacOS, sRGB colors are used for all GUI elements, except for image generation
-which uses Apple RGB color space.  When this option is set, theme colors are
-converted to equivalent Apple RGB colors before image generation."
-  :group 'powerline
-  :type 'boolean)
-
 (defcustom powerline-gui-use-vcs-glyph nil
   "Display a unicode character to represent a version control system. Not always supported in GUI."
   :group 'powerline
