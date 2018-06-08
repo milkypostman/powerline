@@ -31,7 +31,8 @@
 
 (defvar powerline-image-apple-rgb
   (and (eq (window-system) 'ns)
-       (< 16
+       ns-use-srgb-colorspace
+       (< 11
           (string-to-number
            (car
             (split-string
@@ -39,7 +40,7 @@
                   (match-string-no-properties 1 system-configuration)) "\\.")))))
   "Boolean variable to determine whether to use Apple RGB colorspace to render images.
 
-t on macOS 10.12+, nil otherwise.
+t on macOS 10.7+ and `ns-use-srgb-colorspace' is t, nil otherwise.
 
 This variable is automatically set, there's no need to modify it.")
 
