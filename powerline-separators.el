@@ -34,10 +34,8 @@
        ns-use-srgb-colorspace
        (< 11
           (string-to-number
-           (car
-            (split-string
-             (and (string-match "darwin\\([0-9]+\\.[0-9]+\\.[0-9]+\\)" system-configuration)
-                  (match-string-no-properties 1 system-configuration)) "\\.")))))
+           (and (string-match "darwin\\([0-9]+\\)" system-configuration)
+                (match-string-no-properties 1 system-configuration)))))
   "Boolean variable to determine whether to use Apple RGB colorspace to render images.
 
 t on macOS 10.7+ and `ns-use-srgb-colorspace' is t, nil otherwise.
