@@ -640,11 +640,16 @@ static char * %s[] = {
   (if (and (not (equal powerline-minor-mode-filter-regexp-list nil))
 	   (< 0 (length powerline-minor-mode-filter-regexp-list)))
       (if (equal powerline-minor-mode-filter-mode 'include)
-	  (cl-dolist (rgex powerline-minor-mode-filter-regexp-list)
-	    (setq mlist (cl-delete-if-not (lambda (item) (string-match rgex item)) mlist)))
-	(cl-dolist (rgex powerline-minor-mode-filter-regexp-list)
-	  (setq mlist (cl-delete-if (lambda (item) (string-match rgex item)) mlist)))))
+	  (setq mlist (cl-delete-if-not #'pl/minor-mode-filter-list-match-p mlist))
+	(setq mlist (cl-delete-if #'pl/minor-mode-filter-list-match-p mlist))))
   (identity mlist))
+
+(defun pl/minor-mode-filter-list-match-p (str)
+  "Returns t if STR matches at least one of the regular expressions in ‘powerline-minor-mode-filter-regexp-list’, otherwise nil."
+  (let (foundp)
+    (cl-dolist (rgx powerline-minor-mode-filter-regexp-list)
+      (if (string-match rgx str) (setq foundp t)))
+    (identity foundp)))
 
 (defun powerline-render (values)
   "Render a list of powerline VALUES."
