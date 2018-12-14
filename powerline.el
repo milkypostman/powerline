@@ -157,6 +157,36 @@ converted to equivalent Apple RGB colors before image generation."
   :group 'powerline
   :type 'string)
 
+(defcustom powerline-minor-mode-filter-mode 'include
+  "The way in which minor mode indicators are filtered using ‘powerline-minor-mode-filter-regexp-list’.
+
+Valid values:
+
+- include (the default): any minor-mode whose indicator string
+  does not match any of the regexps in
+  ‘powerline-minor-mode-filter-regexp-list’ will NOT be
+  displayed (white-list mode). Use this filter mode if you would
+  like to hide all but a select, few minor mode indicators.
+
+- exclude: any minor-mode whose indicator string does not match
+  any of the regexps in ‘powerline-minor-mode-filter-regexp-list’
+  will be displayed (black-list mode). Unse this filter mode if
+  you would like to show all but a select, few minor mode
+  indicators."
+  :group 'powerline
+  :type '(choice (const include)
+                 (const exclude)))
+
+(defcustom powerline-minor-mode-filter-regexp-list nil
+  "List of regular experssions for filtering minor mode indicators accoring to ‘powerline-minor-mode-filter-mode’.
+
+When nil (the default) or an empty list, all minor mode
+indicators will be shown. For details on regular expressions, see
+info node ‘(elisp) Regular Expressions’. Also note well that an
+empty regular expression (\"\") matches everything."
+  :group 'powerline
+  :type '(repeat regexp))
+
 (defun pl/create-or-get-cache ()
   "Return a frame-local hash table that acts as a memoization cache for powerline. Create one if the frame doesn't have one yet."
   (let ((table (frame-parameter nil 'powerline-cache)))
@@ -469,8 +499,9 @@ static char * %s[] = {
                                           [header-line down-mouse-3]
                                           (powerline-mouse 'minor 'menu mm))
                                         map)))
-             (split-string (format-mode-line minor-mode-alist))
-             (propertize " " 'face face)))
+             (pl/filter-minor-modes (split-string (format-mode-line minor-mode-alist)))
+             (propertize " " 'face face)
+	     ))
 
 ;;;###autoload (autoload 'powerline-narrow "powerline")
 (defpowerline powerline-narrow
@@ -603,6 +634,17 @@ static char * %s[] = {
     (propertize " " 'display item
                 'face (plist-get (cdr item) :face)))
    (item item)))
+
+(defun pl/filter-minor-modes (mlist)
+  "Filter minor mode indicators in MLIST."
+  (if (and (not (equal powerline-minor-mode-filter-regexp-list nil))
+	   (< 0 (length powerline-minor-mode-filter-regexp-list)))
+      (if (equal powerline-minor-mode-filter-mode 'include)
+	  (cl-dolist (rgex powerline-minor-mode-filter-regexp-list)
+	    (setq mlist (cl-delete-if-not (lambda (item) (string-match rgex item)) mlist)))
+	(cl-dolist (rgex powerline-minor-mode-filter-regexp-list)
+	  (setq mlist (cl-delete-if (lambda (item) (string-match rgex item)) mlist)))))
+  (identity mlist))
 
 (defun powerline-render (values)
   "Render a list of powerline VALUES."
