@@ -29,7 +29,18 @@
 (require 'cl-lib)
 (require 'color)
 
-(defvar powerline-image-apple-rgb)
+(defvar powerline-image-apple-rgb
+  (and (eq (window-system) 'ns)
+       ns-use-srgb-colorspace
+       (< 11
+          (string-to-number
+           (and (string-match "darwin\\([0-9]+\\)" system-configuration)
+                (match-string-no-properties 1 system-configuration)))))
+  "Boolean variable to determine whether to use Apple RGB colorspace to render images.
+
+t on macOS 10.7+ and `ns-use-srgb-colorspace' is t, nil otherwise.
+
+This variable is automatically set, there's no need to modify it.")
 
 (defun pl/interpolate (color1 color2)
   "Interpolate between COLOR1 and COLOR2.
