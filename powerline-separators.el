@@ -98,7 +98,7 @@ RED, GREEN and BLUE should be between 0.0 and 1.0, inclusive."
             (make-list (- total fill fade) 1))))
 
 (defun pl/pattern-bindings-body (patterns height-exp pattern-height-sym
-					  second-pattern-height-sym)
+                                          second-pattern-height-sym)
   "Create let-var bindings and a function body from PATTERNS.
 The `car' and `cdr' parts of the result can be passed to the
 function `pl/wrap-defun' as its `let-vars' and `body' arguments,
@@ -114,17 +114,17 @@ for let-var binding variables."
          (reserve (+ (length header) (length footer) (length center))))
     (when pattern
       (cons `((,pattern-height-sym (max (- ,height-exp ,reserve) 0))
-	      (,second-pattern-height-sym (/ ,pattern-height-sym 2))
-	      (,pattern-height-sym ,(if second-pattern `(ceiling ,pattern-height-sym 2) `,pattern-height-sym)))
-	    (list (when header `(mapconcat 'identity ',header ""))
-		  `(mapconcat 'identity
-			      (cl-subseq ',pattern 0 ,pattern-height-sym) "")
-		  (when center `(mapconcat 'identity ',center ""))
-		  (when second-pattern
-		    `(mapconcat 'identity
-				(cl-subseq ',second-pattern
-					   0 ,second-pattern-height-sym) ""))
-		  (when footer `(mapconcat 'identity ',footer "")))))))
+              (,second-pattern-height-sym (/ ,pattern-height-sym 2))
+              (,pattern-height-sym ,(if second-pattern `(ceiling ,pattern-height-sym 2) `,pattern-height-sym)))
+            (list (when header `(mapconcat 'identity ',header ""))
+                  `(mapconcat 'identity
+                              (cl-subseq ',pattern 0 ,pattern-height-sym) "")
+                  (when center `(mapconcat 'identity ',center ""))
+                  (when second-pattern
+                    `(mapconcat 'identity
+                                (cl-subseq ',second-pattern
+                                           0 ,second-pattern-height-sym) ""))
+                  (when footer `(mapconcat 'identity ',footer "")))))))
 
 (defun pl/pattern-defun (name dir width &rest patterns)
   "Create a powerline function of NAME in DIR with WIDTH for PATTERNS.
@@ -155,16 +155,16 @@ destination color, and 2 is the interpolated color between 0 and 1."
   (when (eq dir 'right)
     (setq patterns (mapcar 'pl/reverse-pattern patterns)))
   (let ((bindings-body (pl/pattern-bindings-body patterns
-						 'height
-						 'pattern-height
-						 'second-pattern-height))
-	(bindings-body-2x (pl/pattern-bindings-body (nthcdr 5 patterns)
-						    '(* height 2)
-						    'pattern-height-2x
-						    'second-pattern-height-2x)))
+                                                 'height
+                                                 'pattern-height
+                                                 'second-pattern-height))
+        (bindings-body-2x (pl/pattern-bindings-body (nthcdr 5 patterns)
+                                                    '(* height 2)
+                                                    'pattern-height-2x
+                                                    'second-pattern-height-2x)))
     (pl/wrap-defun name dir width
-		   (append (car bindings-body) (car bindings-body-2x))
-		   (cdr bindings-body) (cdr bindings-body-2x))))
+                   (append (car bindings-body) (car bindings-body-2x))
+                   (cdr bindings-body) (cdr bindings-body-2x))))
 
 (defun pl/background-color (face)
   (face-attribute face
@@ -179,7 +179,7 @@ destination color, and 2 is the interpolated color between 0 and 1."
   (let* ((src-face (if (eq dir 'left) 'face1 'face2))
          (dst-face (if (eq dir 'left) 'face2 'face1)))
     `(defun ,(intern (format "powerline-%s-%s" name (symbol-name dir)))
-       (face1 face2 &optional height)
+         (face1 face2 &optional height)
        (when window-system
          (unless height (setq height (pl/separator-height)))
          (let* ,(append `((color1 (when ,src-face
@@ -192,45 +192,45 @@ destination color, and 2 is the interpolated color between 0 and 1."
                           (colori (or colori "None")))
                         let-vars)
            (apply 'create-image
-		  ,(append `(concat (format "/* XPM */ static char * %s_%s[] = { \"%s %s 3 1\", \"0 c %s\", \"1 c %s\", \"2 c %s\","
-					    ,(replace-regexp-in-string "-" "_" name)
-					    (symbol-name ',dir)
-					    ,width
-					    height
-					    color1
-					    color2
-					    colori))
-			   body
-			   '("};"))
-		  'xpm t
-		  :ascent 'center
-		  :face (when (and face1 face2)
-			  ,dst-face)
-		  ,(and body-2x
-			`(and (featurep 'mac)
-			      (list :data-2x
-				    ,(append `(concat (format "/* XPM */ static char * %s_%s_2x[] = { \"%s %s 3 1\", \"0 c %s\", \"1 c %s\", \"2 c %s\","
-							      ,(replace-regexp-in-string "-" "_" name)
-							      (symbol-name ',dir)
-							      (* ,width 2)
-							      (* height 2)
-							      color1
-							      color2
-							      colori))
-					     body-2x
-					     '("};")))))))))))
+                  ,(append `(concat (format "/* XPM */ static char * %s_%s[] = { \"%s %s 3 1\", \"0 c %s\", \"1 c %s\", \"2 c %s\","
+                                            ,(replace-regexp-in-string "-" "_" name)
+                                            (symbol-name ',dir)
+                                            ,width
+                                            height
+                                            color1
+                                            color2
+                                            colori))
+                           body
+                           '("};"))
+                  'xpm t
+                  :ascent 'center
+                  :face (when (and face1 face2)
+                          ,dst-face)
+                  ,(and body-2x
+                        `(and (featurep 'mac)
+                              (list :data-2x
+                                    ,(append `(concat (format "/* XPM */ static char * %s_%s_2x[] = { \"%s %s 3 1\", \"0 c %s\", \"1 c %s\", \"2 c %s\","
+                                                              ,(replace-regexp-in-string "-" "_" name)
+                                                              (symbol-name ',dir)
+                                                              (* ,width 2)
+                                                              (* height 2)
+                                                              color1
+                                                              color2
+                                                              colori))
+                                             body-2x
+                                             '("};")))))))))))
 
 (defmacro pl/alternate (dir)
   "Generate an alternating pattern XPM function for DIR."
   (pl/pattern-defun "alternate" dir 4
                     '((2 2 1 1)
                       (0 0 2 2))
-		    nil nil nil nil
-		    ;; 2x
-		    '((2 2 2 2 1 1 1 1)
-		      (2 2 2 2 1 1 1 1)
-		      (0 0 0 0 2 2 2 2)
-		      (0 0 0 0 2 2 2 2))))
+                    nil nil nil nil
+                    ;; 2x
+                    '((2 2 2 2 1 1 1 1)
+                      (2 2 2 2 1 1 1 1)
+                      (0 0 0 0 2 2 2 2)
+                      (0 0 0 0 2 2 2 2))))
 
 (defmacro pl/arrow (dir)
   "Generate an arrow XPM function for DIR."
@@ -244,13 +244,13 @@ destination color, and 2 is the interpolated color between 0 and 1."
                        (pl/pattern-to-string (make-list middle-width 0)))
                      (cl-loop for i from width downto 0
                               concat (pl/pattern-to-string (,row-modifier (pl/row-pattern i middle-width)))))
-		   `((when (cl-evenp height)
+                   `((when (cl-evenp height)
                        (pl/pattern-to-string (make-list (* middle-width 2) 1)))
-		     (cl-loop for i from 0 to (* middle-width 2)
+                     (cl-loop for i from 0 to (* middle-width 2)
                               concat (pl/pattern-to-string (,row-modifier (pl/row-pattern i (* middle-width 2)))))
                      (cl-loop for i from (* middle-width 2) downto 0
                               concat (pl/pattern-to-string (,row-modifier (pl/row-pattern i (* middle-width 2)))))
-		     (when (cl-evenp height)
+                     (when (cl-evenp height)
                        (pl/pattern-to-string (make-list (* middle-width 2) 1)))))))
 
 (defmacro pl/arrow-fade (dir)
@@ -265,13 +265,13 @@ destination color, and 2 is the interpolated color between 0 and 1."
                        (pl/pattern-to-string (,row-modifier (pl/row-pattern (1+ width) middle-width 2))))
                      (cl-loop for i from width downto 0
                               concat (pl/pattern-to-string (,row-modifier (pl/row-pattern i middle-width 2)))))
-		   `((when (cl-evenp height)
+                   `((when (cl-evenp height)
                        (pl/pattern-to-string (,row-modifier (pl/row-pattern 0 (* middle-width 2) (* 2 2)))))
-		     (cl-loop for i from 0 to (* (- middle-width 2) 2)
+                     (cl-loop for i from 0 to (* (- middle-width 2) 2)
                               concat (pl/pattern-to-string (,row-modifier (pl/row-pattern i (* middle-width 2) (* 2 2)))))
                      (cl-loop for i from (* (- middle-width 2) 2) downto 0
                               concat (pl/pattern-to-string (,row-modifier (pl/row-pattern i (* middle-width 2) (* 2 2)))))
-		     (when (cl-evenp height)
+                     (when (cl-evenp height)
                        (pl/pattern-to-string (,row-modifier (pl/row-pattern 0 (* middle-width 2) (* 2 2)))))))))
 
 (defmacro pl/bar (dir)
@@ -286,16 +286,16 @@ destination color, and 2 is the interpolated color between 0 and 1."
                       (0 0)
                       (1 1)
                       (1 1))
-		    nil nil nil nil
-		    ;; 2x
-		    '((0 0 0 0)
-		      (0 0 0 0)
-		      (0 0 0 0)
-		      (0 0 0 0)
-		      (1 1 1 1)
-		      (1 1 1 1)
-		      (1 1 1 1)
-		      (1 1 1 1))))
+                    nil nil nil nil
+                    ;; 2x
+                    '((0 0 0 0)
+                      (0 0 0 0)
+                      (0 0 0 0)
+                      (0 0 0 0)
+                      (1 1 1 1)
+                      (1 1 1 1)
+                      (1 1 1 1)
+                      (1 1 1 1))))
 
 (defmacro pl/brace (dir)
   "Generate a brace XPM function for DIR."
@@ -313,31 +313,31 @@ destination color, and 2 is the interpolated color between 0 and 1."
                       (0 0 2 1)
                       (0 2 1 1)
                       (0 2 1 1))
-		    ;; 2x
-		    '((0 0 1 1 1 1 1 1))
-		    '((1 1 1 1 1 1 1 1)
-		      (1 1 1 1 1 1 1 1)
-		      (2 1 1 1 1 1 1 1)
-		      (0 2 1 1 1 1 1 1))
-		    '((0 2 1 1 1 1 1 1)
-		      (2 1 1 1 1 1 1 1)
-		      (1 1 1 1 1 1 1 1)
-		      (1 1 1 1 1 1 1 1))
-		    '((0 0 1 1 1 1 1 1))
-		    '((0 0 2 1 1 1 1 1)
-		      (0 0 0 1 1 1 1 1)
-		      (0 0 0 2 1 1 1 1)
-		      (0 0 0 0 1 1 1 1)
-		      (0 0 0 0 2 1 1 1)
-		      (0 0 0 0 0 2 1 1)
-		      (0 0 0 0 0 0 0 2)
-		      (0 0 0 0 0 0 0 2)
-		      (0 0 0 0 0 2 1 1)
-		      (0 0 0 0 2 1 1 1)
-		      (0 0 0 0 1 1 1 1)
-		      (0 0 0 2 1 1 1 1)
-		      (0 0 0 1 1 1 1 1)
-		      (0 0 2 1 1 1 1 1))))
+                    ;; 2x
+                    '((0 0 1 1 1 1 1 1))
+                    '((1 1 1 1 1 1 1 1)
+                      (1 1 1 1 1 1 1 1)
+                      (2 1 1 1 1 1 1 1)
+                      (0 2 1 1 1 1 1 1))
+                    '((0 2 1 1 1 1 1 1)
+                      (2 1 1 1 1 1 1 1)
+                      (1 1 1 1 1 1 1 1)
+                      (1 1 1 1 1 1 1 1))
+                    '((0 0 1 1 1 1 1 1))
+                    '((0 0 2 1 1 1 1 1)
+                      (0 0 0 1 1 1 1 1)
+                      (0 0 0 2 1 1 1 1)
+                      (0 0 0 0 1 1 1 1)
+                      (0 0 0 0 2 1 1 1)
+                      (0 0 0 0 0 2 1 1)
+                      (0 0 0 0 0 0 0 2)
+                      (0 0 0 0 0 0 0 2)
+                      (0 0 0 0 0 2 1 1)
+                      (0 0 0 0 2 1 1 1)
+                      (0 0 0 0 1 1 1 1)
+                      (0 0 0 2 1 1 1 1)
+                      (0 0 0 1 1 1 1 1)
+                      (0 0 2 1 1 1 1 1))))
 
 (defmacro pl/butt (dir)
   "Generate a butt XPM function for DIR."
@@ -349,21 +349,21 @@ destination color, and 2 is the interpolated color between 0 and 1."
                     '((0 0 1)
                       (0 1 1)
                       (1 1 1))
-		    nil nil
-		    ;; 2x
-		    '((0 0 0 0 0 0))
-		    '((1 1 1 1 1 1)
-		      (0 1 1 1 1 1)
-		      (0 0 1 1 1 1)
-		      (0 0 0 1 1 1)
-		      (0 0 0 0 1 1)
-		      (0 0 0 0 0 1))
-		    '((0 0 0 0 0 1)
-		      (0 0 0 0 1 1)
-		      (0 0 0 1 1 1)
-		      (0 0 1 1 1 1)
-		      (0 1 1 1 1 1)
-		      (1 1 1 1 1 1))))
+                    nil nil
+                    ;; 2x
+                    '((0 0 0 0 0 0))
+                    '((1 1 1 1 1 1)
+                      (0 1 1 1 1 1)
+                      (0 0 1 1 1 1)
+                      (0 0 0 1 1 1)
+                      (0 0 0 0 1 1)
+                      (0 0 0 0 0 1))
+                    '((0 0 0 0 0 1)
+                      (0 0 0 0 1 1)
+                      (0 0 0 1 1 1)
+                      (0 0 1 1 1 1)
+                      (0 1 1 1 1 1)
+                      (1 1 1 1 1 1))))
 
 (defmacro pl/chamfer (dir)
   "Generate a chamfer XPM function for DIR."
@@ -372,15 +372,15 @@ destination color, and 2 is the interpolated color between 0 and 1."
                     '((1 1 1)
                       (0 1 1)
                       (0 0 1))
-		    nil nil nil
-		    ;; 2x
-		    '((0 0 0 0 0 0))
-		    '((1 1 1 1 1 1)
-		      (0 1 1 1 1 1)
-		      (0 0 1 1 1 1)
-		      (0 0 0 1 1 1)
-		      (0 0 0 0 1 1)
-		      (0 0 0 0 0 1))))
+                    nil nil nil
+                    ;; 2x
+                    '((0 0 0 0 0 0))
+                    '((1 1 1 1 1 1)
+                      (0 1 1 1 1 1)
+                      (0 0 1 1 1 1)
+                      (0 0 0 1 1 1)
+                      (0 0 0 0 1 1)
+                      (0 0 0 0 0 1))))
 
 (defmacro pl/contour (dir)
   "Generate a contour XPM function for DIR."
@@ -397,31 +397,31 @@ destination color, and 2 is the interpolated color between 0 and 1."
                       (0 0 0 0 0 0 2 1 1 1)
                       (0 0 0 0 0 0 0 2 1 1)
                       (0 0 0 0 0 0 0 0 0 0))
-		    nil nil
-		    ;; 2x
-		    '((0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1))
-		    '((1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
-		      (1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
-		      (0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
-		      (0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
-		      (0 0 0 0 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
-		      (0 0 0 0 0 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
-		      (0 0 0 0 0 0 2 1 1 1 1 1 1 1 1 1 1 1 1 1)
-		      (0 0 0 0 0 0 0 2 1 1 1 1 1 1 1 1 1 1 1 1)
-		      (0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1)
-		      (0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1)
-		      (0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1)
-		      (0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1))
-		    '((0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1)
-		      (0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1)
-		      (0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1)
-		      (0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1)
-		      (0 0 0 0 0 0 0 0 0 0 0 0 2 1 1 1 1 1 1 1)
-		      (0 0 0 0 0 0 0 0 0 0 0 0 0 2 1 1 1 1 1 1)
-		      (0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1)
-		      (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1)
-		      (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
-		      (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0))))
+                    nil nil
+                    ;; 2x
+                    '((0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1))
+                    '((1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
+                      (1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
+                      (0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
+                      (0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
+                      (0 0 0 0 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
+                      (0 0 0 0 0 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
+                      (0 0 0 0 0 0 2 1 1 1 1 1 1 1 1 1 1 1 1 1)
+                      (0 0 0 0 0 0 0 2 1 1 1 1 1 1 1 1 1 1 1 1)
+                      (0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1)
+                      (0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1)
+                      (0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1)
+                      (0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1))
+                    '((0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1)
+                      (0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1)
+                      (0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1)
+                      (0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1)
+                      (0 0 0 0 0 0 0 0 0 0 0 0 2 1 1 1 1 1 1 1)
+                      (0 0 0 0 0 0 0 0 0 0 0 0 0 2 1 1 1 1 1 1)
+                      (0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1)
+                      (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1)
+                      (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+                      (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0))))
 
 (defmacro pl/curve (dir)
   "Generate a curve XPM function for DIR."
@@ -439,33 +439,33 @@ destination color, and 2 is the interpolated color between 0 and 1."
                       (0 0 1 1)
                       (2 1 1 1)
                       (1 1 1 1))
-		    nil nil
-		    ;; 2x
-		    '((0 0 0 0 0 0 0 0))
-		    '((1 1 1 1 1 1 1 1)
-		      (1 1 1 1 1 1 1 1)
-		      (1 1 1 1 1 1 1 1)
-		      (0 0 1 1 1 1 1 1)
-		      (0 0 0 2 1 1 1 1)
-		      (0 0 0 0 2 1 1 1)
-		      (0 0 0 0 0 2 1 1)
-		      (0 0 0 0 0 0 1 1)
-		      (0 0 0 0 0 0 1 1)
-		      (0 0 0 0 0 0 0 1)
-		      (0 0 0 0 0 0 0 1)
-		      (0 0 0 0 0 0 0 1))
-		    '((0 0 0 0 0 0 0 1)
-		      (0 0 0 0 0 0 0 1)
-		      (0 0 0 0 0 0 0 1)
-		      (0 0 0 0 0 0 1 1)
-		      (0 0 0 0 0 0 1 1)
-		      (0 0 0 0 0 2 1 1)
-		      (0 0 0 0 2 1 1 1)
-		      (0 0 0 2 1 1 1 1)
-		      (0 0 1 1 1 1 1 1)
-		      (1 1 1 1 1 1 1 1)
-		      (1 1 1 1 1 1 1 1)
-		      (1 1 1 1 1 1 1 1))))
+                    nil nil
+                    ;; 2x
+                    '((0 0 0 0 0 0 0 0))
+                    '((1 1 1 1 1 1 1 1)
+                      (1 1 1 1 1 1 1 1)
+                      (1 1 1 1 1 1 1 1)
+                      (0 0 1 1 1 1 1 1)
+                      (0 0 0 2 1 1 1 1)
+                      (0 0 0 0 2 1 1 1)
+                      (0 0 0 0 0 2 1 1)
+                      (0 0 0 0 0 0 1 1)
+                      (0 0 0 0 0 0 1 1)
+                      (0 0 0 0 0 0 0 1)
+                      (0 0 0 0 0 0 0 1)
+                      (0 0 0 0 0 0 0 1))
+                    '((0 0 0 0 0 0 0 1)
+                      (0 0 0 0 0 0 0 1)
+                      (0 0 0 0 0 0 0 1)
+                      (0 0 0 0 0 0 1 1)
+                      (0 0 0 0 0 0 1 1)
+                      (0 0 0 0 0 2 1 1)
+                      (0 0 0 0 2 1 1 1)
+                      (0 0 0 2 1 1 1 1)
+                      (0 0 1 1 1 1 1 1)
+                      (1 1 1 1 1 1 1 1)
+                      (1 1 1 1 1 1 1 1)
+                      (1 1 1 1 1 1 1 1))))
 
 (defmacro pl/rounded (dir)
   "Generate a rounded XPM function for DIR."
@@ -477,21 +477,21 @@ destination color, and 2 is the interpolated color between 0 and 1."
                       (0 0 0 0 2 1)
                       (0 0 0 0 0 1)
                       (0 0 0 0 0 2))
-		    nil nil nil
-		    ;; 2x
-		    '((0 0 0 0 0 0 0 0 0 0 0 0))
-		    '((1 1 1 1 1 1 1 1 1 1 1 1)
-		      (0 0 2 1 1 1 1 1 1 1 1 1)
-		      (0 0 0 0 1 1 1 1 1 1 1 1)
-		      (0 0 0 0 0 0 1 1 1 1 1 1)
-		      (0 0 0 0 0 0 0 2 1 1 1 1)
-		      (0 0 0 0 0 0 0 0 1 1 1 1)
-		      (0 0 0 0 0 0 0 0 0 1 1 1)
-		      (0 0 0 0 0 0 0 0 0 0 1 1)
-		      (0 0 0 0 0 0 0 0 0 0 1 1)
-		      (0 0 0 0 0 0 0 0 0 0 2 1)
-		      (0 0 0 0 0 0 0 0 0 0 0 1)
-		      (0 0 0 0 0 0 0 0 0 0 0 1))))
+                    nil nil nil
+                    ;; 2x
+                    '((0 0 0 0 0 0 0 0 0 0 0 0))
+                    '((1 1 1 1 1 1 1 1 1 1 1 1)
+                      (0 0 2 1 1 1 1 1 1 1 1 1)
+                      (0 0 0 0 1 1 1 1 1 1 1 1)
+                      (0 0 0 0 0 0 1 1 1 1 1 1)
+                      (0 0 0 0 0 0 0 2 1 1 1 1)
+                      (0 0 0 0 0 0 0 0 1 1 1 1)
+                      (0 0 0 0 0 0 0 0 0 1 1 1)
+                      (0 0 0 0 0 0 0 0 0 0 1 1)
+                      (0 0 0 0 0 0 0 0 0 0 1 1)
+                      (0 0 0 0 0 0 0 0 0 0 2 1)
+                      (0 0 0 0 0 0 0 0 0 0 0 1)
+                      (0 0 0 0 0 0 0 0 0 0 0 1))))
 
 (defmacro pl/roundstub (dir)
   "Generate a roundstub XPM function for DIR."
@@ -503,21 +503,21 @@ destination color, and 2 is the interpolated color between 0 and 1."
                     '((0 0 2)
                       (0 0 1)
                       (1 1 1))
-		    nil nil
-		    ;; 2x
-		    '((0 0 0 0 0 0))
-		    '((1 1 1 1 1 1)
-		      (2 1 1 1 1 1)
-		      (0 0 0 2 1 1)
-		      (0 0 0 0 1 1)
-		      (0 0 0 0 0 1)
-		      (0 0 0 0 0 1))
-		    '((0 0 0 0 0 1)
-		      (0 0 0 0 0 1)
-		      (0 0 0 0 1 1)
-		      (0 0 0 2 1 1)
-		      (2 1 1 1 1 1)
-		      (1 1 1 1 1 1))))
+                    nil nil
+                    ;; 2x
+                    '((0 0 0 0 0 0))
+                    '((1 1 1 1 1 1)
+                      (2 1 1 1 1 1)
+                      (0 0 0 2 1 1)
+                      (0 0 0 0 1 1)
+                      (0 0 0 0 0 1)
+                      (0 0 0 0 0 1))
+                    '((0 0 0 0 0 1)
+                      (0 0 0 0 0 1)
+                      (0 0 0 0 1 1)
+                      (0 0 0 2 1 1)
+                      (2 1 1 1 1 1)
+                      (1 1 1 1 1 1))))
 
 (defmacro pl/slant (dir)
   "Generate a slant XPM function for DIR."
@@ -526,7 +526,7 @@ destination color, and 2 is the interpolated color between 0 and 1."
                    '((width (1- (ceiling height 2))))
                    `((cl-loop for i from 0 to (1- height)
                               concat (pl/pattern-to-string (,row-modifier (pl/row-pattern (/ i 2) width)))))
-		   `((cl-loop for i from 0 to (1- (* height 2))
+                   `((cl-loop for i from 0 to (1- (* height 2))
                               concat (pl/pattern-to-string (,row-modifier (pl/row-pattern (/ i 2) (* width 2)))))))))
 
 (defmacro pl/wave (dir)
@@ -549,41 +549,41 @@ destination color, and 2 is the interpolated color between 0 and 1."
                       (0 0 0 0 0 0 0 0 1 1 1)
                       (0 0 0 0 0 0 0 0 2 1 1)
                       (0 0 0 0 0 0 0 0 0 0 2))
-		    nil nil
-		    ;; 2x
-		    '((0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1))
-		    '((1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
-		      (0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
-		      (0 0 0 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
-		      (0 0 0 0 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
-		      (0 0 0 0 0 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
-		      (0 0 0 0 0 0 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
-		      (0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
-		      (0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
-		      (0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
-		      (0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
-		      (0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1)
-		      (0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1)
-		      (0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1)
-		      (0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1)
-		      (0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1)
-		      (0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1)
-		      (0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1)
-		      (0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1))
-		    '((0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1)
-		      (0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1)
-		      (0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1)
-		      (0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1)
-		      (0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1)
-		      (0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1)
-		      (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1)
-		      (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1)
-		      (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1)
-		      (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1)
-		      (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 1 1 1 1 1)
-		      (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 1 1 1 1)
-		      (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1)
-		      (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0))))
+                    nil nil
+                    ;; 2x
+                    '((0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1))
+                    '((1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
+                      (0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
+                      (0 0 0 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
+                      (0 0 0 0 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
+                      (0 0 0 0 0 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
+                      (0 0 0 0 0 0 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
+                      (0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
+                      (0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
+                      (0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
+                      (0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1)
+                      (0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1)
+                      (0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1)
+                      (0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1)
+                      (0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1)
+                      (0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1)
+                      (0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1)
+                      (0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1)
+                      (0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1))
+                    '((0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1)
+                      (0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1)
+                      (0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1)
+                      (0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1)
+                      (0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1)
+                      (0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1)
+                      (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1)
+                      (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1)
+                      (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1)
+                      (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1)
+                      (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 1 1 1 1 1)
+                      (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 1 1 1 1)
+                      (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1)
+                      (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0))))
 
 (defmacro pl/zigzag (dir)
   "Generate a zigzag pattern XPM function for DIR."
@@ -594,37 +594,37 @@ destination color, and 2 is the interpolated color between 0 and 1."
                       (0 0 0)
                       (0 0 1)
                       (0 1 1))
-		    nil nil nil nil
-		    ;; 2x
-		    '((1 1 1 1 1 1)
-		      (0 1 1 1 1 1)
-		      (0 0 1 1 1 1)
-		      (0 0 0 1 1 1)
-		      (0 0 0 0 1 1)
-		      (0 0 0 0 0 1)
-		      (0 0 0 0 0 0)
-		      (0 0 0 0 0 1)
-		      (0 0 0 0 1 1)
-		      (0 0 0 1 1 1)
-		      (0 0 1 1 1 1)
-		      (0 1 1 1 1 1))))
+                    nil nil nil nil
+                    ;; 2x
+                    '((1 1 1 1 1 1)
+                      (0 1 1 1 1 1)
+                      (0 0 1 1 1 1)
+                      (0 0 0 1 1 1)
+                      (0 0 0 0 1 1)
+                      (0 0 0 0 0 1)
+                      (0 0 0 0 0 0)
+                      (0 0 0 0 0 1)
+                      (0 0 0 0 1 1)
+                      (0 0 0 1 1 1)
+                      (0 0 1 1 1 1)
+                      (0 1 1 1 1 1))))
 
 (defmacro pl/nil (dir)
   "Generate a XPM function that returns nil for DIR."
   `(defun ,(intern (format "powerline-nil-%s" (symbol-name dir)))
-     (face1 face2 &optional height)
+       (face1 face2 &optional height)
      nil))
 
 (defmacro pl/utf-8 (dir)
   "Generate function that returns raw utf-8 symbols."
   (let ((dir-name (symbol-name dir))
-	(src-face (if (eq dir 'left) 'face1 'face2))
-	(dst-face (if (eq dir 'left) 'face2 'face1)))
+        (src-face (if (eq dir 'left) 'face1 'face2))
+        (dst-face (if (eq dir 'left) 'face2 'face1)))
     `(defun ,(intern (format "powerline-utf-8-%s" dir-name))
-       (face1 face2 &optional height)
+         (face1 face2 &optional height)
        (powerline-raw
-	(char-to-string ,(intern (format "powerline-utf-8-separator-%s"
-					 dir-name)))
+        (char-to-string ,(intern (format "powerline-utf-8-separator-%s"
+                                         dir-name)))
         (list :foreground (pl/background-color ,src-face)
               :background (pl/background-color ,dst-face)
               :inverse-video nil)))))
