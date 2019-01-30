@@ -546,15 +546,17 @@ static char * %s[] = {
 
 (add-hook 'minibuffer-exit-hook 'pl/minibuffer-exit)
 
-(defvar powerline-selected-window (frame-selected-window))
+(defvar powerline-selected-window (frame-selected-window)
+  "Selected window.")
+
 (defun powerline-set-selected-window ()
-  "sets the variable `powerline-selected-window` appropriately"
+  "Set the variable `powerline-selected-window' appropriately."
   (when (not (minibuffer-window-active-p (frame-selected-window)))
     (setq powerline-selected-window (frame-selected-window))
     (force-mode-line-update)))
 
 (defun powerline-unset-selected-window ()
-  "Unsets the variable `powerline-selected-window` and updates the modeline"
+  "Unset the variable `powerline-selected-window' and update the mode line."
   (setq powerline-selected-window nil)
   (force-mode-line-update))
 
@@ -569,13 +571,16 @@ static char * %s[] = {
 
 ;; Executes after the window manager requests that the user's events
 ;; be directed to a different frame.
-(defadvice handle-switch-frame
-    (after powerline-set-selected-window-after-switch-frame activate)
+(defadvice handle-switch-frame (after powerline-handle-switch-frame activate)
+  "Call `powerline-set-selected-window'."
   (powerline-set-selected-window))
 
-(defadvice select-window (after powerline-select-window activate)
-  "makes powerline aware of window changes"
-  (powerline-set-selected-window))
+(defadvice select-window (around powerline-select-window activate)
+  "Call `powerline-set-selected-window' when NORECORD is nil."
+  (prog1
+      ad-do-it
+    (unless norecord
+      (powerline-set-selected-window))))
 
 ;;;###autoload (autoload 'powerline-selected-window-active "powerline")
 (defun powerline-selected-window-active ()
