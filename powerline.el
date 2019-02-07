@@ -138,15 +138,6 @@ This is needed to make sure that text is properly aligned."
   :group 'powerline
   :type 'boolean)
 
-(defcustom powerline-image-apple-rgb nil
-  "When t, Use Apple RGB colors for image generation.
-
-On MacOS, sRGB colors are used for all GUI elements, except for image generation
-which uses Apple RGB color space.  When this option is set, theme colors are
-converted to equivalent Apple RGB colors before image generation."
-  :group 'powerline
-  :type 'boolean)
-
 (defcustom powerline-gui-use-vcs-glyph nil
   "Display a unicode character to represent a version control system. Not always supported in GUI."
   :group 'powerline
@@ -301,7 +292,7 @@ static char * %s[] = {
      'xpm t :ascent 'center)))
 
 (defun pl/percent-xpm
-  (height pmax pmin winend winstart width color1 color2)
+    (height pmax pmin winend winstart width color1 color2)
   "Generate percentage xpm of HEIGHT for PMAX to PMIN given WINEND and WINSTART with WIDTH and COLOR1 and COLOR2."
   (let* ((height- (1- height))
          (fillstart (round (* height- (/ (float winstart) (float pmax)))))
@@ -371,7 +362,7 @@ static char * %s[] = {
 (defmacro defpowerline (name body)
   "Create function NAME by wrapping BODY with powerline padding an propetization."
   `(defun ,name
-     (&optional face pad)
+       (&optional face pad)
      (powerline-raw ,body face pad)))
 
 (defun pl/property-substrings (str prop)
@@ -486,10 +477,10 @@ static char * %s[] = {
 (defpowerline powerline-vc
   (when (and (buffer-file-name (current-buffer)) vc-mode)
     (if (and window-system (not powerline-gui-use-vcs-glyph))
-	(format-mode-line '(vc-mode vc-mode))
+        (format-mode-line '(vc-mode vc-mode))
       (format " %s%s"
-	      (char-to-string #xe0a0)
-	      (format-mode-line '(vc-mode vc-mode))))))
+              (char-to-string #xe0a0)
+              (format-mode-line '(vc-mode vc-mode))))))
 
 ;;;###autoload (autoload 'powerline-encoding "powerline")
 (defpowerline powerline-encoding
@@ -517,14 +508,14 @@ static char * %s[] = {
   (powerline-raw
    (format-mode-line
     (concat " " (propertize
-		 (format-mode-line mode-line-buffer-identification)
-		 'face face
-		 'mouse-face 'mode-line-highlight
-		 'help-echo "Buffer name\n\ mouse-1: Previous buffer\n\ mouse-3: Next buffer"
-		 'local-map (let ((map (make-sparse-keymap)))
-			      (define-key map [mode-line mouse-1] 'mode-line-previous-buffer)
-			      (define-key map [mode-line mouse-3] 'mode-line-next-buffer)
-			      map))))
+                 (format-mode-line mode-line-buffer-identification)
+                 'face face
+                 'mouse-face 'mode-line-highlight
+                 'help-echo "Buffer name\n\ mouse-1: Previous buffer\n\ mouse-3: Next buffer"
+                 'local-map (let ((map (make-sparse-keymap)))
+                              (define-key map [mode-line mouse-1] 'mode-line-previous-buffer)
+                              (define-key map [mode-line mouse-3] 'mode-line-next-buffer)
+                              map))))
    face pad))
 
 ;;;###autoload (autoload 'powerline-process "powerline")
@@ -555,15 +546,17 @@ static char * %s[] = {
 
 (add-hook 'minibuffer-exit-hook 'pl/minibuffer-exit)
 
-(defvar powerline-selected-window (frame-selected-window))
+(defvar powerline-selected-window (frame-selected-window)
+  "Selected window.")
+
 (defun powerline-set-selected-window ()
-  "sets the variable `powerline-selected-window` appropriately"
+  "Set the variable `powerline-selected-window' appropriately."
   (when (not (minibuffer-window-active-p (frame-selected-window)))
     (setq powerline-selected-window (frame-selected-window))
     (force-mode-line-update)))
 
 (defun powerline-unset-selected-window ()
-  "Unsets the variable `powerline-selected-window` and updates the modeline"
+  "Unset the variable `powerline-selected-window' and update the mode line."
   (setq powerline-selected-window nil)
   (force-mode-line-update))
 
@@ -578,13 +571,16 @@ static char * %s[] = {
 
 ;; Executes after the window manager requests that the user's events
 ;; be directed to a different frame.
-(defadvice handle-switch-frame
-    (after powerline-set-selected-window-after-switch-frame activate)
+(defadvice handle-switch-frame (after powerline-handle-switch-frame activate)
+  "Call `powerline-set-selected-window'."
   (powerline-set-selected-window))
 
-(defadvice select-window (after powerline-select-window activate)
-  "makes powerline aware of window changes"
-  (powerline-set-selected-window))
+(defadvice select-window (around powerline-select-window activate)
+  "Call `powerline-set-selected-window' when NORECORD is nil."
+  (prog1
+      ad-do-it
+    (unless norecord
+      (powerline-set-selected-window))))
 
 ;;;###autoload (autoload 'powerline-selected-window-active "powerline")
 (defun powerline-selected-window-active ()
