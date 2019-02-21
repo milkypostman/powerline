@@ -118,7 +118,8 @@
                                                            (powerline-current-separator)
                                                            (cdr powerline-default-separator-dir))))
                           (lhs (list (powerline-raw "%*" face0 'l)
-                                     (powerline-buffer-size face0 'l)
+                                     (when powerline-display-buffer-size
+                                       (powerline-buffer-size face0 'l))
                                      (powerline-buffer-id `(mode-line-buffer-id ,face0) 'l)
                                      (powerline-raw " ")
                                      (funcall separator-left face0 face1)
@@ -131,7 +132,8 @@
                                      (funcall separator-right face1 face0)
                                      (powerline-raw " ")
                                      (powerline-raw "%6p" face0 'r)
-                                     (powerline-hud face2 face1)
+                                     (when powerline-display-hud
+                                       (powerline-hud face2 face1))
                                      (powerline-fill face0 0)))
                           (center (list (powerline-raw " " face1)
                                         (funcall separator-left face1 face2)
@@ -167,7 +169,8 @@
                                                            (powerline-current-separator)
                                                            (cdr powerline-default-separator-dir))))
                           (lhs (list (powerline-raw "%*" mode-line 'l)
-                                     (powerline-buffer-size mode-line 'l)
+                                     (when powerline-display-buffer-size
+                                       (powerline-buffer-size mode-line 'l))
                                      (powerline-buffer-id mode-line-buffer-id 'l)
                                      (powerline-raw " ")
                                      (funcall separator-left mode-line face1)
@@ -180,7 +183,8 @@
                                      (funcall separator-right face1 mode-line)
                                      (powerline-raw " ")
                                      (powerline-raw "%6p" mode-line 'r)
-                                     (powerline-hud face2 face1)))
+                                     (when powerline-display-hud
+                                       (powerline-hud face2 face1))))
                           (center (append (list (powerline-raw " " face1)
                                                 (funcall separator-left face1 face2)
                                                 (when (and (boundp 'erc-track-minor-mode) erc-track-minor-mode)
