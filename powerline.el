@@ -575,12 +575,7 @@ static char * %s[] = {
   "Call `powerline-set-selected-window'."
   (powerline-set-selected-window))
 
-(defadvice select-window (around powerline-select-window activate)
-  "Call `powerline-set-selected-window' when NORECORD is nil."
-  (prog1
-      ad-do-it
-    (unless norecord
-      (powerline-set-selected-window))))
+(add-hook 'buffer-list-update-hook #'powerline-set-selected-window)
 
 ;;;###autoload (autoload 'powerline-selected-window-active "powerline")
 (defun powerline-selected-window-active ()
