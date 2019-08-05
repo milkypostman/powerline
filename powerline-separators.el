@@ -55,6 +55,7 @@ COLOR1 and COLOR2 must be supplied as hex strings with a leading #."
 
 (defun pl/apply-apple-gamma (V)
   "Apply Apple gamma correction to sRGB' value V"
+  (setq V (min 1.0 (max 0.0 (expt V (/ 1.8)))))
   (if (isnan V) 0.0 V))
 
 (defun pl/color-xyz-to-apple-rgb (X Y Z)
