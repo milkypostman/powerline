@@ -77,7 +77,7 @@
 
 Valid Values: alternate, arrow, arrow-fade, bar, box, brace,
 butt, chamfer, contour, curve, rounded, roundstub, wave, zigzag,
-utf-8."
+slant, utf-8."
   :group 'powerline
   :type '(choice (const alternate)
                  (const arrow)
