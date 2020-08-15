@@ -289,7 +289,7 @@ static char * %s[] = {
                                 "\"};"
                               "\",\n")))
                        data))))
-     'xpm t :ascent 'center)))
+     'xpm t :scale t :ascent 'center)))
 
 (defun pl/percent-xpm
     (height pmax pmin winend winstart width color1 color2)
