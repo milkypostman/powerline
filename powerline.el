@@ -562,12 +562,16 @@ static char * %s[] = {
 
 (add-hook 'window-configuration-change-hook 'powerline-set-selected-window)
 
-;; focus-in-hook was introduced in emacs v24.4.
-;; Gets evaluated in the last frame's environment.
-(add-hook 'focus-in-hook 'powerline-set-selected-window)
-
-;; focus-out-hook was introduced in emacs v24.4.
-(add-hook 'focus-out-hook 'powerline-unset-selected-window)
+;; Watch focus changes
+(if (boundp 'after-focus-change-function)
+  (add-function :after after-focus-change-function
+		(lambda ()
+                  (if (frame-focus-state)
+                      (powerline-set-selected-window)
+                    (powerline-unset-selected-window))))
+  (with-no-warnings
+    (add-hook 'focus-in-hook 'powerline-set-selected-window)
+    (add-hook 'focus-out-hook 'powerline-unset-selected-window)))
 
 ;; Executes after the window manager requests that the user's events
 ;; be directed to a different frame.
