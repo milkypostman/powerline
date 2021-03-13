@@ -204,6 +204,7 @@ destination color, and 2 is the interpolated color between 0 and 1."
                            '("};"))
                   'xpm t
                   :ascent 'center
+                  :scale t
                   :face (when (and face1 face2)
                           ,dst-face)
                   ,(and body-2x
