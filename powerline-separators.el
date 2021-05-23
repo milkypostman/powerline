@@ -28,6 +28,7 @@
 
 (require 'cl-lib)
 (require 'color)
+(require 'ring)
 
 (defvar powerline-image-apple-rgb
   (and (eq (window-system) 'ns)
@@ -79,8 +80,10 @@ RED, GREEN and BLUE should be between 0.0 and 1.0, inclusive."
 (defun pl/pattern (lst)
   "Turn LST into an infinite pattern."
   (when lst
-    (let ((pattern (cl-copy-list lst)))
-      (setcdr (last pattern) pattern))))
+    (let ((r (make-ring (length lst))))
+      (dolist (e lst)
+        (ring-insert-at-beginning r e))
+      r)))
 
 (defun pl/pattern-to-string (pattern)
   "Convert a PATTERN into a string that can be used in an XPM."
@@ -120,13 +123,14 @@ for let-var binding variables."
               (,second-pattern-height-sym (/ ,pattern-height-sym 2))
               (,pattern-height-sym ,(if second-pattern `(ceiling ,pattern-height-sym 2) `,pattern-height-sym)))
             (list (when header `(mapconcat 'identity ',header ""))
-                  `(mapconcat 'identity
-                              (cl-subseq ',pattern 0 ,pattern-height-sym) "")
+                  `(concat (cl-loop for i to ,pattern-height-sym
+                                    concat (ring-ref ',pattern i))
+                           "")
                   (when center `(mapconcat 'identity ',center ""))
                   (when second-pattern
-                    `(mapconcat 'identity
-                                (cl-subseq ',second-pattern
-                                           0 ,second-pattern-height-sym) ""))
+                    `(concat (cl-loop for i to ,second-pattern-height-sym
+                                      concat (ring-ref ',second-pattern i))
+                             ""))
                   (when footer `(mapconcat 'identity ',footer "")))))))
 
 (defun pl/pattern-defun (name dir width &rest patterns)
