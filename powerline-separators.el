@@ -99,9 +99,9 @@ RED, GREEN and BLUE should be between 0.0 and 1.0, inclusive."
     (setq fade 0))
   (let ((fill (min fill total))
         (fade (min fade (max (- total fill) 0))))
-    (append (make-list fill 0)
-            (make-list fade 2)
-            (make-list (- total fill fade) 1))))
+    (nconc (make-list fill 0)
+           (make-list fade 2)
+           (make-list (- total fill fade) 1))))
 
 (defun pl/pattern-bindings-body (patterns height-exp pattern-height-sym
                                           second-pattern-height-sym)
