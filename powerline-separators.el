@@ -122,16 +122,14 @@ for let-var binding variables."
       (cons `((,pattern-height-sym (max (- ,height-exp ,reserve) 0))
               (,second-pattern-height-sym (/ ,pattern-height-sym 2))
               (,pattern-height-sym ,(if second-pattern `(ceiling ,pattern-height-sym 2) `,pattern-height-sym)))
-            (list (when header `(mapconcat 'identity ',header ""))
-                  `(concat (cl-loop for i to ,pattern-height-sym
-                                    concat (ring-ref ',pattern i))
-                           "")
-                  (when center `(mapconcat 'identity ',center ""))
+            (list (when header `(apply 'concat ',header))
+                  `(cl-loop for i to ,pattern-height-sym
+                            concat (ring-ref ',pattern i))
+                  (when center `(apply 'concat ',center))
                   (when second-pattern
-                    `(concat (cl-loop for i to ,second-pattern-height-sym
-                                      concat (ring-ref ',second-pattern i))
-                             ""))
-                  (when footer `(mapconcat 'identity ',footer "")))))))
+                    `(cl-loop for i to ,second-pattern-height-sym
+                              concat (ring-ref ',second-pattern i)))
+                  (when footer `(apply 'concat ',footer)))))))
 
 (defun pl/pattern-defun (name dir width &rest patterns)
   "Create a powerline function of NAME in DIR with WIDTH for PATTERNS.
