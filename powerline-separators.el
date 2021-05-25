@@ -80,10 +80,7 @@ RED, GREEN and BLUE should be between 0.0 and 1.0, inclusive."
 (defun pl/pattern (lst)
   "Turn LST into an infinite pattern."
   (when lst
-    (let ((r (make-ring (length lst))))
-      (dolist (e lst)
-        (ring-insert-at-beginning r e))
-      r)))
+    (ring-convert-sequence-to-ring lst)))
 
 (defun pl/pattern-to-string (pattern)
   "Convert a PATTERN into a string that can be used in an XPM."
