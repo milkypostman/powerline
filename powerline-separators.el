@@ -28,6 +28,7 @@
 
 (require 'cl-lib)
 (require 'color)
+(require 'ring)
 
 (defvar powerline-image-apple-rgb
   (and (eq (window-system) 'ns)
@@ -79,8 +80,7 @@ RED, GREEN and BLUE should be between 0.0 and 1.0, inclusive."
 (defun pl/pattern (lst)
   "Turn LST into an infinite pattern."
   (when lst
-    (let ((pattern (cl-copy-list lst)))
-      (setcdr (last pattern) pattern))))
+    (ring-convert-sequence-to-ring lst)))
 
 (defun pl/pattern-to-string (pattern)
   "Convert a PATTERN into a string that can be used in an XPM."
@@ -96,9 +96,9 @@ RED, GREEN and BLUE should be between 0.0 and 1.0, inclusive."
     (setq fade 0))
   (let ((fill (min fill total))
         (fade (min fade (max (- total fill) 0))))
-    (append (make-list fill 0)
-            (make-list fade 2)
-            (make-list (- total fill fade) 1))))
+    (nconc (make-list fill 0)
+           (make-list fade 2)
+           (make-list (- total fill fade) 1))))
 
 (defun pl/pattern-bindings-body (patterns height-exp pattern-height-sym
                                           second-pattern-height-sym)
@@ -119,15 +119,14 @@ for let-var binding variables."
       (cons `((,pattern-height-sym (max (- ,height-exp ,reserve) 0))
               (,second-pattern-height-sym (/ ,pattern-height-sym 2))
               (,pattern-height-sym ,(if second-pattern `(ceiling ,pattern-height-sym 2) `,pattern-height-sym)))
-            (list (when header `(mapconcat 'identity ',header ""))
-                  `(mapconcat 'identity
-                              (cl-subseq ',pattern 0 ,pattern-height-sym) "")
-                  (when center `(mapconcat 'identity ',center ""))
+            (list (when header `(apply 'concat ',header))
+                  `(cl-loop for i to ,pattern-height-sym
+                            concat (ring-ref ',pattern i))
+                  (when center `(apply 'concat ',center))
                   (when second-pattern
-                    `(mapconcat 'identity
-                                (cl-subseq ',second-pattern
-                                           0 ,second-pattern-height-sym) ""))
-                  (when footer `(mapconcat 'identity ',footer "")))))))
+                    `(cl-loop for i to ,second-pattern-height-sym
+                              concat (ring-ref ',second-pattern i)))
+                  (when footer `(apply 'concat ',footer)))))))
 
 (defun pl/pattern-defun (name dir width &rest patterns)
   "Create a powerline function of NAME in DIR with WIDTH for PATTERNS.
