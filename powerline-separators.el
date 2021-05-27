@@ -35,8 +35,9 @@
        (bound-and-true-p ns-use-srgb-colorspace)
        (< 11
           (string-to-number
-           (and (string-match "darwin\\([0-9]+\\)" system-configuration)
-                (match-string-no-properties 1 system-configuration))))
+           (save-match-data
+             (and (string-match "darwin\\([0-9]+\\)" system-configuration)
+                  (match-string-no-properties 1 system-configuration)))))
        (< emacs-major-version 28))
   "Boolean variable to determine whether to use Apple RGB colorspace to render images.
 
