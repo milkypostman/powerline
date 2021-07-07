@@ -529,9 +529,13 @@ destination color, and 2 is the interpolated color between 0 and 1."
     (pl/wrap-defun "slant" dir 'width
                    '((width (1- (ceiling height 2))))
                    `((cl-loop for i from 0 to (1- height)
-                              concat (pl/pattern-to-string (,row-modifier (pl/row-pattern (/ i 2) width)))))
+                              concat (pl/pattern-to-string
+                                      (,row-modifier
+                                       (pl/row-pattern (/ i 2) width (cl-mod i 2))))))
                    `((cl-loop for i from 0 to (1- (* height 2))
-                              concat (pl/pattern-to-string (,row-modifier (pl/row-pattern (/ i 2) (* width 2)))))))))
+                              concat (pl/pattern-to-string
+                                      (,row-modifier
+                                       (pl/row-pattern (/ i 2) (* width 2) (cl-mod i 2)))))))))
 
 (defmacro pl/wave (dir)
   "Generate a wave XPM function for DIR."
