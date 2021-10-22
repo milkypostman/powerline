@@ -533,6 +533,20 @@ destination color, and 2 is the interpolated color between 0 and 1."
                    `((cl-loop for i from 0 to (1- (* height 2))
                               concat (pl/pattern-to-string (,row-modifier (pl/row-pattern (/ i 2) (* width 2)))))))))
 
+(defmacro pl/smooth-slant (dir)
+  "Generate a smoothed slant XPM function for DIR."
+  (let* ((row-modifier (if (eq dir 'left) 'identity 'reverse)))
+    (pl/wrap-defun "smooth-slant" dir 'width
+                   '((width (1- (ceiling height 2))))
+                   `((cl-loop for i from 0 to (1- height)
+                              concat (pl/pattern-to-string
+                                      (,row-modifier
+                                       (pl/row-pattern (/ i 2) width (cl-mod i 2))))))
+                   `((cl-loop for i from 0 to (1- (* height 2))
+                              concat (pl/pattern-to-string
+                                      (,row-modifier
+                                       (pl/row-pattern (/ i 2) (* width 2) (cl-mod i 2)))))))))
+
 (defmacro pl/wave (dir)
   "Generate a wave XPM function for DIR."
   (pl/pattern-defun "wave" dir 11
