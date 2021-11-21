@@ -516,16 +516,15 @@ Leave RESERVE space on the right."
 ;;;###autoload (autoload 'powerline-buffer-id "powerline")
 (defun powerline-buffer-id (&optional face pad)
   (powerline-raw
-   (format-mode-line
-    (concat " " (propertize
-                 (format-mode-line mode-line-buffer-identification)
-                 'face face
-                 'mouse-face 'mode-line-highlight
-                 'help-echo "Buffer name\n\ mouse-1: Previous buffer\n\ mouse-3: Next buffer"
-                 'local-map (let ((map (make-sparse-keymap)))
-                              (define-key map [mode-line mouse-1] 'mode-line-previous-buffer)
-                              (define-key map [mode-line mouse-3] 'mode-line-next-buffer)
-                              map))))
+   '(" " (:propertize
+          mode-line-buffer-identification
+          'face face
+          'mouse-face 'mode-line-highlight
+          'help-echo "Buffer name\n\ mouse-1: Previous buffer\n\ mouse-3: Next buffer"
+          'local-map (let ((map (make-sparse-keymap)))
+                       (define-key map [mode-line mouse-1] 'mode-line-previous-buffer)
+                       (define-key map [mode-line mouse-3] 'mode-line-next-buffer)
+                       map)))
    face pad))
 
 ;;;###autoload (autoload 'powerline-process "powerline")
