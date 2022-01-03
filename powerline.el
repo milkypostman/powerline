@@ -140,7 +140,8 @@ This is needed to make sure that text is properly aligned."
   :type 'boolean)
 
 (defcustom powerline-gui-use-vcs-glyph nil
-  "Display a unicode character to represent a version control system. Not always supported in GUI."
+  "Display a unicode character to represent a version control system.
+Not always supported in GUI."
   :group 'powerline
   :type 'boolean)
 
@@ -150,7 +151,8 @@ This is needed to make sure that text is properly aligned."
   :type 'string)
 
 (defun pl/create-or-get-cache ()
-  "Return a frame-local hash table that acts as a memoization cache for powerline. Create one if the frame doesn't have one yet."
+  "Return a frame-local hash table that acts as a memoization cache for powerline.
+Create one if the frame doesn't have one yet."
   (let ((table (frame-parameter nil 'powerline-cache)))
     (if (hash-table-p table) table (pl/reset-cache))))
 
@@ -182,7 +184,8 @@ This is needed to make sure that text is properly aligned."
   (set-frame-parameter frame 'powerline-cache nil))
 
 (defun powerline-desktop-save-delete-cache ()
-  "Set all caches to nil unless `frameset-filter-alist' has :never for powerline-cache."
+  "Set all caches to nil.
+This is not done if `frameset-filter-alist' has :never for powerline-cache."
   (unless (and (boundp 'frameset-filter-alist)
                (eq (cdr (assq 'powerline-cache frameset-filter-alist))
                    :never))
@@ -260,7 +263,8 @@ The memoization cache is frame-local."
 (powerline-reset)
 
 (defun pl/make-xpm (name color1 color2 data)
-  "Return an XPM image with NAME using COLOR1 for enabled and COLOR2 for disabled bits specified in DATA."
+  "Return an XPM image with NAME using COLOR1 and COLOR2 bits specified in DATA.
+COLOR1 signifies enabled, and COLOR2 signifies disabled."
   (when window-system
     (create-image
      (concat
@@ -296,7 +300,8 @@ static char * %s[] = {
 
 (defun pl/percent-xpm
     (height pmax pmin winend winstart width color1 color2)
-  "Generate percentage xpm of HEIGHT for PMAX to PMIN given WINEND and WINSTART with WIDTH and COLOR1 and COLOR2."
+  "Generate percentage xpm of HEIGHT for PMAX to PMIN given WINEND and WINSTART.
+Use WIDTH and COLOR1 and COLOR2."
   (let* ((height- (1- height))
          (fillstart (round (* height- (/ (float winstart) (float pmax)))))
          (fillend (round (* height- (/ (float winend) (float pmax)))))
@@ -316,7 +321,7 @@ static char * %s[] = {
 
 ;;;###autoload
 (defun powerline-hud (face1 face2 &optional width)
-  "Return an XPM of relative buffer location using FACE1 and FACE2 of optional WIDTH."
+  "Return XPM of relative buffer location using FACE1 and FACE2 of optional WIDTH."
   (unless width (setq width 2))
   (let ((color1 (if face1 (face-background face1) "None"))
         (color2 (if face2 (face-background face2) "None"))
@@ -394,7 +399,8 @@ static char * %s[] = {
 
 ;;;###autoload
 (defun powerline-raw (str &optional face pad)
-  "Render STR as mode-line data using FACE and optionally PAD import on left (l) or right (r)."
+  "Render STR as mode-line data using FACE and optionally PAD import.
+PAD can be left (`l') or right (`r')."
   (when str
     (let* ((rendered-str (format-mode-line str))
            (padded-str (concat
@@ -420,7 +426,8 @@ static char * %s[] = {
               'face face))
 
 (defun powerline-fill-center (face reserve)
-  "Return empty space using FACE to the center of remaining space leaving RESERVE space on the right."
+  "Return empty space using FACE to center of remaining space.
+Leave RESERVE space on the right."
   (unless reserve
     (setq reserve 20))
   (when powerline-text-scale-factor
