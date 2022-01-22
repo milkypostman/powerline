@@ -39,7 +39,7 @@
              (and (string-match "darwin\\([0-9]+\\)" system-configuration)
                   (match-string-no-properties 1 system-configuration)))))
        (< emacs-major-version 28))
-  "Boolean variable to determine whether to use Apple RGB colorspace to render images.
+  "If non-nil, use Apple RGB colorspace to render images.
 
 t on macOS 10.7+ and `ns-use-srgb-colorspace' is t, nil otherwise.
 
@@ -92,7 +92,7 @@ RED, GREEN and BLUE should be between 0.0 and 1.0, inclusive."
   (mapcar 'reverse pattern))
 
 (defun pl/row-pattern (fill total &optional fade)
-  "Make a list that has FILL 0s out of TOTAL 1s with FADE 2s to the right of the fill."
+  "Return list that has FILL 0s out of TOTAL 1s with FADE 2s to the right."
   (unless fade
     (setq fade 0))
   (let ((fill (min fill total))
@@ -149,12 +149,15 @@ CENTER
 SECOND-PATTERN ...
 FOOTER
 
-PATTERN and SECOND-PATTERN repeat infinitely to fill the space needed to generate a full height XPM.
+PATTERN and SECOND-PATTERN repeat infinitely to fill the space
+needed to generate a full height XPM.
 
-PATTERN, HEADER, FOOTER, SECOND-PATTERN, CENTER are of the form ((COLOR ...) (COLOR ...) ...).
+PATTERN, HEADER, FOOTER, SECOND-PATTERN, CENTER are of the
+form ((COLOR ...) (COLOR ...) ...).
 
-COLOR can be one of 0, 1, or 2, where 0 is the source color, 1 is the
-destination color, and 2 is the interpolated color between 0 and 1."
+COLOR can be one of 0, 1, or 2, where 0 is the source color, 1 is
+the destination color, and 2 is the interpolated color between 0
+and 1."
   (when (eq dir 'right)
     (setq patterns (mapcar 'pl/reverse-pattern patterns)))
   (let ((bindings-body (pl/pattern-bindings-body patterns
