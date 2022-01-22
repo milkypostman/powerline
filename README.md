@@ -1,6 +1,9 @@
 powerline
 =========
 
+***NOTE:** This project is in maintenance mode and not currently being developed or maintained. Pull requests will be reviewed and accepted but may not get 
+an immediate response. Sorry for the inconvenience.*
+
 Emacs version of the Vim powerline.
 
 This is a proposed version 2.0 of the original [Emacs Powerline](http://www.emacswiki.org/emacs/PowerLine) which is a fork of [vim-powerline](https://github.com/Lokaltog/vim-powerline).  
