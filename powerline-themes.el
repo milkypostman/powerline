@@ -40,6 +40,17 @@
   :group 'powerline
   :type 'boolean)
 
+
+(defcustom powerline-display-minor-modes t
+  "When non-nil, display minor modes in the mode-line."
+  :group 'powerline
+  :type 'boolean)
+
+(defcustom powerline-display-major-mode t
+  "When non-nil, display minor modes in the mode-line."
+  :group 'powerline
+  :type 'boolean)
+
 ;;;###autoload
 (defun powerline-default-theme ()
   "Setup the default mode-line."
@@ -71,9 +82,9 @@
                                      (funcall separator-left face0 face1)
                                      (when (and (boundp 'erc-track-minor-mode) erc-track-minor-mode)
                                        (powerline-raw erc-modified-channels-object face1 'l))
-                                     (powerline-major-mode face1 'l)
+                                     (when powerline-display-major-mode (powerline-major-mode face1 'l))
                                      (powerline-process face1)
-                                     (powerline-minor-modes face1 'l)
+                                     (when powerline-display-minor-modes (powerline-minor-modes face1 'l))
                                      (powerline-narrow face1 'l)
                                      (powerline-raw " " face1)
                                      (funcall separator-left face1 face2)
@@ -139,10 +150,10 @@
                                         (funcall separator-left face1 face2)
                                         (when (and (boundp 'erc-track-minor-mode) erc-track-minor-mode)
                                           (powerline-raw erc-modified-channels-object face2 'l))
-                                        (powerline-major-mode face2 'l)
+                                        (when powerline-display-major-mode (powerline-major-mode face2 'l))
                                         (powerline-process face2)
                                         (powerline-raw " :" face2)
-                                        (powerline-minor-modes face2 'l)
+                                        (when powerline-display-minor-modes (powerline-minor-modes face2 'l))
                                         (powerline-raw " " face2)
                                         (funcall separator-right face2 face1))))
                      (concat (powerline-render lhs)
@@ -190,7 +201,7 @@
                                                 (funcall separator-left face1 face2)
                                                 (when (and (boundp 'erc-track-minor-mode) erc-track-minor-mode)
                                                   (powerline-raw erc-modified-channels-object face2 'l))
-                                                (powerline-major-mode face2 'l)
+                                                (when powerline-display-major-mode (powerline-major-mode face2 'l))
                                                 (powerline-process face2)
                                                 (powerline-raw " " face2))
                                           (if (split-string (format-mode-line minor-mode-alist))
@@ -199,9 +210,10 @@
                                                                 (powerline-raw evil-mode-line-tag face1 'l)
                                                                 (powerline-raw " " face1)
                                                                 (funcall separator-left face1 face2)))
-                                                      (list (powerline-minor-modes face2 'l)
-                                                            (powerline-raw " " face2)
-                                                            (funcall separator-right face2 face1)))
+                                                      (if powerline-display-minor-modes
+                                                          (list (powerline-minor-modes face2 'l)
+                                                                (powerline-raw " " face2)
+                                                                (funcall separator-right face2 face1))))
                                             (list (powerline-raw evil-mode-line-tag face2)
                                                   (funcall separator-right face2 face1))))))
                      (concat (powerline-render lhs)
@@ -230,7 +242,7 @@
                                                            (cdr powerline-default-separator-dir))))
                           (lhs (list (powerline-buffer-id `(mode-line-buffer-id ,face0) 'l)
                                      (powerline-raw "[" face0 'l)
-                                     (powerline-major-mode face0)
+                                     (when powerline-display-major-mode (powerline-major-mode face0))
                                      (powerline-process face0)
                                      (powerline-raw "]" face0)
                                      (when (buffer-modified-p)
@@ -244,7 +256,7 @@
                                      (when (and (boundp 'erc-track-minor-mode) erc-track-minor-mode)
                                        (powerline-raw erc-modified-channels-object face1 'l))
                                      (powerline-raw "[" face0 'l)
-                                     (powerline-minor-modes face0)
+                                     (when powerline-display-minor-modes (powerline-minor-modes face0))
                                      (powerline-raw "%n" face0)
                                      (powerline-raw "]" face0)
                                      (when (and vc-mode buffer-file-name)
